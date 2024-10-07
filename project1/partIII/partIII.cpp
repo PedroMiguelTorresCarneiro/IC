@@ -23,7 +23,7 @@ void showMenu(const std::string& loadedImage) {
     }
     std::cout << "1. Load Image" << std::endl;
     std::cout << "2. Display image" << std::endl;
-    std::cout << "3. Save image" << std::endl;
+    std::cout << "3. Display image in grey scale" << std::endl;
     std::cout << "4. Exit" << std::endl;
     std::cout << "Enter your choice: ";
 }
@@ -111,8 +111,14 @@ int main() {
             }
             break;
 
-        case 3: // ------------------------| Save the image | not working for now
-            std::cout << "NOT WORKING...\n";
+        case 3: // ------------------------| Display the image in grey scale |
+            if (imageLoaded) {
+                std::vector<cv::Mat> channels = imageStore[loadedImage].second.second; // - Get the loaded image channels
+
+                decoder.convertToGrayscale(channels); // ------------------------------------- Convert the image to grayscale and display
+            } else {
+                std::cout << "No image loaded. Please load an image first.\n";
+            }
             break;
 
         case 4: // ------------------------| Exit |

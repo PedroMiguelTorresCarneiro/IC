@@ -70,6 +70,67 @@ std::vector<cv::Mat> ImageDecoder::splitChannels(const cv::Mat& image) {
     return channels; // ------------------------------------------------------------- Return the splited channels
 }
 
+// -----------------------------------------------------------------------------------------------------
+// ---------------------------------| Convert the image to grayscale | ---------------------------------
+// -----------------------------------------------------------------------------------------------------
+/*
+    Average method: 
+        The Average method takes the average value of R, G, and B as the grayscale value. 
+            > Grayscale = (R + G + B ) / 3
+        
+        There may be some overflow error occurred if the sum of R, G, and B is greater than 255. 
+        To avoid the exception, R, G, and B should be calculated respectively.
+            > Grayscale = R / 3 + G / 3 + B / 3
+    
+        The average method is simple but doesn’t work as well as expected. 
+        The reason is that human eyeballs react differently to RGB. 
+        Eyes are most sensitive to green light, less sensitive to red light, 
+        and the least sensitive to blue light. Therefore, 
+        the three colours should have different weights in the distribution. 
+        
+    That brings us to the weighted method. 
+    Weighted method: 
+        The Weighted Method, also called the luminosity method, 
+        weighs red, green and blue according to their wavelengths.
+        The improved formula is as follows:
+            > Grayscale = 0.299R + 0.587G + 0.114B
+
+
+ */
+void ImageDecoder::convertToGrayscale(const std::vector<cv::Mat>& channels) {
+    if (channels.size() != 3) {
+        std::cout << "Error: Expected 3 channels (B, G, R)." << std::endl;
+        return;
+    }
+
+    // Ensure all channels are of type CV_8U (unsigned 8-bit integer)
+    cv::Mat blueChannel, greenChannel, redChannel;
+    channels[0].convertTo(blueChannel, CV_8U);
+    channels[1].convertTo(greenChannel, CV_8U);
+    channels[2].convertTo(redChannel, CV_8U);
+
+    cv::Mat grayscaleImage = cv::Mat::zeros(blueChannel.size(), CV_8UC1);  // Create an empty grayscale image
+
+    for (int row = 0; row < grayscaleImage.rows; row++) {
+        for (int col = 0; col < grayscaleImage.cols; col++) {
+            uchar blue = blueChannel.at<uchar>(row, col);   // Blue channel
+            uchar green = greenChannel.at<uchar>(row, col);  // Green channel
+            uchar red = redChannel.at<uchar>(row, col);    // Red channel
+
+            // Apply the grayscale conversion formula
+            uchar gray = static_cast<uchar>(0.299 * red + 0.587 * green + 0.114 * blue);
+
+            // Set the pixel in the grayscale image
+            grayscaleImage.at<uchar>(row, col) = gray;
+        }
+    }
+
+    // Display the grayscale image
+    cv::imshow("Manual Grayscale Image", grayscaleImage);
+    cv::waitKey(0);  // Wait for a key press
+}
+
+
 // Save the image to a file
 void ImageDecoder::saveImage() {
     std::cout << "NOT WORKING...\n";

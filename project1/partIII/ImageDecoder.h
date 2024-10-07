@@ -19,6 +19,9 @@ public:
     // ----------------------------------------------- Split the image into RGB channels
     std::vector<cv::Mat> splitChannels(const cv::Mat& image);
 
+    // ----------------------------------------------- Convert the image to grayscale
+    void convertToGrayscale(const std::vector<cv::Mat>& channels);
+
     // ----------------------------------------------- Save the image
     void saveImage();
 private:
