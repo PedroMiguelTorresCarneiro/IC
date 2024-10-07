@@ -24,7 +24,8 @@ void showMenu(const std::string& loadedImage) {
     std::cout << "1. Load Image" << std::endl;
     std::cout << "2. Display image" << std::endl;
     std::cout << "3. Display image in grey scale" << std::endl;
-    std::cout << "4. Exit" << std::endl;
+    std::cout << "4. Display RBG and Grey Scale Channels" << std::endl;
+    std::cout << "5. Exit" << std::endl;
     std::cout << "Enter your choice: ";
 }
 
@@ -46,7 +47,7 @@ std::vector<std::string> listImagesInDataset(const std::string& datasetPath) {
 // ---------------------------------| Get Image Path | ---------------------------------
 // -------------------------------------------------------------------------------------
 std::string getImagePath(std::string& imageName) {
-    std::string datasetPath = "../dataset/"; // ----------------------------------------- Path to the dataset
+    std::string datasetPath = "../../../datasets/image/"; // ----------------------------------------- Path to the dataset
 
     std::vector<std::string> images = listImagesInDataset(datasetPath); // -------------- List images in the dataset
 
@@ -120,8 +121,10 @@ int main() {
                 std::cout << "No image loaded. Please load an image first.\n";
             }
             break;
+        case 4: // ------------------------| Display RBG and Grey Scale Channels |
 
-        case 4: // ------------------------| Exit |
+            break;
+        case 5: // ------------------------| Exit |
             std::cout << "Exiting the program...\n";
             break;
 

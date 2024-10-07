@@ -130,6 +130,14 @@ void ImageDecoder::convertToGrayscale(const std::vector<cv::Mat>& channels) {
     cv::waitKey(0);  // Wait for a key press
 }
 
+// -----------------------------------------------------------------------------------------------------
+// ---------------------------------| Get grayscale channels | ---------------------------------
+// -----------------------------------------------------------------------------------------------------
+std::vector<cv::Mat> ImageDecoder::getGrayscaleChannels(const std::vector<cv::Mat>& channels){
+
+
+    return {};
+}
 
 // Save the image to a file
 void ImageDecoder::saveImage() {

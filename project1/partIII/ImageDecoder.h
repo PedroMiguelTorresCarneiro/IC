@@ -22,6 +22,9 @@ public:
     // ----------------------------------------------- Convert the image to grayscale
     void convertToGrayscale(const std::vector<cv::Mat>& channels);
 
+    // ----------------------------------------------- Get grayscale channels
+    std::vector<cv::Mat> getGrayscaleChannels(const std::vector<cv::Mat>& channels);
+
     // ----------------------------------------------- Save the image
     void saveImage();
 private:
