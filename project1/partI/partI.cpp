@@ -81,7 +81,7 @@ int main() {
     bool fileLoaded = false;
     std::string loadedFile = "";
     int choice;
-    std::string datasetPath = "../dataset/pt/";
+    std::string datasetPath = "../../../datasets/text/pt/";  // Path to the dataset directory
 
     do {
         showMenu(loadedFile);  // Show the menu with the loaded file name (if any)
