@@ -57,7 +57,7 @@ int getDetails(const char* filename){
 int main()
 {  
     int option = 0;
-    const char* filename = "/home/joao/IC/IC/datasets/audio/sample01.wav";
+    const char* filename = "../../datasets/audio/sample01.wav";
     
     while(option != 3){
         std::cout<<std::endl;
