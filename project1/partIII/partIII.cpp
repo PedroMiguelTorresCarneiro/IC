@@ -1,10 +1,21 @@
-#include "ImageDecoder.cpp"  // Include the ImageDecoder class
-#include <filesystem>  // For file checking
-#include <cstring>
-#include <vector>
+#include "ImageDecoder.h"  // -------------------- Include the header, not the .cpp file
+#include <filesystem> // ------------------------- for std::filesystem
+#include <iostream> // --------------------------- for std::cout
+#include <map> // -------------------------------- for std::map
+#include <string> // ----------------------------- for std::string
+#include <vector> // ----------------------------- for std::vector
 
-namespace fs = std::filesystem;  // Shorten the namespace for convenience
+namespace fs = std::filesystem; // --------------- Namespace alias for std::filesystem
 
+// ----------------------------------------------- Dictionary-like structure to store image details (name, path, image, split channels)
+std::map<std::string, std::pair<std::string, std::pair<cv::Mat, std::vector<cv::Mat>>>> imageStore;
+// dictionary structure:
+//      imageStore["my_image"] = { "../dataset/my_image.ppm", {image, channels} };
+//
+
+// --------------------------------------------------------------------------------
+// ---------------------------------| Show Menu | ---------------------------------
+// --------------------------------------------------------------------------------
 void showMenu(const std::string& loadedImage) {
     std::cout << "\n----- IMAGE PROCESSING MENU -----" << std::endl;
     if (!loadedImage.empty()) {
@@ -17,97 +28,94 @@ void showMenu(const std::string& loadedImage) {
     std::cout << "Enter your choice: ";
 }
 
-// Function to list all images in the dataset directory
+// ---------------------------------------------------------------------------------------------
+// ---------------------------------| List Images in Dataset | ---------------------------------
+// ---------------------------------------------------------------------------------------------
 std::vector<std::string> listImagesInDataset(const std::string& datasetPath) {
     std::vector<std::string> images;
     for (const auto& entry : fs::directory_iterator(datasetPath)) {
         if (entry.path().extension() == ".ppm") {
-            images.push_back(entry.path().filename().stem());  // Only the filename without extension
+            images.push_back(entry.path().filename().stem());  // -------------------------- Add the image name to the list
         }
     }
-    return images;
+    
+    return images; // ---------------------------------------------------------------------- Return the list of images with .ppm extension
 }
 
+// -------------------------------------------------------------------------------------
+// ---------------------------------| Get Image Path | ---------------------------------
+// -------------------------------------------------------------------------------------
 std::string getImagePath(std::string& imageName) {
-    std::string datasetPath = "../dataset/";  // Adjusted relative path to dataset
+    std::string datasetPath = "../dataset/"; // ----------------------------------------- Path to the dataset
 
-    // List all images in the dataset directory
-    std::vector<std::string> images = listImagesInDataset(datasetPath);
+    std::vector<std::string> images = listImagesInDataset(datasetPath); // -------------- List images in the dataset
 
     if (images.empty()) {
         std::cout << "No images found in the dataset directory.\n";
-        return "";
+        return "";  // ------------------------------------------------------------------ Return empty string if no images found
     }
 
-    // Display a menu of available images
-    std::cout << "\nAvailable images in the dataset:\n";
+    std::cout << "\nAvailable images in the dataset:\n"; // ----------------------------- Display the list of images
     for (size_t i = 0; i < images.size(); ++i) {
         std::cout << i + 1 << ". " << images[i] << std::endl;
     }
 
     int choice;
-    std::cout << "Select an image by number: ";
-    std::cin >> choice;
+    std::cout << "Select an image by number: ";  // ------------------------------------ Ask the user to select an image from the list
+    std::cin >> choice; 
 
-    // Ensure valid input
-    if (choice < 1 || choice > images.size()) {
+    if (choice < 1 || choice > images.size()) { 
         std::cout << "Invalid selection.\n";
-        return "";
+        return "";  // ----------------------------------------------------------------- Return empty string if invalid selection
     }
 
-    // Set the selected image name (without extension)
-    imageName = images[choice - 1];
-
-    // Construct the full image path
+    imageName = images[choice - 1]; 
     std::string imagePath = datasetPath + imageName + ".ppm";
 
-    return imagePath;
+    return imagePath; // --------------------------------------------------------------- Return the path to the selected image
 }
 
 int main() {
     ImageDecoder decoder;
-    bool imageLoaded = false;
+    bool imageLoaded = false; // ------------------------------------------------------ Flag to check if an image is loaded
     int choice;
-    std::string loadedImage = "";  // To store the name of the loaded image
-    char outputFile[256];
+    std::string loadedImage = ""; // -------------------------------------------------- Name of the loaded image
 
     do {
         showMenu(loadedImage);
         std::cin >> choice;
 
         switch (choice) {
-        case 1:
-            // List and load image from the dataset directory
+        case 1: // ------------------------| Load Image |
             {
                 std::string fullPath = getImagePath(loadedImage);
-                if (!fullPath.empty()) {  // Proceed only if a valid image is selected
-                    decoder.decodeImage(fullPath.c_str());
+                if (!fullPath.empty()) {
+                    // --------------------------------------------------------------- Load and decode the image
+                    std::pair<cv::Mat, std::vector<cv::Mat>> imageAndChannels = decoder.decodeImage(fullPath.c_str());
+
+                    // --------------------------------------------------------------- Store the image and its channels in the dictionary   
+                    imageStore[loadedImage] = { fullPath, imageAndChannels };
                     imageLoaded = true;
+
+                    std::cout << "Image and channels stored successfully in the dictionary." << std::endl;
                 }
             }
             break;
 
-        case 2:
-            // Display the loaded image if available
+        case 2: // ------------------------| Display the image |
             if (imageLoaded) {
-                decoder.displayImage();
+                std::string path = imageStore[loadedImage].first; // ---------------------- Get the path to the loaded image
+                decoder.displayImage(path.c_str());  // ----------------------------------- Display the image
             } else {
                 std::cout << "No image loaded. Please load an image first.\n";
             }
             break;
 
-        case 3:
-            // Save the image if available
-            if (imageLoaded) {
-                std::cout << "Enter the path to save the image: ";
-                std::cin >> outputFile;
-                decoder.saveImage(outputFile);
-            } else {
-                std::cout << "No image loaded. Please load an image first.\n";
-            }
+        case 3: // ------------------------| Save the image | not working for now
+            std::cout << "NOT WORKING...\n";
             break;
 
-        case 4:
+        case 4: // ------------------------| Exit |
             std::cout << "Exiting the program...\n";
             break;
 
