@@ -194,6 +194,7 @@ A Gaussian blur filter uses a convoltion matrix (kernel) to smooth the image by 
 - **Convoltion Operation**: of the image with the gaussian kernel for each channel
 
 ***Convoltion**: is a mathematical operation on two functions , resultin in a third function:*
+
 $$
 (f * g)(t) = \int_{-\infty}^{\infty} f(\tau)g(t - \tau) \, d\tau \equiv (f * g)(n) = \sum_{m=-\infty}^{\infty} f(m)g(n - m)
 $$
@@ -203,14 +204,15 @@ $$
 1. **Sigma (σ) - Controls How Much Detail is Lost**: Sigma defines how much influence the neighboring pixels have when averaging a pixel's value.
     - <u>Smaller sigma values</u>: will result in a subtle blur where only nearby pixels contribute significantly to the final value, preserving more details.
     - <u>Larger sigma values</u>: will cause more pixels to contribute to the blur, making the result smoother and less detailed.
-```    
-The larger the sigma, the more blurred the image becomes(more details are lost).
+```md    
+# The larger the sigma, the more blurred the image becomes(more details are lost).
 ```
 2. **Kernel Size - Defines the Area Over Which the Blur is Applied**: Kernel size determines how large an area around each pixel is considered when applying the blur. 
     - <u>A small kernel size</u>: only considers the nearest neighbors, so the **blur is localized** and affects only a small area.
     - <u>A larger kernel size</u>: means the algorithm will look at a wider area of the image, blurring a larger region around each pixel.
-```
-The larger the kernel size, the wider the area of the image that gets blurred, causing the blur effect to spread over a larger region.
+```md
+# The larger the kernel size, the wider the area of the image that gets blurred, 
+# causing the blur effect to spread over a larger region.
 ```
 
 **CONCLUSION**
