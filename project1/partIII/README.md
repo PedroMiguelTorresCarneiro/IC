@@ -80,3 +80,11 @@ In order to be more easy to collaborating with others, as CMake will handle the 
     ```md
         - The image appears in colors because the viewer assigns each channel to th specific color and use the scale to control the intensity of each color(Red,Green,Blue)
     ```
+
+- **Grayscale Convertion**:
+    Is combining the 3 channels into a single channel representing the **light intensity** of each pixel.
+    The problem facing on this is how much each channel weights during the fusion of the channels, for this we have the following formula:
+    ```math
+    GraysFormula = 0.299 * Red + 0.587 * Green + 0.114 * Blue
+    ```
+    The weights are determined by perceptual factors that ensure the grayscale image looks natural to the human eye.
