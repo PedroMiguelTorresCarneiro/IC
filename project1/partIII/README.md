@@ -106,3 +106,36 @@ In order to be more easy to collaborating with others, as CMake will handle the 
         - Pixel (3,2): R: 121 , G: 103 , B: 49   | Gray: 102 
         - Pixel (3,3): R: 124 , G: 103 , B: 50   | Gray: 103
     ```
+
+    - **Histogram Grayscale**:
+        For the purpose of printing on the terminal the histogram have the height between [0,  32] (255/8) and for best fit on terminal only print each 8th intensity value.
+    ```md                                                                                                                          
+                                                            *                                                                          
+                                                            *                                                                          
+                                                            *                                                                          
+                                                            *                                                                          
+                                    *                       *                                                                          
+                                    *                       *                                                                          
+                                    *                       *   *                                                                      
+                                    *       *               *   *                                                                      
+                                    *       *   *           *   *   *                                                                  
+                                    *       *   *       *   *   *   *                                                                  
+                                    *       *   *       *   *   *   *                                                                  
+                                    *       *   *       *   *   *   *                                                                  
+                                    *   *   *   *   *   *   *   *   *                                                                  
+                                    *   *   *   *   *   *   *   *   *                                                                  
+                                    *   *   *   *   *   *   *   *   *                                                                  
+                                    *   *   *   *   *   *   *   *   *                                                                  
+                                *   *   *   *   *   *   *   *   *   *                                                                  
+                                *   *   *   *   *   *   *   *   *   *                                                                  
+                                *   *   *   *   *   *   *   *   *   *                                                                  
+                                *   *   *   *   *   *   *   *   *   *   *                                                              
+                                *   *   *   *   *   *   *   *   *   *   *                                                              
+                                *   *   *   *   *   *   *   *   *   *   *   *                                                          
+                                *   *   *   *   *   *   *   *   *   *   *   *           *               *   *                          
+                                *   *   *   *   *   *   *   *   *   *   *   *   *       *   *           *   *                          
+                            *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *                          
+                            *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *           *              
+                        *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *              
+        0   8  16  24  32  40  48  56  64  72  80  88  96 104 112 120 128 136 144 152 160 168 176 184 192 200 208 216 224 232 240 248 
+    ```
