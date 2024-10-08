@@ -27,11 +27,12 @@ download from the website
 In order to be more easy to collaborating with others, as CMake will handle the build configuration across differents enviroments
 
 - 2.1 : **Create a *CMakeLists.txt***
-    - find the OpenCv library installed on system;
-    - pointing automatically to the correct include;
-    - include all the OpenCv libraries
+    ```md
+        - find the OpenCv library installed on system;
+        - pointing automatically to the correct include;
+        - include all the OpenCv libraries
 
-    ```txt
+    
     cmake_minimum_required(VERSION 3.10)
     project(ImageDecoderProject)
 
