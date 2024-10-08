@@ -78,7 +78,8 @@ In order to be more easy to collaborating with others, as CMake will handle the 
 - **OpenCv Displays RGB Images**:
     To display an RGB image, *OpenCV* combines the 3 channels into a color image.
     ```md
-        - The image appears in colors because the viewer assigns each channel to th specific color and use the scale to control the intensity of each color(Red,Green,Blue)
+        - The image appears in colors because the viewer assigns each channel to the specific color 
+        and use the scale to control the intensity of each color(Red,Green,Blue)
     ```
 
 - **Grayscale Convertion**:
