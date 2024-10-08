@@ -14,16 +14,22 @@ public:
     std::pair<cv::Mat, std::vector<cv::Mat>> decodeImage(const char* filename); 
 
     // ----------------------------------------------- Display the image in a window
-    void displayImage(const char* filename);
+    void displayImage(const cv::Mat& image);
 
     // ----------------------------------------------- Split the image into RGB channels
     std::vector<cv::Mat> splitChannels(const cv::Mat& image);
 
     // ----------------------------------------------- Convert the image to grayscale
-    void convertToGrayscale(const std::vector<cv::Mat>& channels);
+    cv::Mat convertToGrayscale(const std::vector<cv::Mat>& channels);
 
-    // ----------------------------------------------- Get grayscale channels
-    std::vector<cv::Mat> getGrayscaleChannels(const std::vector<cv::Mat>& channels);
+    // ----------------------------------------------- Display the channels
+    void displayChannels(const std::vector<cv::Mat>& colorChannels, const cv::Mat& grayscaleImage);
+
+    // ----------------------------------------------- Create Grayscale Histogram
+    void createGrayscaleHistogram(const std::vector<std::vector<uchar>>& grayscaleImage);
+
+    // ----------------------------------------------- Apply Gaussian Blur to the Image
+    cv::Mat applyGaussianBlur(const cv::Mat& image, int kernelSize, double sigma);
 
     // ----------------------------------------------- Save the image
     void saveImage();

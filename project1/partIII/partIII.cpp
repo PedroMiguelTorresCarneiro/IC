@@ -25,7 +25,9 @@ void showMenu(const std::string& loadedImage) {
     std::cout << "2. Display image" << std::endl;
     std::cout << "3. Display image in grey scale" << std::endl;
     std::cout << "4. Display RBG and Grey Scale Channels" << std::endl;
-    std::cout << "5. Exit" << std::endl;
+    std::cout << "5. Histogram of grayscale" << std::endl;
+    std::cout << "6. Apply Gaussian blur filter" << std::endl;
+    std::cout << "7. Exit" << std::endl;
     std::cout << "Enter your choice: ";
 }
 
@@ -105,8 +107,8 @@ int main() {
 
         case 2: // ------------------------| Display the image |
             if (imageLoaded) {
-                std::string path = imageStore[loadedImage].first; // ---------------------- Get the path to the loaded image
-                decoder.displayImage(path.c_str());  // ----------------------------------- Display the image
+                cv::Mat image = imageStore[loadedImage].second.first; // ---------------------- Get the path to the loaded image
+                decoder.displayImage(image);  // ----------------------------------- Display the image
             } else {
                 std::cout << "No image loaded. Please load an image first.\n";
             }
@@ -114,17 +116,107 @@ int main() {
 
         case 3: // ------------------------| Display the image in grey scale |
             if (imageLoaded) {
-                std::vector<cv::Mat> channels = imageStore[loadedImage].second.second; // - Get the loaded image channels
+                // Get the stored channels from the imageStore map
+                std::vector<cv::Mat> channels = imageStore[loadedImage].second.second;
 
-                decoder.convertToGrayscale(channels); // ------------------------------------- Convert the image to grayscale and display
+                // Convert the channels to grayscale and get the grayscale image
+                cv::Mat grayscaleImage = decoder.convertToGrayscale(channels);
+                std::cout << "Grayscale image generated successfully." << std::endl;
+
+                // Display the grayscale image using the updated displayImage function
+                if (!grayscaleImage.empty()) {
+                    decoder.displayImage(grayscaleImage);  // Pass the cv::Mat grayscale image
+                } else {
+                    std::cout << "Error: Could not generate the grayscale image." << std::endl;
+                }
             } else {
                 std::cout << "No image loaded. Please load an image first.\n";
             }
             break;
         case 4: // ------------------------| Display RBG and Grey Scale Channels |
+            if (imageLoaded) {
+                // Get the stored color channels and grayscale image
+                std::vector<cv::Mat> channels = imageStore[loadedImage].second.second;
+                cv::Mat grayscaleImage = decoder.convertToGrayscale(channels);
 
+                // Call the function to display the channels in the terminal
+                decoder.displayChannels(channels, grayscaleImage);
+            } else {
+                std::cout << "No image loaded. Please load an image first.\n";
+            }
             break;
-        case 5: // ------------------------| Exit |
+        case 5: // ------------------------| Histogram of grayscale |
+            if (imageLoaded) {
+                // Get the grayscale image from the stored channels
+                cv::Mat grayscaleImage = decoder.convertToGrayscale(imageStore[loadedImage].second.second);
+
+                // Create a 2D vector to store the grayscale image data
+                std::vector<std::vector<uchar>> grayscaleData(grayscaleImage.rows, std::vector<uchar>(grayscaleImage.cols));
+
+                // Fill the 2D vector with pixel data from the grayscale image
+                for (int row = 0; row < grayscaleImage.rows; ++row) {
+                    for (int col = 0; col < grayscaleImage.cols; ++col) {
+                        grayscaleData[row][col] = grayscaleImage.at<uchar>(row, col);
+                    }
+                }
+
+                // Call the createGrayscaleHistogram function with the grayscale data
+                decoder.createGrayscaleHistogram(grayscaleData);
+            } else {
+                std::cout << "No image loaded. Please load an image first.\n";
+            }
+            break;
+        case 6: // ------------------------| Apply Gaussian Blur |
+            if (imageLoaded) {
+                int kernelSize;
+                int blurType;
+
+                // Ask the user for the kernel size
+                std::cout << "Enter the kernel size (odd number, e.g., 3, 5, 7): ";
+                std::cin >> kernelSize;
+
+                // Ensure the kernel size is an odd number
+                if (kernelSize % 2 == 0) {
+                    std::cout << "Invalid kernel size. Must be an odd number.\n";
+                    break;
+                }
+
+                // Ask the user for the blur type
+                std::cout << "Choose the type of blur:\n";
+                std::cout << "1. Soft blur (sigma = 0.5)\n";
+                std::cout << "2. Moderate blur (sigma = 1.0)\n";
+                std::cout << "3. Strong blur (sigma = 2.0)\n";
+                std::cout << "Enter your choice (1, 2, or 3): ";
+                std::cin >> blurType;
+
+                // Translate the choice into a sigma value
+                double sigma;
+                switch (blurType) {
+                    case 1:
+                        sigma = 0.5;  // Soft blur
+                        break;
+                    case 2:
+                        sigma = 1.0;  // Moderate blur
+                        break;
+                    case 3:
+                        sigma = 2.0;  // Strong blur
+                        break;
+                    default:
+                        std::cout << "Invalid blur type selected.\n";
+                        break;
+                }
+
+                // Apply the Gaussian blur to the loaded image
+                cv::Mat blurredImage = decoder.applyGaussianBlur(imageStore[loadedImage].second.first, kernelSize, sigma);
+
+                // Display the blurred image
+                decoder.displayImage(blurredImage);
+            } else {
+                std::cout << "No image loaded. Please load an image first.\n";
+            }
+            break;
+
+        case 7: // ------------------------| Exit |
             std::cout << "Exiting the program...\n";
             break;
 
@@ -132,7 +224,7 @@ int main() {
             std::cout << "Invalid option. Please try again.\n";
         }
 
-    } while (choice != 4);
+    } while (choice != 7);
 
     return 0;
 }
