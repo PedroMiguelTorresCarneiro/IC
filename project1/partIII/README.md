@@ -51,11 +51,11 @@ In order to be more easy to collaborating with others, as CMake will handle the 
 
 - 2.2 : **Build and Run**
     ```bash
-    mkdir build
-    cd build
-    cmake ..
-    make
-    ./ImageDecoder
+        mkdir build
+        cd build
+        cmake ..
+        make
+        ./ImageDecoder
     ```
 
 
@@ -90,3 +90,25 @@ In order to be more easy to collaborating with others, as CMake will handle the 
     GraysFormula = 0.299 * Red + 0.587 * Green + 0.114 * Blue
     ```
     The weights are determined by perceptual factors that ensure the grayscale image looks natural to the human eye.
+    - Table with pixel channels ( **RGB | Grayscale**)
+    ```md
+        - Pixel (0,0): R: 95  , G: 90  , B: 39   | Gray: 85  
+        - Pixel (0,1): R: 98  , G: 90  , B: 41   | Gray: 86  
+        - Pixel (0,2): R: 99  , G: 90  , B: 42   | Gray: 87  
+        - Pixel (0,3): R: 105 , G: 94  , B: 45   | Gray: 91  
+        - Pixel (0,4): R: 108 , G: 96  , B: 46   | Gray: 93  
+        - Pixel (1,0): R: 116 , G: 103 , B: 52   | Gray: 101 
+        - Pixel (1,1): R: 119 , G: 105 , B: 56   | Gray: 103 
+        - Pixel (1,2): R: 120 , G: 106 , B: 57   | Gray: 104 
+        - Pixel (1,3): R: 122 , G: 105 , B: 57   | Gray: 104 
+        - Pixel (1,4): R: 124 , G: 106 , B: 56   | Gray: 105 
+        - Pixel (2,0): R: 121 , G: 103 , B: 49   | Gray: 102 
+        - Pixel (2,1): R: 121 , G: 102 , B: 51   | Gray: 101 
+        - Pixel (2,2): R: 120 , G: 101 , B: 50   | Gray: 100 
+        - Pixel (2,3): R: 125 , G: 106 , B: 54   | Gray: 105 
+        - Pixel (2,4): R: 124 , G: 106 , B: 51   | Gray: 105 
+        - Pixel (3,0): R: 118 , G: 99  , B: 45   | Gray: 98  
+        - Pixel (3,1): R: 120 , G: 102 , B: 47   | Gray: 101 
+        - Pixel (3,2): R: 121 , G: 103 , B: 49   | Gray: 102 
+        - Pixel (3,3): R: 124 , G: 103 , B: 50   | Gray: 103
+    ```
