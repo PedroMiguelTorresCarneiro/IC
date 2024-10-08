@@ -4,24 +4,16 @@
 
 ### **1º** OpenCv instalation
 
----
-- macOs:
-```
-brew install opencv
-```
----
-- linux:
-```
-sudo apt-get install libopencv-dev
-```
----
-- win:
-```
-download from the website
-```
+```md
+# macOs:
+    brew install opencv
 
----
+# linux:
+    sudo apt-get install libopencv-dev
 
+# win:
+    download from the website
+```
 
 ### **2º** SetUp enviroment
 In order to be more easy to collaborating with others, as CMake will handle the build configuration across differents enviroments
@@ -59,6 +51,8 @@ In order to be more easy to collaborating with others, as CMake will handle the 
     ```
 
 
+---
+---
 ### NOTES:
 
 - **BGR (Blue,Green, Red)** :
