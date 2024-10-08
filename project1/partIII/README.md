@@ -37,25 +37,14 @@ In order to be more easy to collaborating with others, as CMake will handle the 
 
     set(CMAKE_CXX_STANDARD 17)
 
-    # Check if std::filesystem requires linking with stdc++fs
-    if (APPLE OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-        find_library(STD_FS_LIBRARY stdc++fs)
-        if (STD_FS_LIBRARY)
-            message(STATUS "Linking with stdc++fs")
-            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lstdc++fs")
-        endif()
-    endif()
-
     # Find OpenCV package
     find_package(OpenCV REQUIRED)
 
     # Include OpenCV directories
     include_directories(${OpenCV_INCLUDE_DIRS})
 
-    # Add the executable
+    # Add the executable and link libraries
     add_executable(ImageDecoder partIII.cpp ImageDecoder.cpp)
-
-    # Link OpenCV libraries
     target_link_libraries(ImageDecoder ${OpenCV_LIBS})
     ```
 
@@ -69,3 +58,25 @@ In order to be more easy to collaborating with others, as CMake will handle the 
     ```
 
 
+### NOTES:
+
+- **BGR (Blue,Green, Red)** :
+    when you load an image using *OpenCV’s* ***cv::imread()***, the pixel data is stored in **BGR** order, with the Blue component first, followed by Green and then Red.
+    ```md
+        - pixel[0] = Blue
+        - pixel[1] = Green
+        - pixel[2] = Red
+    ```
+- **RGB Channels and Grayscale Appearance**:
+    Each channel contains intensity values for thar specific color (0 to 255).
+    When displayed alone these single-channel matrices as an image, it appears **grayscale** because on a intensity scale:
+    ```md
+        - 0     : means no intensity (BLACK) 
+        - 255   : full intensity (WHITE)
+    ```
+    
+- **OpenCv Displays RGB Images**:
+    To display an RGB image, *OpenCV* combines the 3 channels into a color image.
+    ```md
+        - The image appears in colors because the viewer assigns each channel to th specific color and use the scale to control the intensity of each color(Red,Green,Blue)
+    ```
