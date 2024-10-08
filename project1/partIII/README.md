@@ -205,7 +205,7 @@ $$
     - <u>Smaller sigma values</u>: will result in a subtle blur where only nearby pixels contribute significantly to the final value, preserving more details.
     - <u>Larger sigma values</u>: will cause more pixels to contribute to the blur, making the result smoother and less detailed.
 ```md    
-    - The larger the sigma, the more blurred the image becomes(more details are lost).
+    The larger the sigma, the more blurred the image becomes(more details are lost).
 ```
 2. **Kernel Size - Defines the Area Over Which the Blur is Applied**: Kernel size determines how large an area around each pixel is considered when applying the blur. 
     - <u>A small kernel size</u>: only considers the nearest neighbors, so the **blur is localized** and affects only a small area.
