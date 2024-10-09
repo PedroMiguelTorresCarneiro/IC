@@ -84,9 +84,11 @@ To display an RGB image, *OpenCV* combines the 3 channels into a color image.
 ### **Grayscale Convertion**
 Is combining the 3 channels into a single channel representing the **light intensity** of each pixel.
 The problem facing on this is how much each channel weights during the fusion of the channels, for this we have the following formula:
+
 $$
 GraysFormula = 0.299 * Red + 0.587 * Green + 0.114 * Blue
 $$
+
 
 The weights are determined by perceptual factors that ensure the grayscale image looks natural to the human eye.
 - Table with pixel channels ( **RGB | Grayscale**)
