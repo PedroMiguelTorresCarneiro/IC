@@ -222,8 +222,10 @@ $$
 ---
 
 ###  **MSE and PNSR** 
+```md    
     - MSE   : Mean Squared Error
     - PSMR  : Peak Signal-to-Noise Ratio
+```
 
 1. **MSE quantify the difference between two images** - mesuring the *average* squared difference between corresponding pixels in two images:
     - <u>Lower MSE</u> =  **higher** similarity (less diffences)
