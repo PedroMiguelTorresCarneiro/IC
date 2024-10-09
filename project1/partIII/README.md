@@ -220,3 +220,22 @@ $$
 - **KERNEL**: Defines the region of influence (larger kernel means the blur affects a wider area around each pixel).
 
 ---
+
+###  **MSE and PNSR** 
+    - MSE   : Mean Squared Error
+    - PSMR  : Peak Signal-to-Noise Ratio
+
+1. **MSE quantify the difference between two images** - mesuring the *average* squared difference between corresponding pixels in two images:
+    - <u>Lower MSE</u> =  **higher** similarity (less diffences)
+    - <u>Higher MSE</u> = **lower** similarity (more differences)
+
+2. **PSNR (dB) quantify the quality of a reconstructed/compressed image** - mesuring the ratio between the maximum possible value and the noise ( difference between two images):
+    - <u>Lower PSNR</u> = images have significant differences(more noise/distortions)
+    - <u>Higher PSNR</u> = images are more similar(less noise/distortions)
+
+<br>
+
+**CONCLUSION**
+- **MSE** and **PSNR** complement each other. 
+- They are used together in image processing to quantify differences and the level of distortion in images
+---
