@@ -30,8 +30,8 @@ Using Cmake to garantee that all colaborators have correct builds
 | | Compute and display the Mean Squared Error (MSE) and Peak Signal-to-Noise Ratio (PSNR) between the two images | *DONE* |
 | | Display the difference image to visually observe where the differences are | *DONE* |
 | **T6** | | **0%** |
-| | Implement the quantization function on grayscale images | *...* |
-| | Experiment with different numbers of quantization levels | *...* |
-| | Compare the original image with the quantized one using MSE and PSNR to evaluate the quality | *...* |
+| | Implement the quantization function on grayscale images | *DONE* |
+| | Experiment with different numbers of quantization levels | *DONE* |
+| | Compare the original image with the quantized one using MSE and PSNR to evaluate the quality | *DONE* |
 
 
