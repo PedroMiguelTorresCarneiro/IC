@@ -27,7 +27,10 @@ void showMenu(const std::string& loadedImage) {
     std::cout << "4. Display RBG and Grey Scale Channels" << std::endl;
     std::cout << "5. Histogram of grayscale" << std::endl;
     std::cout << "6. Apply Gaussian blur filter" << std::endl;
-    std::cout << "7. Exit" << std::endl;
+    std::cout << "7. Calculate the absolute difference between boat.ppm and girl.ppm and display the resulting image" << std::endl;
+    std::cout << "8. Calculate the Mean Squared Error (MSE) and Peak Signal-to-Noise Ratio (PSNR) between boat.ppm and girl.ppm" << std::endl;
+    std::cout << "9. Quantization of the image boat.ppm and after dysplay the quantized image" << std::endl;
+    std::cout << "10. Exit" << std::endl;
     std::cout << "Enter your choice: ";
 }
 
@@ -189,6 +192,7 @@ int main() {
                 std::cout << "Enter your choice (1, 2, or 3): ";
                 std::cin >> blurType;
 
+
                 // Translate the choice into a sigma value
                 double sigma;
                 switch (blurType) {
@@ -215,8 +219,108 @@ int main() {
                 std::cout << "No image loaded. Please load an image first.\n";
             }
             break;
+        case 7: // ------------------------| Calculate absolute difference between boat.ppm and girl.ppm |
+            {
+                std::string boatImagePath = "../../../datasets/image/boat.ppm"; // Path to boat image
+                std::string girlImagePath = "../../../datasets/image/girl.ppm"; // Path to girl image
 
-        case 7: // ------------------------| Exit |
+                // Load the boat image
+                cv::Mat boatImage = cv::imread(boatImagePath);
+                if (boatImage.empty()) {
+                    std::cout << "Error: Could not open or find the boat image!" << std::endl;
+                    break;
+                }
+
+                // Load the girl image
+                cv::Mat girlImage = cv::imread(girlImagePath);
+                if (girlImage.empty()) {
+                    std::cout << "Error: Could not open or find the girl image!" << std::endl;
+                    break;
+                }
+
+                // Calculate the absolute difference between the two images
+                cv::Mat differenceImage = decoder.calculateAbsoluteDifference(boatImage, girlImage);
+
+                if (differenceImage.empty()) {
+                    std::cout << "Error: Could not calculate the difference (image size or type mismatch)." << std::endl;
+                    break;
+                }
+
+                // Display the resulting image (absolute difference)
+                decoder.displayImage(differenceImage);
+            }
+            break;
+        case 8: // ------------------------| Calculate MSE and PSNR between boat.ppm and girl.ppm |
+            {
+                std::string boatImagePath = "../../../datasets/image/boat.ppm"; // Path to boat image
+                std::string girlImagePath = "../../../datasets/image/girl.ppm"; // Path to girl image
+
+                // Load the boat image
+                cv::Mat boatImage = cv::imread(boatImagePath);
+                if (boatImage.empty()) {
+                    std::cout << "Error: Could not open or find the boat image!" << std::endl;
+                    break;
+                }
+
+                // Load the girl image
+                cv::Mat girlImage = cv::imread(girlImagePath);
+                if (girlImage.empty()) {
+                    std::cout << "Error: Could not open or find the girl image!" << std::endl;
+                    break;
+                }
+
+                // Calculate the Mean Squared Error (MSE)
+                double mse = decoder.calculateMSE(boatImage, girlImage);
+                if (mse >= 0.0) {
+                    std::cout << "\n > Mean Squared Error (MSE): " << mse << std::endl;
+                }
+
+                // Calculate the Peak Signal-to-Noise Ratio (PSNR)
+                double psnr = decoder.calculatePSNR(boatImage, girlImage);
+                if (psnr >= 0.0) {
+                    std::cout << "\n > Peak Signal-to-Noise Ratio (PSNR): " << psnr << " dB" << std::endl;
+                }
+            }
+            break;
+        case 9: // ------------------------| Image Quantization and Comparison |
+            {
+                // Ask user for quantization level
+                int quantizationLevels;
+                std::cout << "Enter the number of quantization levels (2 to 256): ";
+                std::cin >> quantizationLevels;
+
+                // Ensure valid input
+                if (quantizationLevels < 2 || quantizationLevels > 256) {
+                    std::cout << "Invalid quantization level. Please enter a value between 2 and 256." << std::endl;
+                    break;
+                }
+
+                // Load the original image (boat.ppm)
+                std::string boatImagePath = "../../../datasets/image/boat.ppm"; // Path to boat image
+                cv::Mat boatImage = cv::imread(boatImagePath);
+
+                if (boatImage.empty()) {
+                    std::cout << "Error: Could not open the boat image!" << std::endl;
+                    break;
+                }
+
+                // Apply image quantization
+                cv::Mat quantizedImage = decoder.imageQuantization(boatImage, quantizationLevels);
+
+                // Display the quantized image
+                decoder.displayImage(quantizedImage);
+
+                // Compare the original image with the quantized image
+                double mse = decoder.calculateMSE(boatImage, quantizedImage);
+                double psnr = decoder.calculatePSNR(boatImage, quantizedImage);
+
+                // Display MSE and PSNR
+                std::cout << "\nComparison of Original vs Quantized Image:" << std::endl;
+                std::cout << "> Mean Squared Error (MSE): " << mse << std::endl;
+                std::cout << "> Peak Signal-to-Noise Ratio (PSNR): " << psnr << " dB" << std::endl;
+            }
+            break;
+        case 10: // ------------------------| Exit |
             std::cout << "Exiting the program...\n";
             break;
 
@@ -224,7 +328,7 @@ int main() {
             std::cout << "Invalid option. Please try again.\n";
         }
 
-    } while (choice != 7);
+    } while (choice != 10);
 
     return 0;
 }

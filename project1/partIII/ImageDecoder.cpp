@@ -288,6 +288,181 @@ cv::Mat ImageDecoder::applyGaussianBlur(const cv::Mat& image, int kernelSize, do
     return blurredImage;  // Return the blurred image
 }
 
+// ------------------------------------------------------------------------------------------------
+// ---------------------------------| Calculate Absolute Difference | ----------------------------
+// ------------------------------------------------------------------------------------------------
+/*
+    Steps to Manually Calculate the Absolute Difference between Two Images:
+        1 - Check if the input images have the same size and type.
+        2 - Create a new matrix to store the result.
+        3 - Iterate through each pixel.
+        4 - Calculate the absolute difference for each channel (B, G, R).
+        5 - Return the image with the calculated differences.
+*/
+cv::Mat ImageDecoder::calculateAbsoluteDifference(const cv::Mat& image1, const cv::Mat& image2) {
+    // Check if the input images have the same size and type
+    if (image1.size() != image2.size() || image1.type() != image2.type()) {
+        std::cout << "Error: Images must have the same size and type." << std::endl;
+        return cv::Mat();
+    }
+
+    // Create a Mat to store the result
+    cv::Mat differenceImage = cv::Mat::zeros(image1.size(), image1.type());
+
+    // Iterate through each pixel and calculate the absolute difference
+    for (int row = 0; row < image1.rows; ++row) {
+        for (int col = 0; col < image1.cols; ++col) {
+            if (image1.channels() == 3) { // For color images (BGR)
+                cv::Vec3b pixel1 = image1.at<cv::Vec3b>(row, col);
+                cv::Vec3b pixel2 = image2.at<cv::Vec3b>(row, col);
+
+                // Calculate absolute difference for each channel
+                cv::Vec3b diffPixel;
+                diffPixel[0] = std::abs(pixel1[0] - pixel2[0]); // Blue channel
+                diffPixel[1] = std::abs(pixel1[1] - pixel2[1]); // Green channel
+                diffPixel[2] = std::abs(pixel1[2] - pixel2[2]); // Red channel
+
+                differenceImage.at<cv::Vec3b>(row, col) = diffPixel;
+            } else if (image1.channels() == 1) { // For grayscale images
+                uchar pixel1 = image1.at<uchar>(row, col);
+                uchar pixel2 = image2.at<uchar>(row, col);
+
+                // Calculate absolute difference for grayscale
+                uchar diffPixel = std::abs(pixel1 - pixel2);
+
+                differenceImage.at<uchar>(row, col) = diffPixel;
+            }
+        }
+    }
+
+    return differenceImage; // Return the image with the calculated differences
+}
+
+// ------------------------------------------------------------------------------------------------
+// ---------------------------------| Calculate Mean Squared Error (MSE) | ------------------------
+// ------------------------------------------------------------------------------------------------
+/*
+    Steps to Manually Calculate the Mean Squared Error (MSE) between Two Images:
+        1 - Check if the input images have the same size and type.
+        2 - Initialize the sum of squared differences.
+        3 - Iterate through each pixel.
+        4 - Calculate the squared difference for each channel (B, G, R).
+        --------------------------------------------------------------------- Already done in the [calculateAbsoluteDifference]
+        5 - Divide by the total number of pixels and channels.
+        6 - Return the MSE value.
+*/
+double ImageDecoder::calculateMSE(const cv::Mat& image1, const cv::Mat& image2) {
+    // Calculate the absolute difference
+    cv::Mat absoluteDifference = calculateAbsoluteDifference(image1, image2);
+
+    // Initialize the sum of squared differences
+    double mse = 0.0;
+
+    // Calculate the sum of squared differences for each pixel
+    for (int row = 0; row < absoluteDifference.rows; ++row) {
+        for (int col = 0; col < absoluteDifference.cols; ++col) {
+            cv::Vec3b diff = absoluteDifference.at<cv::Vec3b>(row, col);
+
+            // Sum up the squared differences for each channel
+            for (int channel = 0; channel < 3; ++channel) {
+                mse += static_cast<double>(diff[channel] * diff[channel]);
+            }
+        }
+    }
+
+    // Divide by the total number of pixels and channels
+    mse /= (absoluteDifference.total() * absoluteDifference.channels());
+
+    return mse;
+}
+
+// ------------------------------------------------------------------------------------------------
+// ---------------------------------| Calculate Peak Signal-to-Noise Ratio (PSNR) | ---------------
+// ------------------------------------------------------------------------------------------------
+/*
+    Steps to Manually Calculate the Peak Signal-to-Noise Ratio (PSNR) between Two Images:
+        1 - Calculate the Mean Squared Error (MSE) between the images.
+        --------------------------------------------------------------------- Already done in the [calculateMSE]
+        2 - Check if the MSE is 0 or negative (PSNR is undefined or infinite).
+        3 - Calculate the PSNR using the formula:
+            PSNR = 10 * log10((255^2) / MSE)
+        4 - Return the PSNR value.
+*/
+double ImageDecoder::calculatePSNR(const cv::Mat& image1, const cv::Mat& image2) {
+    double mse = calculateMSE(image1, image2);
+    if (mse <= 0.0) {
+        return -1.0;  // If MSE is 0 or negative, PSNR is undefined or infinite
+    }
+
+    double psnr = 10.0 * std::log10((255.0 * 255.0) / mse);
+    return psnr;
+}
+
+
+// ------------------------------------------------------------------------------------------------
+// ---------------------------------| Image Quantization | ----------------------------------------
+// ------------------------------------------------------------------------------------------------
+/*
+    Steps to Manually Quantize an Image:
+        1 - Check if the input image is valid.
+        2 - Check if the number of quantization levels is within the range [2, 256].
+        3 - Apply quantization to the image based on the number of levels.
+        4 - For grayscale images, quantize the intensity values directly.
+        5 - For color images, quantize each channel separately.
+        6 - Return the quantized image.
+*/
+cv::Mat ImageDecoder::imageQuantization(const cv::Mat& image, int quantizationLevels) {
+    if (image.empty()) {
+        std::cout << "Error: Image is empty!" << std::endl;
+        return cv::Mat();  // Return an empty image if the input is invalid
+    }
+
+    if (quantizationLevels < 2 || quantizationLevels > 256) {
+        std::cout << "Error: Number of quantization levels must be between 2 and 256!" << std::endl;
+        return cv::Mat();  // Return an empty image if invalid quantization level
+    }
+
+    cv::Mat quantizedImage;
+
+    if (image.channels() == 1) {
+        // The image is grayscale, so apply quantization directly
+        quantizedImage = cv::Mat::zeros(image.size(), image.type());
+
+        int stepSize = 256 / quantizationLevels;
+        
+        for (int row = 0; row < image.rows; ++row) {
+            for (int col = 0; col < image.cols; ++col) {
+                uchar pixelValue = image.at<uchar>(row, col);
+                uchar quantizedValue = (pixelValue / stepSize) * stepSize;
+                quantizedImage.at<uchar>(row, col) = quantizedValue;
+            }
+        }
+    } else if (image.channels() == 3) {
+        // The image is color, so apply quantization to each channel
+        std::vector<cv::Mat> channels(3);
+        cv::split(image, channels);  // Split the image into 3 BGR channels
+
+        int stepSize = 256 / quantizationLevels;
+
+        for (int i = 0; i < 3; ++i) {
+            for (int row = 0; row < channels[i].rows; ++row) {
+                for (int col = 0; col < channels[i].cols; ++col) {
+                    uchar pixelValue = channels[i].at<uchar>(row, col);
+                    uchar quantizedValue = (pixelValue / stepSize) * stepSize;
+                    channels[i].at<uchar>(row, col) = quantizedValue;
+                }
+            }
+        }
+
+        cv::merge(channels, quantizedImage);  // Merge the quantized channels back into a color image
+    } else {
+        std::cout << "Error: Unsupported number of channels in the image!" << std::endl;
+        return cv::Mat();  // Return an empty image if unsupported channel count
+    }
+
+    return quantizedImage;  // Return the quantized image
+}
+
 
 
 // Save the image to a file

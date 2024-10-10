@@ -31,10 +31,23 @@ public:
     // ----------------------------------------------- Apply Gaussian Blur to the Image
     cv::Mat applyGaussianBlur(const cv::Mat& image, int kernelSize, double sigma);
 
+    // ----------------------------------------------- Calculate Absolute Difference
+    cv::Mat calculateAbsoluteDifference(const cv::Mat& image1, const cv::Mat& image2);
+
+    // ----------------------------------------------- Calculate MSE (Mean Squared Error)
+    double calculateMSE(const cv::Mat& image1, const cv::Mat& image2);
+
+    // ----------------------------------------------- Calculate PSNR (Peak Signal-to-Noise Ratio)
+    double calculatePSNR(const cv::Mat& image1, const cv::Mat& image2);
+
+    // ----------------------------------------------- Image Quantization
+    cv::Mat imageQuantization(const cv::Mat& image, int quantizationLevels);
+
     // ----------------------------------------------- Save the image
     void saveImage();
 private:
 
 };
+
 
 #endif
