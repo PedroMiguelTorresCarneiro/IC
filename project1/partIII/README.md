@@ -238,9 +238,9 @@ $$
 
         ### Mathematical formula of MSE
 
-        $
-        \text{MSE} = \frac{\sum \text{s}}{\text{p} \times \text{c}}
-        $
+$$
+\text{MSE} = \frac{\sum \text{s}}{\text{p} \times \text{c}}
+$$
         
             - s , square difference
             - p , total nº of pixels
