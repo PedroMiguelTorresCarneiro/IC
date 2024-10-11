@@ -1,6 +1,7 @@
 #include <iostream>
 #include "TextFileReader.h"
 
+
 void showMenu() {
     std::cout << "\n----- TEXT FILE PROCESSING MENU -----" << std::endl;
     std::cout << "1. Load a Text File <pre-chosen for test purposes>" << std::endl;

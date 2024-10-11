@@ -2,6 +2,7 @@
 
 ---
 # PROJECT 1 : Part I
+## author : Inês Águia
 
 ***WORKING README ...***
 

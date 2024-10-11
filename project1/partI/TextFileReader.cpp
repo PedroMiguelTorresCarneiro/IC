@@ -7,6 +7,7 @@
 #include <cctype>     // For std::tolower, std::ispunct
 #include <filesystem>
 
+
 bool TextFileReader::loadFile(const std::string& filePath, std::string& loadedFileName) {
     std::ifstream inputFile(filePath);
     if (!inputFile.is_open()) {
