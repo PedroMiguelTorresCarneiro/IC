@@ -383,19 +383,22 @@ double ImageDecoder::calculateMSE(const cv::Mat& image1, const cv::Mat& image2) 
     Steps to Manually Calculate the Peak Signal-to-Noise Ratio (PSNR) between Two Images:
         1 - Calculate the Mean Squared Error (MSE) between the images.
         --------------------------------------------------------------------- Already done in the [calculateMSE]
-        2 - Check if the MSE is 0 or negative (PSNR is undefined or infinite).
+        2 - Check if the MSE is 0 or negative:
+            - MSE == 0: The images are identical, and PSNR is infinite.
+            - MSE < 0: PSNR is undefined, because MSE cannot be negative.
         3 - Calculate the PSNR using the formula:
             PSNR = 10 * log10((255^2) / MSE)
         4 - Return the PSNR value.
 */
 double ImageDecoder::calculatePSNR(const cv::Mat& image1, const cv::Mat& image2) {
     double mse = calculateMSE(image1, image2);
-    if (mse <= 0.0) {
-        return -1.0;  // If MSE is 0 or negative, PSNR is undefined or infinite
+    if (mse <= 0.0) { // ------------------------------------------------------------ Check if the MSE is 0 or negative
+        std::cout << "Error: MSE is 0 or negative!" << std::endl;
+        return -1.0; // ------------------------------------------------------------- Return -1 if MSE is 0 or negative, to indicate an error
     }
 
-    double psnr = 10.0 * std::log10((255.0 * 255.0) / mse);
-    return psnr;
+    double psnr = 10.0 * std::log10((255.0 * 255.0) / mse); // ---------------------- Calculate the PSNR using the MATH FORMULA
+    return psnr; // ----------------------------------------------------------------- Return the PSNR value
 }
 
 

@@ -240,6 +240,11 @@ $$
     - <u>Lower PSNR</u> = images have significant differences(more noise/distortions)
     - <u>Higher PSNR</u> = images are more similar(less noise/distortions)
 
+        ### Mathematical formula of PSNR
+        $$
+        \text{PSNR} = 10 \times \log_{10} \left( \frac{255^2}{\text{MSE}} \right)
+        $$
+
 <br>
 
 **CONCLUSION**
