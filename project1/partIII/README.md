@@ -253,27 +253,55 @@ $$
 ```
 This processe reduce the number of bits to represent each pixel, compressing the image. However, quantization inherently introduces some loss of information, which can affect image quality.
 
-| **Type of Image**   | **Pixel Representation** | **Quantization process** |
-|---------------------|--------------------------|--------------------------|
-| **Grayscale Image**  | **Single** intensity value  *[0 to 256]* `8 bits` | **Quantization involves reducing the number of intensity levels** Reducing *256 levels* `8-bit image` *16 levels* `4-bit image`, this results, visually, in fewer distinct shades of gray |
-| **RGB Image**        | **Three** intensity values: ***R*** `8 bits`, ***G*** `8 bits`, ***B*** `8 bits` | **Quantizing an RGB image requires reducing the intensity levels for each channel (R, G, B)** |
-
-#### - QUANTIZATION LEVELS:
-- Refers to the number of diferent intensity values that a pixel can take after quantization.
-    
-    |Gray scale | RGB |
-    |-----------|-----|
-    | how may gray shades | how many colors can be represented |
-
-**Mathematical Formula for Quantization**
+### **Mathematical Formula for Quantization**
 
 $$
 Q(x) = \text{round} \left( \frac{x - \text{min}}{\text{max} - \text{min}} \times (L - 1) \right)
 $$
 
+    - x , pixel value.
+    - min and max , minimum and maximum possible pixel values 
+    - L , nº of quantization levels.
+in our case:
 
-|
-### T6 : Compare the original image with the quantized one using MSE and PSNR to evaluate the quality.
+$$
+Q(x) = \text{round} \left( \frac{x \times (L - 1) }{\text{255}}  \right)
+$$
+
+
+- ***Grayscale Image***:
+    - **Pixel representation**: 
+        - Single intensity value [*0 to 256*] `8 bits`.
+    - **Quantization process**: 
+        - Reducing the number of intensity levels. 
+            - ***EXAMPLE:*** reducing 256 levels `8-bit image` to 16 levels `4-bit image`, results in fewer distinct shades of gray.
+- ***RGB Image***:
+    - **Pixel representation**: 
+        - Three intensity values: **R** `8 bits`, **G** `8 bits`, **B** `8 bits`.
+    - **Quantization process**: 
+        - Reducing the intensity levels for each channel (R, G, B).
+        
+<br>
+
+#### - <u>QUANTIZATION LEVELS</u>:
+- Refers to the number of diferent intensity values that a pixel can take after quantization.
+    
+    - *Grayscale* : how many gray shades 
+    - *RGB* : how may colors can be represented    
+<br>
+
+- **Effects of Quantization Levels on Image**:
+    - **Detail loss:**
+        - <u>higher levels</u>: retain most of the detail
+        - <u>lower levels</u>: significant detail loss
+    - **Compression:**
+        - <u>higher levels</u>: weak compression
+        - <u>lower levels</u>: strong compression
+
+    `As you can see above, compression and detail loss are inversely related`
+<br>
+
+### Comparing the original image with the quantized one using MSE and PSNR to evaluate the quality.
 Comparing the original image with the quantized one using ***MSE*** and ***PSNR*** show us how much image quantization affects the visual quality of the image. 
 
 - **Using the results ( quantization level : 2 , image : boat.ppm)**
