@@ -345,36 +345,51 @@ cv::Mat ImageDecoder::calculateAbsoluteDifference(const cv::Mat& image1, const c
     Steps to Manually Calculate the Mean Squared Error (MSE) between Two Images:
         1 - Check if the input images have the same size and type.
         2 - Initialize the sum of squared differences.
-        3 - Iterate through each pixel.
+        3 - Get the absolute difference matrix between the images.
         4 - Calculate the squared difference for each channel (B, G, R).
         --------------------------------------------------------------------- Already done in the [calculateAbsoluteDifference]
         5 - Divide by the total number of pixels and channels.
         6 - Return the MSE value.
 */
 double ImageDecoder::calculateMSE(const cv::Mat& image1, const cv::Mat& image2) {
-    // Calculate the absolute difference
-    cv::Mat absoluteDifference = calculateAbsoluteDifference(image1, image2);
-
-    // Initialize the sum of squared differences
-    double mse = 0.0;
-
-    // Calculate the sum of squared differences for each pixel
-    for (int row = 0; row < absoluteDifference.rows; ++row) {
-        for (int col = 0; col < absoluteDifference.cols; ++col) {
-            cv::Vec3b diff = absoluteDifference.at<cv::Vec3b>(row, col);
-
-            // Sum up the squared differences for each channel
-            for (int channel = 0; channel < 3; ++channel) {
-                mse += static_cast<double>(diff[channel] * diff[channel]);
-            }
-        }
+    // ------------------------------------------------------------------------------ Check if the input images have the same size and type
+    if (image1.size() != image2.size() || image1.type() != image2.type()) {
+        std::cout << "Error: Images must have the same size and type to calculate MSE." << std::endl;
+        return -1.0;
     }
 
-    // Divide by the total number of pixels and channels
-    mse /= (absoluteDifference.total() * absoluteDifference.channels());
+    cv::Mat absoluteDifference = calculateAbsoluteDifference(image1, image2); // ---- Calculate the absolute difference matrix
 
-    return mse;
+    double mse = 0.0; // ------------------------------------------------------------ Initialize MSE
+
+    if (absoluteDifference.channels() == 1) { // ------------------------------------ Check for GRAYSCALE image
+        // Grayscale image
+        for (int row = 0; row < absoluteDifference.rows; ++row) {
+            for (int col = 0; col < absoluteDifference.cols; ++col) {
+                uchar diff = absoluteDifference.at<uchar>(row, col); // ------------- Get the pixel value
+                mse += static_cast<double>(diff * diff); // ------------------------- Calculate the squared difference
+            }
+        }
+    } else if (absoluteDifference.channels() == 3) { // ----------------------------- Check for RGB image
+        // Color image
+        for (int row = 0; row < absoluteDifference.rows; ++row) {
+            for (int col = 0; col < absoluteDifference.cols; ++col) {
+                cv::Vec3b diff = absoluteDifference.at<cv::Vec3b>(row, col); // ----- Get the pixel value
+                for (int channel = 0; channel < 3; ++channel) { // ------------------ Iterate over each channel
+                    mse += static_cast<double>(diff[channel] * diff[channel]); // --- Calculate the squared difference
+                }
+            }
+        }
+    } else {
+        std::cout << "Unsupported number of channels!" << std::endl;
+        return -1.0;
+    }
+
+    mse /= (absoluteDifference.total() * absoluteDifference.channels()); // --------- Divide by the total number of pixels and channels
+
+    return mse; // ------------------------------------------------------------------ Return the MSE value
 }
+
 
 // ------------------------------------------------------------------------------------------------
 // ---------------------------------| Calculate Peak Signal-to-Noise Ratio (PSNR) | ---------------
