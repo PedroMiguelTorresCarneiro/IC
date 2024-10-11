@@ -236,11 +236,22 @@ $$
     - <u>Lower MSE</u> =  **higher** similarity (less diffences)
     - <u>Higher MSE</u> = **lower** similarity (more differences)
 
+        ### Mathematical formula of MSE
+
+        $$
+        \text{MSE} = \frac{\sum \text{s}}{\text{p} \times \text{c}}
+        $$
+        
+            - s , square difference
+            - p , total nº of pixels
+            - c , number of channels  
+         
 2. **PSNR (dB) quantify the quality of a reconstructed/compressed image** - mesuring the ratio between the maximum possible value and the noise ( difference between two images):
     - <u>Lower PSNR</u> = images have significant differences(more noise/distortions)
     - <u>Higher PSNR</u> = images are more similar(less noise/distortions)
 
         ### Mathematical formula of PSNR
+
         $$
         \text{PSNR} = 10 \times \log_{10} \left( \frac{255^2}{\text{MSE}} \right)
         $$
