@@ -412,56 +412,66 @@ double ImageDecoder::calculatePSNR(const cv::Mat& image1, const cv::Mat& image2)
         6 - Return the quantized image.
 */
 cv::Mat ImageDecoder::imageQuantization(const cv::Mat& image, int quantizationLevels) {
-    if (image.empty()) {
+    if (image.empty()) { // --------------------------------------------------------- Check if the input image is valid
         std::cout << "Error: Image is empty!" << std::endl;
-        return cv::Mat();  // Return an empty image if the input is invalid
+        return cv::Mat(); // -------------------------------------------------------- Return an empty image
     }
 
-    if (quantizationLevels < 2 || quantizationLevels > 256) {
+    if (quantizationLevels < 2 || quantizationLevels > 256) { // -------------------- Assert quantization range of values
         std::cout << "Error: Number of quantization levels must be between 2 and 256!" << std::endl;
-        return cv::Mat();  // Return an empty image if invalid quantization level
+        return cv::Mat();  // ------------------------------------------------------- Return an empty image
     }
 
-    cv::Mat quantizedImage;
+    cv::Mat quantizedImage; // ------------------------------------------------------ Create a new Mat for the quantized image
 
-    if (image.channels() == 1) {
-        // The image is grayscale, so apply quantization directly
-        quantizedImage = cv::Mat::zeros(image.size(), image.type());
+    if (image.channels() == 1) { // ------------------------------------------------- Check for GRAYSCALE image
+        quantizedImage = cv::Mat::zeros(image.size(), image.type()); // ------------- Create an empty image for quantization
 
-        int stepSize = 256 / quantizationLevels;
-        
         for (int row = 0; row < image.rows; ++row) {
             for (int col = 0; col < image.cols; ++col) {
                 uchar pixelValue = image.at<uchar>(row, col);
-                uchar quantizedValue = (pixelValue / stepSize) * stepSize;
+                
+                // ------------------------------------------------------------------ Apply quantization directly from the MATH FORMULA
+                /*
+                    WE can apply quantization scalling it back to get the image more visually correct
+                    using this we reduce the values for example for 4 but scalling them to de sclae 0 to 255 
+                    in order to maintaint the color for example , and only reduce the number 
+                    of variants of thar color pixel
+
+                    DIRECT QUANTIZATION: 
+                        - best aprouch to reduce the size of the image/ compressing.
+                */
+                uchar quantizedValue = std::round((pixelValue / 255.0) * (quantizationLevels - 1));
+                
                 quantizedImage.at<uchar>(row, col) = quantizedValue;
             }
         }
-    } else if (image.channels() == 3) {
-        // The image is color, so apply quantization to each channel
-        std::vector<cv::Mat> channels(3);
-        cv::split(image, channels);  // Split the image into 3 BGR channels
+    } else if (image.channels() == 3) { // ------------------------------------------ Check for RGB image
+        std::vector<cv::Mat> channels(3); // ---------------------------------------- Create a vector for the 3 channels
+        cv::split(image, channels);  // --------------------------------------------- Split the image into 3 BGR channels
 
-        int stepSize = 256 / quantizationLevels;
-
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i) { // -------------------------------------------- Iterate over each channel
             for (int row = 0; row < channels[i].rows; ++row) {
-                for (int col = 0; col < channels[i].cols; ++col) {
+                for (int col = 0; col < channels[i].cols; ++col) { 
                     uchar pixelValue = channels[i].at<uchar>(row, col);
-                    uchar quantizedValue = (pixelValue / stepSize) * stepSize;
-                    channels[i].at<uchar>(row, col) = quantizedValue;
+
+                    // -------------------------------------------------------------- Apply quantization directly from the MATH FORMULA
+                    uchar quantizedValue = std::round((pixelValue / 255.0) * (quantizationLevels - 1));
+
+                    channels[i].at<uchar>(row, col) = quantizedValue; // ------------ Assign the quantized value to the channel
                 }
             }
         }
 
-        cv::merge(channels, quantizedImage);  // Merge the quantized channels back into a color image
+        cv::merge(channels, quantizedImage); // ------------------------------------- Merge the quantized channels back into an image
     } else {
         std::cout << "Error: Unsupported number of channels in the image!" << std::endl;
-        return cv::Mat();  // Return an empty image if unsupported channel count
+        return cv::Mat();  // ------------------------------------------------------- Return an empty image
     }
 
-    return quantizedImage;  // Return the quantized image
+    return quantizedImage; // ------------------------------------------------------- Return the quantized image
 }
+
 
 
 
