@@ -34,7 +34,8 @@ https://www.overleaf.com/read/tcnskvzsppcm#b658fb
 | **Additional Resources**| | **0%** |
 | | **Text Preprocessing Concepts:** Refer to resources on NLP (Natural Language Processing) for more advanced text manipulation techniques|  |
 
-
+---
+---
 
 ### PART III : Image Data Processing
 Using Cmake to garantee that all colaborators have correct builds
