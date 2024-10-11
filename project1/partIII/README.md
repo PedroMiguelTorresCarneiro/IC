@@ -238,9 +238,9 @@ $$
 
         ### Mathematical formula of MSE
 
-        $$
+        $
         \text{MSE} = \frac{\sum \text{s}}{\text{p} \times \text{c}}
-        $$
+        $
         
             - s , square difference
             - p , total nº of pixels
@@ -252,9 +252,9 @@ $$
 
         ### Mathematical formula of PSNR
 
-        $$
+        $
         \text{PSNR} = 10 \times \log_{10} \left( \frac{255^2}{\text{MSE}} \right)
-        $$
+        $
 
 <br>
 
