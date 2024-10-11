@@ -295,48 +295,57 @@ cv::Mat ImageDecoder::applyGaussianBlur(const cv::Mat& image, int kernelSize, do
     Steps to Manually Calculate the Absolute Difference between Two Images:
         1 - Check if the input images have the same size and type.
         2 - Create a new matrix to store the result.
-        3 - Iterate through each pixel.
-        4 - Calculate the absolute difference for each channel (B, G, R).
+        3 - Check if the images are grayscale or RGB.
+        4 - Calculate the absolute difference for each pixel.
         5 - Return the image with the calculated differences.
 */
 cv::Mat ImageDecoder::calculateAbsoluteDifference(const cv::Mat& image1, const cv::Mat& image2) {
-    // Check if the input images have the same size and type
-    if (image1.size() != image2.size() || image1.type() != image2.type()) {
-        std::cout << "Error: Images must have the same size and type." << std::endl;
+    if (image1.size() != image2.size()) { // ----------------------------------------- Check if the input images have the same size
+        std::cout << "Error: Images must have the same size." << std::endl;
         return cv::Mat();
     }
 
-    // Create a Mat to store the result
-    cv::Mat differenceImage = cv::Mat::zeros(image1.size(), image1.type());
-
-    // Iterate through each pixel and calculate the absolute difference
-    for (int row = 0; row < image1.rows; ++row) {
-        for (int col = 0; col < image1.cols; ++col) {
-            if (image1.channels() == 3) { // For color images (BGR)
-                cv::Vec3b pixel1 = image1.at<cv::Vec3b>(row, col);
-                cv::Vec3b pixel2 = image2.at<cv::Vec3b>(row, col);
-
-                // Calculate absolute difference for each channel
-                cv::Vec3b diffPixel;
-                diffPixel[0] = std::abs(pixel1[0] - pixel2[0]); // Blue channel
-                diffPixel[1] = std::abs(pixel1[1] - pixel2[1]); // Green channel
-                diffPixel[2] = std::abs(pixel1[2] - pixel2[2]); // Red channel
-
-                differenceImage.at<cv::Vec3b>(row, col) = diffPixel;
-            } else if (image1.channels() == 1) { // For grayscale images
-                uchar pixel1 = image1.at<uchar>(row, col);
-                uchar pixel2 = image2.at<uchar>(row, col);
-
-                // Calculate absolute difference for grayscale
-                uchar diffPixel = std::abs(pixel1 - pixel2);
-
-                differenceImage.at<uchar>(row, col) = diffPixel;
-            }
-        }
+    if (image1.type() != image2.type()) { // ----------------------------------------- Check if the input images have the same type
+        std::cout << "Error: Images must have the same type." << std::endl;
+        return cv::Mat();
     }
 
-    return differenceImage; // Return the image with the calculated differences
+    cv::Mat differenceImage = cv::Mat::zeros(image1.size(), image1.type()); // ------- Create a new matrix to store the result
+
+    if (image1.channels() == 1) { // ------------------------------------------------- Check for GRAYSCALE image
+        for (int row = 0; row < image1.rows; ++row) {
+            for (int col = 0; col < image1.cols; ++col) {
+                uchar pixel1 = image1.at<uchar>(row, col); // ------------------------- Get the pixel value image1
+                uchar pixel2 = image2.at<uchar>(row, col); // ------------------------- Get the pixel value image2
+
+                uchar diffPixel = std::abs(pixel1 - pixel2); // ----------------------- Calculate the absolute difference
+                differenceImage.at<uchar>(row, col) = diffPixel; // ------------------- Assign the difference to the new image
+            }
+        }
+    } 
+    else if (image1.channels() == 3) { // -------------------------------------------- Check for RGB image
+        for (int row = 0; row < image1.rows; ++row) {
+            for (int col = 0; col < image1.cols; ++col) {
+                cv::Vec3b pixel1 = image1.at<cv::Vec3b>(row, col); // ---------------- Get the pixel vector image1 (B, G, R)
+                cv::Vec3b pixel2 = image2.at<cv::Vec3b>(row, col); // ---------------- Get the pixel vector image2 (B, G, R)
+
+                cv::Vec3b diffPixel; // ---------------------------------------------- Create a new pixel vector for the differences
+                diffPixel[0] = std::abs(pixel1[0] - pixel2[0]); // ------------------- Calculate the absolute difference : BLUE channel
+                diffPixel[1] = std::abs(pixel1[1] - pixel2[1]); // ------------------- Calculate the absolute difference : GREEN channel
+                diffPixel[2] = std::abs(pixel1[2] - pixel2[2]); // ------------------- Calculate the absolute difference : RED channel
+
+                differenceImage.at<cv::Vec3b>(row, col) = diffPixel; // -------------- Assign the difference vector to the new image
+            }
+        }
+    } 
+    else {
+        std::cout << "Error: Unsupported number of channels in the image!" << std::endl;
+        return cv::Mat();
+    }
+
+    return differenceImage; // ------------------------------------------------------ Return the image with the calculated differences
 }
+
 
 // ------------------------------------------------------------------------------------------------
 // ---------------------------------| Calculate Mean Squared Error (MSE) | ------------------------
@@ -355,7 +364,7 @@ double ImageDecoder::calculateMSE(const cv::Mat& image1, const cv::Mat& image2) 
     // ------------------------------------------------------------------------------ Check if the input images have the same size and type
     if (image1.size() != image2.size() || image1.type() != image2.type()) {
         std::cout << "Error: Images must have the same size and type to calculate MSE." << std::endl;
-        return -1.0;
+        return -1.0; // ------------------------------------------------------------- Return -1 ERROR
     }
 
     cv::Mat absoluteDifference = calculateAbsoluteDifference(image1, image2); // ---- Calculate the absolute difference matrix
@@ -363,7 +372,6 @@ double ImageDecoder::calculateMSE(const cv::Mat& image1, const cv::Mat& image2) 
     double mse = 0.0; // ------------------------------------------------------------ Initialize MSE
 
     if (absoluteDifference.channels() == 1) { // ------------------------------------ Check for GRAYSCALE image
-        // Grayscale image
         for (int row = 0; row < absoluteDifference.rows; ++row) {
             for (int col = 0; col < absoluteDifference.cols; ++col) {
                 uchar diff = absoluteDifference.at<uchar>(row, col); // ------------- Get the pixel value
@@ -371,7 +379,6 @@ double ImageDecoder::calculateMSE(const cv::Mat& image1, const cv::Mat& image2) 
             }
         }
     } else if (absoluteDifference.channels() == 3) { // ----------------------------- Check for RGB image
-        // Color image
         for (int row = 0; row < absoluteDifference.rows; ++row) {
             for (int col = 0; col < absoluteDifference.cols; ++col) {
                 cv::Vec3b diff = absoluteDifference.at<cv::Vec3b>(row, col); // ----- Get the pixel value

@@ -225,7 +225,29 @@ $$
 - **KERNEL**: Defines the region of influence (larger kernel means the blur affects a wider area around each pixel).
 
 ---
+### **MATRIX OF ABSOLUTE DIFFERENCE**
+The matrix of absolute differences between two images is a pixel-by-pixel comparison that helps quantify how much two images differ from each other.
+        
+$$
+D(i,j) = |A(i,j) - B(i,j)|
+$$
 
+    - (i,j) , position of the pixel
+    - A(i,j) and B(i,j) , intensity values (or color channels)
+
+
+Tipically used to see how much a image changed :
+- after a compression, 
+- temporal images, 
+- user resgistration align images
+
+<br>
+
+Visual interpretation :
+- <u>Brighter areas</u> : suggests **significant differences**
+- <u>Darker areas</u> : suggests **similarities**
+
+---
 ###  **MSE and PNSR** 
 ```md    
     - MSE   : Mean Squared Error
