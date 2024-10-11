@@ -17,8 +17,7 @@ https://www.overleaf.com/read/tcnskvzsppcm#b658fb
 | | Print the content to check if it has been read correctly | *Done* |
 | **T2**| | **100%** |
 | | **Converting to lowercase:** This ensures that case differences don’t affect the word counts | *Done* |
-| | **Removing punctuation:** Punctuation marks are typically ignored when calculating word
-frequencies | *Done* |
+| | **Removing punctuation:** Punctuation marks are typically ignored when calculating word frequencies | *Done* |
 | **T3**| | **75%** |
 | | Iterate through the text and count how many times each character appears| *Done* |
 | | Store the content in a suitable data structure | *Done* |
