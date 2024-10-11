@@ -5,13 +5,6 @@
 #include <list>
 #include <map>
 
-/**
- * TextFileReader class for handling the loading and displaying of text file content.
- * 
- * This class provides methods to load the contents of a text file into memory and to display
- * the contents. The loaded file contents are stored in a `std::map`, where the key is the file name
- * and the value is a `std::list<std::string>` representing each line of the file.
- */
 class TextFileReader {
 private:
     /**
@@ -21,31 +14,15 @@ private:
     std::map<std::string, std::list<std::string>> fileContents;  // Store loaded file content
 
 public:
-    /**
-     * Method to load the content of a specific file.
-     * Reads the file line by line and stores the content in memory.
-     * 
-     * @param filePath The full path to the file to be loaded.
-     * @param fileName The name of the file to be used as the key in the map.
-     * @return Returns `true` if the file was successfully loaded, `false` otherwise.
-     */
-    bool loadFile(const std::string& filePath, const std::string& fileName);
-
-    /**
-     * Method to print the content of a loaded file.
-     * If the file has been loaded into memory, it prints the content line by line.
-     * 
-     * @param fileName The name of the file whose content is to be printed.
-     */
+    bool loadFile(const std::string& filePath,std::string& loadedFileName);
     void printFileContent(const std::string& fileName);
-
-    /**
-     * Method to check if a file has been loaded.
-     * 
-     * @param fileName The name of the file to check.
-     * @return Returns `true` if the file has been loaded, `false` otherwise.
-     */
     bool isFileLoaded(const std::string& fileName);
+    void convertToLowercase(const std::string& fileName);
+    void removePunctuation(const std::string& fileName);
+    void calculateCharsFrequency(const std::string& fileName);
+    void calculateWordsFrequency(const std::string& fileName);
+    void calculateNgramsFrequency(const std::string& fileName, int n);
+    std::vector<std::string> tokenize(const std::string& line);
 };
 
 #endif  // TEXTFILEREADER_H

@@ -1,123 +1,98 @@
 #include <iostream>
-#include <filesystem>
-#include <vector>
 #include "TextFileReader.h"
 
-namespace fs = std::filesystem;
-
-/**
- * Function to list all available text files in the specified directory and
- * return them as a vector of strings sorted by name.
- *
- * @param datasetPath The path to the dataset directory where the text files are stored.
- * @return A vector of strings containing the filenames of the text files sorted alphabetically.
- */
-std::vector<std::string> listTextFilesInDataset(const std::string& datasetPath) {
-    std::vector<std::string> textFiles;
-    
-    // Iterate through the directory and add all .txt files to the vector
-    for (const auto& entry : fs::directory_iterator(datasetPath)) {
-        if (entry.path().extension() == ".txt") {
-            textFiles.push_back(entry.path().filename().string());  // Store the filename with extension
-        }
-    }
-
-    // Sort the file names in alphabetical order
-    std::sort(textFiles.begin(), textFiles.end());
-
-    return textFiles;
-}
-
-/**
- * Function to display the available text files and allow the user to select one.
- *
- * @param textFiles A vector containing the sorted filenames of the text files.
- * @return The name of the file selected by the user, or an empty string if no valid file is selected.
- */
-void showMenu(const std::string& loadedFile) {
+void showMenu() {
     std::cout << "\n----- TEXT FILE PROCESSING MENU -----" << std::endl;
-    if (!loadedFile.empty()) {
-        std::cout << "\n----| LOADED File : " << loadedFile << "|----\n" << std::endl;
-    }
-    std::cout << "1. Load a Text File" << std::endl;
-    std::cout << "2. Display Loaded Text File Content" << std::endl;
-    std::cout << "3. Exit" << std::endl;
+    std::cout << "1. Load a Text File <pre-chosen for test purposes>" << std::endl;
+    std::cout << "2. Display Loaded Text File Content <pre-chosen>" << std::endl;
+    std::cout << "3. Converting to lowercase <pre-chosen>" << std::endl;
+    std::cout << "4. Removing Punctuation <pre-chosen>" << std::endl;
+    std::cout << "5. Calculate the chars frequencies  <pre-chosen> " << std::endl;
+    std::cout << "6. Calculate the words frequencies <pre-chosen> " << std::endl;
+    std::cout << "7. Calculate the frequency of n-grams (bigrams == 2, trigrams == 3)" << std::endl;
+    std::cout << "8. Exit" << std::endl;
     std::cout << "Enter your choice: ";
-}
-
-/**
- * Function to display the available text files and allow the user to select one.
- *
- * @param textFiles A vector containing the sorted filenames of the text files.
- * @return The name of the file selected by the user, or an empty string if no valid file is selected.
- */
-std::string chooseFileToLoad(const std::vector<std::string>& textFiles) {
-    if (textFiles.empty()) {
-        std::cout << "No text files found in the dataset directory.\n";
-        return "";
-    }
-
-    // Display available text files
-    std::cout << "\nAvailable text files:\n";
-    for (size_t i = 0; i < textFiles.size(); ++i) {
-        std::cout << i + 1 << ". " << textFiles[i] << std::endl;
-    }
-
-    int choice;
-    std::cout << "Select a file by number to load: ";
-    std::cin >> choice;
-
-    if (choice < 1 || choice > textFiles.size()) {
-        std::cout << "Invalid selection.\n";
-        return "";
-    }
-
-    return textFiles[choice - 1];  // Return the filename
 }
 
 int main() {
     TextFileReader reader;
-    std::vector<std::string> textFiles;
-    bool fileLoaded = false;
-    std::string loadedFile = "";
+    std::string filePath = "../../../datasets/text/pt/ep-11-06-22-011.txt";
+    std::string loadedFileName;
     int choice;
-    std::string datasetPath = "../../../datasets/text/pt/";  // Path to the dataset directory
+    bool fileLoaded = false;
 
     do {
-        showMenu(loadedFile);  // Show the menu with the loaded file name (if any)
+        showMenu(); // Show the menu
         std::cin >> choice;
 
         switch (choice) {
             case 1:
-                // List available files and allow the user to select one to load
-                textFiles = listTextFilesInDataset(datasetPath);  // List and sort the files
-                if (textFiles.empty()) {
-                    std::cout << "No text files available in the directory.\n";
+                // Load the pre-defined file
+                if (reader.loadFile(filePath, loadedFileName)) {
+                    fileLoaded = true;
+                    std::cout << "\nFile loaded successfully!\n";
                 } else {
-                    std::string fileToLoad = chooseFileToLoad(textFiles);  // Let the user choose from the sorted list
-                    if (!fileToLoad.empty()) {
-                        std::string fullPath = datasetPath + fileToLoad;  // Full path to the file
-                        if (reader.loadFile(fullPath, fileToLoad)) {
-                            loadedFile = fileToLoad;  // Store the loaded file name
-                            fileLoaded = true;
-                            std::cout << "File loaded successfully: " << loadedFile << "\n";
-                        } else {
-                            std::cout << "Error loading file.\n";
-                        }
-                    }
+                    std::cerr << "\nFailed to load file.\n";
                 }
                 break;
 
             case 2:
                 // Display the loaded file content
                 if (fileLoaded) {
-                    reader.printFileContent(loadedFile);  // Display the content of the loaded file
+                    reader.printFileContent(loadedFileName); // Use the correct file name
                 } else {
-                    std::cout << "No file loaded. Please load a file first.\n";
+                    std::cout << "\nNo file loaded. Please load a file first.\n";
                 }
                 break;
-
             case 3:
+                // Convert the loaded file content to lowercase
+                if (fileLoaded) {
+                    reader.convertToLowercase(loadedFileName); // Use the correct file name
+                    std::cout << "\nFile content converted to lowercase successfully!\n";
+                    reader.printFileContent(loadedFileName); // Use the correct file name
+                } else {
+                    std::cout << "\nNo file loaded. Please load a file first.\n";
+                }
+                break;
+            case 4:
+                // Remove punctuation from the loaded file content
+                if (fileLoaded) {
+                    reader.removePunctuation(loadedFileName); // Use the correct file name
+                    std::cout << "\nPunctuation removed successfully!\n";
+                    reader.printFileContent(loadedFileName); // Use the correct file name
+                } else {
+                    std::cout << "\nNo file loaded. Please load a file first.\n";
+                }
+                break;
+            case 5:
+                // Calculate the frequency of characters in the loaded file content
+                if (fileLoaded) {
+                    reader.calculateCharsFrequency(loadedFileName); // Use the correct file name
+                } else {
+                    std::cout << "\nNo file loaded. Please load a file first.\n";
+                }
+                break;
+            case 6:
+                // Calculate the frequency of words in the loaded file content
+                if (fileLoaded) {
+                    reader.calculateWordsFrequency(loadedFileName); // Use the correct file name
+                } else {
+                    std::cout << "\nNo file loaded. Please load a file first.\n";
+                }
+                break;
+            case 7:
+                // Calculate the frequency of n-grams in the loaded file content
+                if (fileLoaded) {
+                    int n;
+                    std::cout << "Enter the value of n for n-grams: ";
+                    std::cin >> n;
+                    reader.calculateNgramsFrequency(loadedFileName, n); // Use the correct file name
+                } else {
+                    std::cout << "\nNo file loaded. Please load a file first.\n";
+                }
+               
+                break;
+            case 8:
                 std::cout << "Exiting the program...\n";
                 break;
 
@@ -125,8 +100,7 @@ int main() {
                 std::cout << "Invalid option. Please try again.\n";
                 break;
         }
-
-    } while (choice != 3);
+    } while (choice != 8);
 
     return 0;
 }
