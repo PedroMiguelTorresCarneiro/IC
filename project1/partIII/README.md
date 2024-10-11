@@ -1,6 +1,9 @@
 # IC - Information and Coding (2024/25)
+
 ---
-# PROJECT 1 : Part III
+# PROJECT 1 : Part III 
+<p style="text-align: right;"><strong>Author:</strong> Pedro Carneiro</p>
+
 
 ### **1º** OpenCv instalation
 
@@ -85,8 +88,10 @@ To display an RGB image, *OpenCV* combines the 3 channels into a color image.
 Is combining the 3 channels into a single channel representing the **light intensity** of each pixel.
 The problem facing on this is how much each channel weights during the fusion of the channels, for this we have the following formula:
 
+### Mathematical formula 
+
 $$
-GraysFormula = 0.299 * Red + 0.587 * Green + 0.114 * Blue
+G(x) = 0.299 * Red + 0.587 * Green + 0.114 * Blue
 $$
 
 
@@ -118,7 +123,7 @@ The weights are determined by perceptual factors that ensure the grayscale image
 ### **Histogram Grayscale**
 For the purpose of printing on the terminal the histogram have the height between [0,  32] (255/8) and for best fit on terminal only print each 8th intensity value.
 
-```md 
+```plaintext 
 MONARCH.PPM                                                                                                                         
                                                     *                                                                          
                                                     *                                                                          
@@ -152,7 +157,7 @@ MONARCH.PPM
 **High Concentration in Midtones(120-180)**: This suggests that much of the image is composed of midtones (not too dark or too bright), giving it a balanced contrast. Not having neither much withes neither blacks !
 
     
-```md 
+```plaintext 
 AIRPLANE.PPM                                                                                                                         
                                                                                                         *                      
                                                                                                         *                      
@@ -342,12 +347,14 @@ $$
 ### Comparing the original image with the quantized one using MSE and PSNR to evaluate the quality.
 Comparing the original image with the quantized one using ***MSE*** and ***PSNR*** show us how much image quantization affects the visual quality of the image. 
 
-- **Using the results ( quantization level : 2 , image : boat.ppm)**
-    | stats | results |
-    |-------|---------|
-    | MSE | 4753.62 |
-    |PSNR | 11.3606 dB|
+| stats | Quantization Lvl = 2 | Quantization Lvl = 150 | Quantization Lvl = 230 | 
+|-------|---------|---------|---------|
+| **MSE** | 19680.2 | 3431.54 | 206.671 |
+| **PSNR** | 5.19051 dB | 12.7759 dB | 24.978 dB |
 
-    We can see by the value of the MSE that images are significally different, so many pixels have changed. PSNR in this case show us a degradation of pixel quality that we can interpret as lost of detail.
+- At a `quantization level of 2`, the <u>MSE is significantly high</u> (19680.2), indicating a substantial difference from the original image, with many pixels changing drastically. Correspondingly, the <u>PSNR is low</u> (5.19 dB), reflecting a notable loss of detail and image degradation. 
+- As the `quantization levels increase (150 and 230)` the <u>MSE decreases</u>, indicating fewer differences between the quantized and original images. The <u>PSNR values rise</u>, showing a clearer and more accurate image with less noticeable degradation.
 
-    This results are in coerence with the quantization level choosed, 
+> This coherence between quantization levels and error metrics demonstrates that as the number of quantization levels increases, more details are preserved, and the image quality improves.
+
+---
