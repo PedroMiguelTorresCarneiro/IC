@@ -6,6 +6,36 @@
 ## Report:
 https://www.overleaf.com/read/tcnskvzsppcm#b658fb
 
+### PART I : Text Data Manipulation
+
+| Task | Description | Status |
+|------|-------------|--------|
+| **T1**| | **100%** |
+| | Open and read a text file line by line or as a stream of characters | *Done* |
+| | Store the content in a suitable data structure | *Done* |
+| | Make sure the file opens successfully, and handle any errors | *Done* |
+| | Print the content to check if it has been read correctly | *Done* |
+| **T2**| | **100%** |
+| | **Converting to lowercase:** This ensures that case differences don’t affect the word counts | *Done* |
+| | **Removing punctuation:** Punctuation marks are typically ignored when calculating word
+frequencies | *Done* |
+| **T3**| | **75%** |
+| | Iterate through the text and count how many times each character appears| *Done* |
+| | Store the content in a suitable data structure | *Done* |
+| | Print out the character frequencies | *Done* |
+| | Although not mandatory, you can use a plotting library to visualize the frequencies |  |
+| **T4**| | **75%** |
+| | Tokenize the text into words using whitespace as the delimiter| *Done* |
+| | Store the word counts | *Done* |
+| | Print out the character frequencies | *Done* |
+| | Although not mandatory, you can use a plotting library to visualize the frequencies |  |
+| **Further Extensions**| | **50%** |
+| | You can add functionality to handle different encodings (e.g., UTF-8) if working with non-ASCII characters|  |
+| | Consider calculating the frequency of n-grams (bigrams, trigrams) for a more complex analysis. | *Done* |
+| **Additional Resources**| | **0%** |
+| | **Text Preprocessing Concepts:** Refer to resources on NLP (Natural Language Processing) for more advanced text manipulation techniques|  |
+
+
 
 ### PART III : Image Data Processing
 Using Cmake to garantee that all colaborators have correct builds
