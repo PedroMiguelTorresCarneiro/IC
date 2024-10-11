@@ -253,8 +253,7 @@ $$
         ### Mathematical formula of PSNR
 
         ```math
-        \text{PSNR} = 10 \times \log_{10} \left( \frac{255^2}{\text{MSE}} \right)
-    
+            \text{PSNR} = 10 \times \log_{10} \left( \frac{255^2}{\text{MSE}} \right)
         ```
 
 <br>
