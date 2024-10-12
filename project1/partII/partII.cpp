@@ -43,7 +43,8 @@ int main()
         std::cout << "2 - Play the audio file"<<std::endl;
         std::cout << "3 - Get details from audio file"<<std::endl;
         std::cout << "4 - Show file waveform"<<std::endl;
-        std::cout << "5 - Quit"<<std::endl;
+        std::cout << "5 - Show histogram of amplitudes"<<std::endl;
+        std::cout << "6 - Quit"<<std::endl;
         std::cout<<"-----------------------------------------------"<<std::endl;
         std::cin >> option;
 
@@ -59,7 +60,11 @@ int main()
                 break;
             case 4:
                 plotWaveform(filename);
+                break;
             case 5:
+                histogram(filename);
+                break;
+            case 6:
                 std::cout<< "Bye Bye!"<<std::endl;
                 break;
             default:

@@ -6,7 +6,8 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 
-using namespace std;
+
+//using namespace std;
 
 //-----------------------------PLAY THE AUDIO FILE-----------------------------------------
 int playAudio(string filename) {
@@ -116,4 +117,50 @@ int plotWaveform(string filename){
     }
 
     return 0;
+}
+
+//---------------------------------SHOW THE HISTOGRAM----------------------------------------
+int histogram(string filename){
+    sf::SoundBuffer buffer;
+    if (!buffer.loadFromFile(filename))
+    {
+        std::cerr << "Error loading sound file" << std::endl;
+        return -1;
+    }
+
+    const sf::Int16* samples = buffer.getSamples();
+    std::size_t sampleCount = buffer.getSampleCount();
+
+
+    int binCount = 30; //number of bins, could be changed
+    int amplMax = 32767;
+    int amplMin = -32768;
+    std::vector<int> bins(binCount, 0); //range of the bins
+    int binSize = (amplMax - amplMin)/binCount;
+
+    for (std::size_t i=0; i<sampleCount; i++){
+        //haven't differentiated between L and R channels, need to get on that
+        int binIndex = (samples[i] - amplMin)/binSize; 
+
+        //ensure that the bin is withing the specified range
+        if(binIndex<0){
+            binIndex = 0;
+        }else if(binIndex >= binCount){
+            binIndex = binCount - 1;
+        }
+
+        bins[binIndex]++;
+    }
+
+    int binMaxCount = *std::max_element(bins.begin(), bins.end());
+
+    //print the histogram
+
+    for(int i = 0; i<binCount; ++i){
+        int binMin = amplMin + i * binSize;
+        int binMax = binMin + binSize;
+
+        std::cout<<"["<<binMin<<" to "<<binMax<<"] : ";
+        std::cout << " (" << bins[i] << ")\n";
+    }
 }

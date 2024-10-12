@@ -8,5 +8,5 @@ using namespace std;
 int playAudio(string filename);
 int getDetails(string filename);
 int plotWaveform(string filename);
-
+int histogram(string filename);
 #endif
