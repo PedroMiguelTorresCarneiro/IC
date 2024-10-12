@@ -27,5 +27,5 @@
     cd build
     cmake ..
     make
-    ./partI
+    ./TextDecoder
     ```
