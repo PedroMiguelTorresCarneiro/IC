@@ -58,6 +58,63 @@ In order to be more easy to collaborating with others, as CMake will handle the 
 ---
 # NOTES:
 
+### **Option selection**
+To implement the command definition I adopt a grammar-like structure:
+```java
+COMMAND: 
+        "-diff" arg arg ("-display")* 
+        | "-mse" arg arg
+        | "-psnr" arg arg
+        | arg ("-display")*
+        | "-hist" arg;
+
+arg:    "-load" IMAGE ("-grayscale")* ("-gaussian" NUM NUM)* ("-quantization" NUM)* ;
+
+IMAGE:  path_to_image; 
+
+NUM:    [0 9]+;
+
+```
+1. **COMMAND:**
+A command can be:
+    - `-diff` *arg* *arg* --> Absolute difference between two images *[simple|altered]*, optionally followed by `-display`
+    - `-mse` *arg* *arg* --> Calculate the **MSE** between two images *[simple|altered]*
+    - `-psnr` *arg* *arg* --> Calculate the **PSNR** between two images *[simple|altered]*
+    - `arg` --> *[simple|altered]*, optionally followed by `-display`
+    - `-hist` *arg* --> Display the histogram of a single image *[simple|altered]*
+
+2. **arg:**
+    - `-load` *IMAGE* --> load the *IMAGE*
+    - <u>Optionally</u>, following operations can be applied to the loaded image:
+        - `-grayscale` -->  Grayscale conversion
+        - `-gaussian` *NUM* *NUM* --> Apply Gaussian-blur <***kernel size***> <***sigma***> 
+        - `-quantization` *NUM* --> Quantize <***nº levels***>.
+
+3. **IMAGE:**
+    - ***Path*** where the image is stored.
+
+4. **NUM:**
+    - ***Integer*** value.
+
+### COMMAND EXAMPLES:
+```bash
+./ImageDecoder -load "../../../datasets/image/boat.ppm" -display
+```
+
+```bash
+./ImageDecoder -load "../../../datasets/image/boat.ppm" -grayscale -gaussian 5 1 -display
+```
+
+```bash
+./ImageDecoder -diff -load "../../../datasets/image/boat.ppm" -grayscale -load "../../../datasets/image/girl.ppm" -display
+```
+
+```bash
+./ImageDecoder -load "../../../datasets/image/boat.ppm" -quantization 16 -display
+```
+
+---
+
 ### **BGR (Blue,Green, Red)** :
 when you load an image using *OpenCV’s* ***cv::imread()***, the pixel data is stored in **BGR** order, with the Blue component first, followed by Green and then Red.
 ```md
