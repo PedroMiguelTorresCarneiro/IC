@@ -102,15 +102,15 @@ A command can be:
 ```
 
 ```bash
-./ImageDecoder -load "../../../datasets/image/boat.ppm" -grayscale -gaussian 5 1 -display
+./ImageDecoder -load "../../../datasets/image/boat.ppm" -gaussian 9 1 -display
 ```
 
 ```bash
-./ImageDecoder -diff -load "../../../datasets/image/boat.ppm" -grayscale -load "../../../datasets/image/girl.ppm" -display
+./ImageDecoder -diff -load "../../../datasets/image/boat.ppm" -load "../../../datasets/image/girl.ppm" -display
 ```
 
 ```bash
-./ImageDecoder -load "../../../datasets/image/boat.ppm" -quantization 16 -display
+./ImageDecoder -load "../../../datasets/image/boat.ppm" -quantization 150 -display
 ```
 
 ---

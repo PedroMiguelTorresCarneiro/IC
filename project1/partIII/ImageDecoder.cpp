@@ -20,7 +20,7 @@ std::pair<cv::Mat, std::vector<cv::Mat>> ImageDecoder::decodeImage(const char* f
 
     if (image.empty()) {
         std::cout << "Error: Could not open or find the image!" << std::endl;
-        exit(1); // ----------------------------------------------------------------- Exit if the image is not loaded
+        exit(1);
     } else {
         std::cout << "Image successfully loaded: " << filename << std::endl;
     }
@@ -77,7 +77,7 @@ std::vector<cv::Mat> ImageDecoder::splitChannels(const cv::Mat& image) {
     cv::Mat redChannel = cv::Mat::zeros(image.size(), CV_8UC1); 
    
     // ------------------------------------------------------------------------------- Access the pixel data of the image
-    for(int row =0; row < image.rows; row++){ // --------------------------------------- Iterate through each pixel (row)
+    for(int row =0; row < image.rows; row++){ // ------------------------------------- Iterate through each pixel (row)
         for(int col = 0; col < image.cols; col++){ // -------------------------------- Iterate through each pixel (column)
             cv::Vec3b pixel = image.at<cv::Vec3b>(row, col); // ---------------------- Point to the pixel (row, col)
 
@@ -208,8 +208,8 @@ void ImageDecoder::createGrayscaleHistogram(const std::vector<std::vector<uchar>
     std::cout << "\nGrayscale Histogram (Horizontal):\n";
 
     // Print bars
-    for (int i = 0; i < 32; ++i) {  // Scale the height of the histogram to 50 lines
-        for (int j = 0; j < 256; j += 8) {  // Display every 5th index
+    for (int i = 0; i < 32; ++i) {  // Scale the height of the histogram to 32 lines
+        for (int j = 0; j < 256; j += 8) {  // Display every 8th index
             int barHeight = static_cast<int>(32.0 * histogram[j] / maxHistogramValue);
             if (barHeight >= 32 - i) {
                 std::cout << " *  ";
@@ -221,7 +221,7 @@ void ImageDecoder::createGrayscaleHistogram(const std::vector<std::vector<uchar>
     }
 
     // Print intensity labels (0 to 255)
-    for (int i = 0; i < 256; i += 8) {  // Display every 16th index to avoid clutter
+    for (int i = 0; i < 256; i += 8) {  // Display every 8th index to avoid clutter
         std::cout << std::setw(3) << i << " ";
     }
     std::cout << std::endl;
