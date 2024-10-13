@@ -76,16 +76,99 @@ NUM     :	[0 9]+
 ---
 # NOTES:
 
-### File streams
-`std::ifstream` and `std::fstream` read files as raw bytes so if the file were not encoding in *ASCII* or `UTF-8`. 
-- so the TExtDecoder doesnt work with differente encodings like : `UTF-16`, `ISO-8859-1`, `Shift-JIS` ...
+### **UTF-8 Encoding Structure**:
+- **1 byte (7 bits)**: <br>
+`ASCII` chars, the first 128 Unicode code points *[U+0000 to U+007F]*.  <br>
+Includes: 
+    - letters (A-Z, a-z) 
+    - digits (0-9)
+    - punctuation
+    - control chars 
+    ```java 
+    Example:
+        - 'A' (Unicode U+0041) → 01000001 (1 byte)
+    ```
+
+- **2 bytes (11 bits)**: <br>
+For chars with code points *[U+0080 to U+07FF]*.  <br>
+Includes: 
+    - accented Latin chars
+    - chars from various other scripts. 
+    ```java
+    Example:
+        > 'é' (Unicode U+00E9) → 11000011 10101001 (2 bytes)
+    ```
+
+- **3 bytes (16 bits)**:  <br>
+For chars with code points *[U+0800 to U+FFFF]*. <br>
+Includes:
+    - Asian chars and symbols
+    ```java
+    Example:
+        > 'ह' (Devanagari character, Unicode U+0939) → 11100000 10100100 10011001 (3 bytes)
+    ```
+
+- **4 bytes (21 bits)**:  <br>
+For characters with code points *[U+10000 to U+10FFFF]*. <br>
+Includes: 
+    - various historic chars
+    - emoji
+    - symbols
+    ```java
+    Example:
+        >'𝄞' (musical symbol G clef, Unicode U+1D11E) → 11110000 10011101 10000100 10111110 (4 bytes)
+    ```
+<br>
+
+The ***<u>first byte of a UTF-8 sequence</u>*** tells you how many bytes the character occupies:
+- **1 byte** --> `0xxxxxxx`
+- **2 bytes** -> `110xxxxx`
+- **3 bytes** -> `1110xxxx`
+- **4 bytes** -> `11110xxx`
+
+---
+
+### loadFile
+1. **Read file in binary mode:** To ensure we capture the raw bytes
+2. **Determine how many bytes each UTF-8 char occupies:** Handle multi-byte chars<br>
+    We get the first byte of the of the and check if it is between the range we expect:
+    - 1 byte_ `0xxxxxxx` -> range from `00000000` to `011111111` (0 to 127)
+    - 2 bytes `110xxxxx` -> range from `11000000` to `11011111` (192 to 223)
+    - 3 bytes `1110xxxx` -> range from `11100000` to `11101111` (224 to 239)
+    - 4 bytes `11100xxx` -> range from `11100000` to `11100111` (240 to 247)
+    
+    ```c++
+    int TextFileReader::utf8CharBytes(unsigned char byte) {
+        if (byte < 0x80) {          // 1-byte ASCII(0 to 127) -> if byte < 128(0x80)
+            return 1;
+        } else if (byte < 0xE0) {   // 2-byte UTF-8 char(192 to 223) -> if byte < 224(0xE0)
+            return 2;
+        } else if (byte < 0xF0) {   // 3-byte UTF-8 char(224 to 239) -> if byte < 240(0xF0)
+            return 3;
+        } else {                    // 4-byte UTF-8 char(240 to 247) -> if byte >= 240
+            return 4;
+        }
+    }
+    ```
+    
+3. **Store the result:**  in the appropriate structure for further processing
+
+    ```math
+    \text{map<string,list<string>>} \Leftrightarrow \text{map<fileName, list<lines>>}
+    ```
+    To store the file name , and all the lines of that file, giving the suport to add various files to this structure
+
+
+
+
+
+
+---
 
 I'm usign macOs and I cannot use c++26, because AppleClang doesnt support, so we have to get another way to read and interpret differents encodings.
 After some online reading we found external libraries and choose the `ICU (International Componentes for Unicode)`. 
 1. **Extract the encoding**
-    - `uchardet_open`   - creates a charset detector
-    - `ucsdet_setText`  - sets the imput text for analysis *(4kb)*
-    - `ucsdet_detect`   - generates a guess about the encoding based on the input text
-    - `ucsdet_getName`  - retrieves the encoding name
-
-2. 
+    - `uchardet_open`   -> creates a charset detector
+    - `ucsdet_setText`  -> sets the imput text for analysis *(4kb)*
+    - `ucsdet_detect`   -> generates a guess about the encoding based on the input text
+    - `ucsdet_getName`  -> retrieves the encoding name

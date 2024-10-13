@@ -53,40 +53,73 @@ string TextFileReader::guessEncoding(const string& filePath) {
     return string(encoding);
 }
 
-/**
- * loadFile
- * Loads the content of the file specified by filePath into memory, storing it in the `fileContents` map.
- * The file content is split into lines and stored as a list of strings.
- * 
- * @param filePath: Path to the file to load.
- * @param loadedFileName: A reference to store the name of the loaded file (extracted from the path).
- * @return: Returns true if the file was successfully loaded, otherwise false.
- */
-bool TextFileReader::loadFile(const std::string& filePath, std::string& loadedFileName) {
-    std::ifstream inputFile(filePath);          // Open the file for reading
-    if (!inputFile.is_open()) {                 // Check if the file is open
-        std::cerr << "Error: Unable to open file: " << filePath << std::endl;
+bool TextFileReader::loadFile(const string& filePath, string& loadedFileName) {
+    ifstream inputFile(filePath, ios::binary);  // Open the file in binary mode
+    if (!inputFile.is_open()) {                           // Check if the file is open
+        cerr << "Error: Unable to open file: " << filePath << endl;
         return false;
     }
 
-    // Extract file name from the file path using std::filesystem::path
-    loadedFileName = std::filesystem::path(filePath).filename().string();
+    // Extract file name from the file path using filesystem::path
+    loadedFileName = filesystem::path(filePath).filename().string();
 
-    std::list<std::string> content;             // List to store the file's content line by line
-    std::string line;
+    list<string> content;  // List to store the file's content line by line
 
-    while (std::getline(inputFile, line)) {
-        content.push_back(line);               // Add each line to the list
-        /*
-            push_back() :
-                - Adds a new element at the end of the list, after its current last element.
-                - The content of the line is copied to the list.
-        */
+    char byte;
+    string currentLine;
+
+    while (inputFile.get(byte)) {  // Read each byte from the file
+        unsigned char firstByte = static_cast<unsigned char>(byte);
+        
+        // Store the line in the list when newline is encountered
+        if (firstByte == '\n') {
+            content.push_back(currentLine);  
+            currentLine.clear();
+            continue;
+        }
+
+        // Determine how many bytes the character occupies
+        int charLength = utf8CharBytes(firstByte);  
+
+        if (charLength == 0) {
+            cerr << "Invalid UTF-8 sequence encountered." << endl;
+            return false;  // Return error if invalid UTF-8 sequence is found
+        }
+
+        // Read the rest of the bytes for the multi-byte character
+        string utf8Char(1, byte);  //Start a string with one character(byte).
+        for (int i = 1; i < charLength; ++i) {
+            if (!inputFile.get(byte)) {
+                cerr << "Unexpected end of file in UTF-8 sequence." << endl;
+                return false;
+            }
+            utf8Char += byte; // add the next byte of this UTF-8 char
+        }
+
+        currentLine += utf8Char;  // Add the UTF-8 character to the current line
+    }
+
+    if (!currentLine.empty()) {
+        content.push_back(currentLine);  // Store the last line if there’s no newline at the end
     }
 
     inputFile.close();
     fileContents[loadedFileName] = content;  // Store the content in the map (the file name as key)
+
     return true;
+}
+
+// Function to determine how many bytes a UTF-8 character occupies
+int TextFileReader::utf8CharBytes(unsigned char byte) {
+    if (byte < 0x80) {  // 1-byte ASCII (U+0000 to U+007F)
+        return 1;
+    } else if (byte < 0xE0) {  // 2-byte UTF-8 character (U+0080 to U+07FF)
+        return 2;
+    } else if (byte < 0xF0) {  // 3-byte UTF-8 character (U+0800 to U+FFFF)
+        return 3;
+    } else {  // 4-byte UTF-8 character (U+10000 to U+10FFFF)
+        return 4;
+    }
 }
 
 
@@ -96,19 +129,19 @@ bool TextFileReader::loadFile(const std::string& filePath, std::string& loadedFi
  * 
  * @param fileName: The name of the file to print.
  */
-void TextFileReader::printFileContent(const std::string& fileName) {
+void TextFileReader::printFileContent(const string& fileName) {
     if (fileContents.find(fileName) != fileContents.end()) {        // Check if the file is loaded
-        std::cout << "\n----- CONTENT OF FILE: " << fileName << " -----\n" << std::endl;
+        cout << "\n----- CONTENT OF FILE: " << fileName << " -----\n" << endl;
         for (const auto& line : fileContents[fileName]) {
             /*
                 auto& :
                     - auto : used to deduce the type of the variable from its initializer.
                     - & : used to capture the variable by reference and not create a copy and alter the copy.
             */
-            std::cout << line << std::endl;
+            cout << line << endl;
         }
     } else {
-        std::cout << "File not found or not loaded: " << fileName << std::endl;
+        cout << "File not found or not loaded: " << fileName << endl;
     }
 }
 

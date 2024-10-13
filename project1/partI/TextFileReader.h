@@ -78,6 +78,8 @@ public:
     vector<string> tokenize(const string& line);
 
     string guessEncoding(const string& filePath);
+
+    int utf8CharBytes(unsigned char byte);
 };
 
 #endif  // TEXTFILEREADER_H
