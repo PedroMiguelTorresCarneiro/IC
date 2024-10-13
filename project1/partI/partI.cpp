@@ -3,39 +3,41 @@
 #include <vector>
 #include "TextFileReader.h"
 
+using namespace std;
+
 /*
 void showMenu() {
-    std::cout << "\n----- TEXT FILE PROCESSING MENU -----" << std::endl;
-    std::cout << "1. Load a Text File <pre-chosen for test purposes>" << std::endl;
-    std::cout << "2. Display Loaded Text File Content <pre-chosen>" << std::endl;
-    std::cout << "3. Converting to lowercase <pre-chosen>" << std::endl;
-    std::cout << "4. Removing Punctuation <pre-chosen>" << std::endl;
-    std::cout << "5. Calculate the chars frequencies  <pre-chosen> " << std::endl;
-    std::cout << "6. Calculate the words frequencies <pre-chosen> " << std::endl;
-    std::cout << "7. Calculate the frequency of n-grams (bigrams == 2, trigrams == 3)" << std::endl;
-    std::cout << "8. Exit" << std::endl;
-    std::cout << "Enter your choice: ";
+    cout << "\n----- TEXT FILE PROCESSING MENU -----" << endl;
+    cout << "1. Load a Text File <pre-chosen for test purposes>" << endl;
+    cout << "2. Display Loaded Text File Content <pre-chosen>" << endl;
+    cout << "3. Converting to lowercase <pre-chosen>" << endl;
+    cout << "4. Removing Punctuation <pre-chosen>" << endl;
+    cout << "5. Calculate the chars frequencies  <pre-chosen> " << endl;
+    cout << "6. Calculate the words frequencies <pre-chosen> " << endl;
+    cout << "7. Calculate the frequency of n-grams (bigrams == 2, trigrams == 3)" << endl;
+    cout << "8. Exit" << endl;
+    cout << "Enter your choice: ";
 }
 
 int main() {
     TextFileReader reader;
-    std::string filePath = "../../../datasets/text/pt/ep-11-06-22-011.txt";
-    std::string loadedFileName;
+    string filePath = "../../../datasets/text/pt/ep-11-06-22-011.txt";
+    string loadedFileName;
     int choice;
     bool fileLoaded = false;
 
     do {
         showMenu(); // Show the menu
-        std::cin >> choice;
+        cin >> choice;
 
         switch (choice) {
             case 1:
                 // Load the pre-defined file
                 if (reader.loadFile(filePath, loadedFileName)) {
                     fileLoaded = true;
-                    std::cout << "\nFile loaded successfully!\n";
+                    cout << "\nFile loaded successfully!\n";
                 } else {
-                    std::cerr << "\nFailed to load file.\n";
+                    cerr << "\nFailed to load file.\n";
                 }
                 break;
 
@@ -44,27 +46,27 @@ int main() {
                 if (fileLoaded) {
                     reader.printFileContent(loadedFileName); // Use the correct file name
                 } else {
-                    std::cout << "\nNo file loaded. Please load a file first.\n";
+                    cout << "\nNo file loaded. Please load a file first.\n";
                 }
                 break;
             case 3:
                 // Convert the loaded file content to lowercase
                 if (fileLoaded) {
                     reader.convertToLowercase(loadedFileName); // Use the correct file name
-                    std::cout << "\nFile content converted to lowercase successfully!\n";
+                    cout << "\nFile content converted to lowercase successfully!\n";
                     reader.printFileContent(loadedFileName); // Use the correct file name
                 } else {
-                    std::cout << "\nNo file loaded. Please load a file first.\n";
+                    cout << "\nNo file loaded. Please load a file first.\n";
                 }
                 break;
             case 4:
                 // Remove punctuation from the loaded file content
                 if (fileLoaded) {
                     reader.removePunctuation(loadedFileName); // Use the correct file name
-                    std::cout << "\nPunctuation removed successfully!\n";
+                    cout << "\nPunctuation removed successfully!\n";
                     reader.printFileContent(loadedFileName); // Use the correct file name
                 } else {
-                    std::cout << "\nNo file loaded. Please load a file first.\n";
+                    cout << "\nNo file loaded. Please load a file first.\n";
                 }
                 break;
             case 5:
@@ -72,7 +74,7 @@ int main() {
                 if (fileLoaded) {
                     reader.calculateCharsFrequency(loadedFileName); // Use the correct file name
                 } else {
-                    std::cout << "\nNo file loaded. Please load a file first.\n";
+                    cout << "\nNo file loaded. Please load a file first.\n";
                 }
                 break;
             case 6:
@@ -80,27 +82,27 @@ int main() {
                 if (fileLoaded) {
                     reader.calculateWordsFrequency(loadedFileName); // Use the correct file name
                 } else {
-                    std::cout << "\nNo file loaded. Please load a file first.\n";
+                    cout << "\nNo file loaded. Please load a file first.\n";
                 }
                 break;
             case 7:
                 // Calculate the frequency of n-grams in the loaded file content
                 if (fileLoaded) {
                     int n;
-                    std::cout << "Enter the value of n for n-grams: ";
-                    std::cin >> n;
+                    cout << "Enter the value of n for n-grams: ";
+                    cin >> n;
                     reader.calculateNgramsFrequency(loadedFileName, n); // Use the correct file name
                 } else {
-                    std::cout << "\nNo file loaded. Please load a file first.\n";
+                    cout << "\nNo file loaded. Please load a file first.\n";
                 }
                
                 break;
             case 8:
-                std::cout << "Exiting the program...\n";
+                cout << "Exiting the program...\n";
                 break;
 
             default:
-                std::cout << "Invalid option. Please try again.\n";
+                cout << "Invalid option. Please try again.\n";
                 break;
         }
     } while (choice != 8);
@@ -112,26 +114,45 @@ int main() {
 
 int main(int argc, char* argv[]) {
     if (argc < 3) {
-        std::cout << "Usage: ./TextDecoder <command> [options]\n";
-        std::cout << "Commands: \n";
-        std::cout << "  -load <file-path> [-lower] [-punct] [-display] [-charFreq | -wordFreq | -nGrams <N>]\n";
-        std::cout << "  -charFreq -load <file-path> [-lower] [-punct] [-display]\n";
-        std::cout << "  -wordFreq -load <file-path> [-lower] [-punct] [-display]\n";
-        std::cout << "  -nGrams <N> -load <file-path> [-lower] [-punct] [-display]\n";
+        cout << "Usage: ./TextDecoder <command> [options]\n";
+        cout << "Commands: \n";
+        cout << "  -load <file-path> [-lower] [-punct] [-display] [-charFreq | -wordFreq | -nGrams <N>]\n";
+        cout << "  -charFreq -load <file-path> [-lower] [-punct] [-display]\n";
+        cout << "  -wordFreq -load <file-path> [-lower] [-punct] [-display]\n";
+        cout << "  -nGrams <N> -load <file-path> [-lower] [-punct] [-display]\n";
         return -1;
     }
 
     TextFileReader reader;
-    std::string loadedFileName;
+    string loadedFileName;
     bool lowercase = false, removePunctuation = false, display = false;
     int nGramsValue = 0;
-    std::string filePath;
-    std::string command = argv[1];
+    string filePath;
+    string command = argv[1];
+        // Check if the first argument is "-encod"
+    if (command == "-encod") {
+        if (argc < 4 || string(argv[2]) != "-load") {
+            cout << "Error: Missing '-load' argument for encoding detection.\n";
+            return -1;
+        }
+
+        // Get the file path after '-load'
+        filePath = argv[3];
+
+        // Detect encoding
+        string detectedEncoding = reader.guessEncoding(filePath);
+        if (!detectedEncoding.empty()) {
+            cout << "\nDetected Encoding: " << detectedEncoding << "\n\n";
+        } else {
+            cout << "Could not detect encoding.\n";
+        }
+        return 0;  // Exit after detecting encoding
+    }
 
     // Check if the first argument is "-load"
     if (command == "-load") {
         if (argc < 3) {
-            std::cout << "Error: Missing file path after '-load'.\n";
+            cout << "\nError: Missing file path after '-load'.\n\n";
             return -1;
         }
 
@@ -139,13 +160,13 @@ int main(int argc, char* argv[]) {
 
         // Load the file
         if (!reader.loadFile(filePath, loadedFileName)) {
-            std::cout << "Error: Could not load file: " << filePath << "\n";
+            cout << "Error: Could not load file: " << filePath << "\n";
             return -1;
         }
 
         // Process remaining options starting from index 3
         for (int i = 3; i < argc; ++i) {
-            std::string option = argv[i];
+            string option = argv[i];
 
             if (option == "-lower") {
                 lowercase = true;
@@ -161,15 +182,15 @@ int main(int argc, char* argv[]) {
                 return 0;
             } else if (option == "-nGrams") {
                 if (i + 1 < argc) {
-                    nGramsValue = std::stoi(argv[++i]);
+                    nGramsValue = stoi(argv[++i]);
                     reader.calculateNgramsFrequency(loadedFileName, nGramsValue);
                     return 0;
                 } else {
-                    std::cout << "Error: Missing number after -nGrams.\n";
+                    cout << "Error: Missing number after -nGrams.\n";
                     return -1;
                 }
             } else {
-                std::cout << "Error: Unknown option: " << option << "\n";
+                cout << "Error: Unknown option: " << option << "\n";
                 return -1;
             }
         }
@@ -177,11 +198,11 @@ int main(int argc, char* argv[]) {
         // Apply transformations after loading the file
         if (lowercase) {
             reader.convertToLowercase(loadedFileName);
-            std::cout << "File content converted to lowercase.\n";
+            cout << "File content converted to lowercase.\n";
         }
         if (removePunctuation) {
             reader.removePunctuation(loadedFileName);
-            std::cout << "Punctuation removed from file content.\n";
+            cout << "Punctuation removed from file content.\n";
         }
         if (display) {
             reader.printFileContent(loadedFileName);
@@ -190,20 +211,20 @@ int main(int argc, char* argv[]) {
         // Handle operations like nGrams, charFreq, or wordFreq before -load
         if (command == "-nGrams") {
             if (argc < 5) {
-                std::cout << "Error: Missing number after -nGrams and file path.\n";
+                cout << "Error: Missing number after -nGrams and file path.\n";
                 return -1;
             }
 
-            nGramsValue = std::stoi(argv[2]);
+            nGramsValue = stoi(argv[2]);
 
-            if (std::string(argv[3]) != "-load") {
-                std::cout << "Error: Missing '-load' argument for nGrams.\n";
+            if (string(argv[3]) != "-load") {
+                cout << "Error: Missing '-load' argument for nGrams.\n";
                 return -1;
             }
 
             filePath = argv[4];
             if (!reader.loadFile(filePath, loadedFileName)) {
-                std::cout << "Error: Could not load file: " << filePath << "\n";
+                cout << "Error: Could not load file: " << filePath << "\n";
                 return -1;
             }
 
@@ -212,14 +233,14 @@ int main(int argc, char* argv[]) {
 
         } else if (command == "-charFreq" || command == "-wordFreq") {
             // Check for "-load"
-            if (argc < 4 || std::string(argv[2]) != "-load") {
-                std::cout << "Error: Missing '-load' argument for " << command << ".\n";
+            if (argc < 4 || string(argv[2]) != "-load") {
+                cout << "Error: Missing '-load' argument for " << command << ".\n";
                 return -1;
             }
 
             filePath = argv[3];
             if (!reader.loadFile(filePath, loadedFileName)) {
-                std::cout << "Error: Could not load file: " << filePath << "\n";
+                cout << "Error: Could not load file: " << filePath << "\n";
                 return -1;
             }
 
@@ -231,7 +252,7 @@ int main(int argc, char* argv[]) {
             }
         }
     } else {
-        std::cout << "Unknown command: " << command << "\n";
+        cout << "Unknown command: " << command << "\n";
         return -1;
     }
 
