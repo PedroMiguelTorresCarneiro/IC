@@ -147,6 +147,7 @@ The ***<u>first byte of a UTF-8 sequence</u>*** tells you how many bytes the cha
     ```math
     \text{map<string,list<string>>} \Leftrightarrow \text{map<fileName, list<lines>>}
     ```
+
     To store the file name , and all the lines of that file, giving the suport to add various files to this structure
 ---
 ### convertToLowercase
