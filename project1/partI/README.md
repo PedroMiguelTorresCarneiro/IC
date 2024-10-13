@@ -9,12 +9,7 @@
 - **Installing Boost.locale** (to work with UTF-8 encoding)
 ```bash
 #macOs:
-    1. brew install boost
-    2. Set the Environment Variables for pkg-config
-        - nano ~/.zshrc (or ~/.bashrc)
-        - Add the following line:
-            - export PKG_CONFIG_PATH="/opt/homebrew/opt/icu4c/lib/pkgconfig"
-        - source ~/.zshrc (or ~/.bashrc)
+    brew install boost
 #Linux:
     sudo apt-get update
     sudo apt-get install libboost-all-dev
