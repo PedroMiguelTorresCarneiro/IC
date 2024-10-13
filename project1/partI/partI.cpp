@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include "TextFileReader.h"
+#include <boost/locale.hpp>
+#include <locale>
 
 using namespace std;
 
@@ -113,6 +115,14 @@ int main() {
 */
 
 int main(int argc, char* argv[]) {
+    try {
+        // Set the global locale to UTF-8 using Boost.Locale
+        std::locale::global(boost::locale::generator().generate("en_US.UTF-8"));
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Locale setup failed: " << e.what() << std::endl;
+        return -1;
+    }
+
     if (argc < 3) {
         cout << "Usage: ./TextDecoder <command> [options]\n";
         cout << "Commands: \n";
@@ -129,26 +139,7 @@ int main(int argc, char* argv[]) {
     int nGramsValue = 0;
     string filePath;
     string command = argv[1];
-        // Check if the first argument is "-encod"
-    if (command == "-encod") {
-        if (argc < 4 || string(argv[2]) != "-load") {
-            cout << "Error: Missing '-load' argument for encoding detection.\n";
-            return -1;
-        }
-
-        // Get the file path after '-load'
-        filePath = argv[3];
-
-        // Detect encoding
-        string detectedEncoding = reader.guessEncoding(filePath);
-        if (!detectedEncoding.empty()) {
-            cout << "\nDetected Encoding: " << detectedEncoding << "\n\n";
-        } else {
-            cout << "Could not detect encoding.\n";
-        }
-        return 0;  // Exit after detecting encoding
-    }
-
+    
     // Check if the first argument is "-load"
     if (command == "-load") {
         if (argc < 3) {

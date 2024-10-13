@@ -6,11 +6,11 @@
 #include <algorithm>  // To remove_if, transform
 #include <cctype>     // To tolower, ispunct
 #include <filesystem> // To extract th filename from the path
-#include <unicode/ucnv.h>
-#include <unicode/ucsdet.h>
+#include <boost/locale.hpp>  // Include Boost.Locale for Unicode handling
 
 using namespace std;
 
+/*
 string TextFileReader::guessEncoding(const string& filePath) {
     UErrorCode error = U_ZERO_ERROR;
     UCharsetDetector* charsetDetector = ucsdet_open(&error);
@@ -52,6 +52,7 @@ string TextFileReader::guessEncoding(const string& filePath) {
     // Return the encoding type
     return string(encoding);
 }
+*/
 
 bool TextFileReader::loadFile(const string& filePath, string& loadedFileName) {
     ifstream inputFile(filePath, ios::binary);  // Open the file in binary mode
@@ -152,11 +153,10 @@ void TextFileReader::printFileContent(const string& fileName) {
  * @param fileName: The name of the file to process.
  */
 void TextFileReader::convertToLowercase(const string& fileName) {
-    if (fileContents.find(fileName) != fileContents.end()) {        // Check if the file is loaded
+    if (fileContents.find(fileName) != fileContents.end()) {  // Check if the file is loaded
         for (auto& line : fileContents[fileName]) {
-            for (char& c : line) {
-                c = tolower(c);        // Convert each character to lowercase
-            }
+            // Use Boost.Locale to convert the entire line to lowercase
+            line = boost::locale::to_lower(line);  // Handles both ASCII and UTF-8 multi-byte characters
         }
     } else {
         cout << "File not found or not loaded: " << fileName << endl;

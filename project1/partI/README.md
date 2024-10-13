@@ -6,24 +6,20 @@
 
 ***WORKING README ...***
 
-- **Installing ICU** (to work with UTF-8 encoding)
-```md
+- **Installing Boost.locale** (to work with UTF-8 encoding)
+```bash
 #macOs:
-    1. brew install icu4c
+    1. brew install boost
     2. Set the Environment Variables for pkg-config
         - nano ~/.zshrc (or ~/.bashrc)
         - Add the following line:
             - export PKG_CONFIG_PATH="/opt/homebrew/opt/icu4c/lib/pkgconfig"
         - source ~/.zshrc (or ~/.bashrc)
 #Linux:
-    - sudo apt install libicu-dev
+    sudo apt-get update
+    sudo apt-get install libboost-all-dev
 #Windows:
-    1. Install vcpkg:
-        - git clone https://github.com/microsoft/vcpkg.git
-        - cd vcpkg
-        - ./bootstrap-vcpkg.bat
-    2. Install ICU:
-        - vcpkg install icu
+    Download the Boost libraries from Boost's official website
 ```
 
 - **Build and Run**
@@ -86,7 +82,7 @@ Includes:
     - control chars 
     ```java 
     Example:
-        - 'A' (Unicode U+0041) → 01000001 (1 byte)
+        'A' (Unicode U+0041) → 01000001 (1 byte)
     ```
 
 - **2 bytes (11 bits)**: <br>
@@ -96,7 +92,7 @@ Includes:
     - chars from various other scripts. 
     ```java
     Example:
-        > 'é' (Unicode U+00E9) → 11000011 10101001 (2 bytes)
+        'é' (Unicode U+00E9) → 11000011 10101001 (2 bytes)
     ```
 
 - **3 bytes (16 bits)**:  <br>
@@ -105,7 +101,7 @@ Includes:
     - Asian chars and symbols
     ```java
     Example:
-        > 'ह' (Devanagari character, Unicode U+0939) → 11100000 10100100 10011001 (3 bytes)
+        'ह' (Devanagari character, Unicode U+0939) → 11100000 10100100 10011001 (3 bytes)
     ```
 
 - **4 bytes (21 bits)**:  <br>
@@ -116,7 +112,7 @@ Includes:
     - symbols
     ```java
     Example:
-        >'𝄞' (musical symbol G clef, Unicode U+1D11E) → 11110000 10011101 10000100 10111110 (4 bytes)
+        '𝄞' (musical symbol G clef, Unicode U+1D11E) → 11110000 10011101 10000100 10111110 (4 bytes)
     ```
 <br>
 
@@ -150,21 +146,27 @@ The ***<u>first byte of a UTF-8 sequence</u>*** tells you how many bytes the cha
         }
     }
     ```
-    
+    After this depending of the calculated number join the bytes in a *string* to make a *multi-byte char*.
 3. **Store the result:**  in the appropriate structure for further processing
 
     ```math
     \text{map<string,list<string>>} \Leftrightarrow \text{map<fileName, list<lines>>}
     ```
     To store the file name , and all the lines of that file, giving the suport to add various files to this structure
-
-
-
-
-
+---
+### convertToLowercase
+There is no simple pattern to covert upper cases in lower cases beside ASCII chars. So we use the fucntion `toLower()`in ASCII chars and the external libraries like **ICU** aor **Boost.locale** for the non-ASCII chars.
+Boost.locale is simpler to use, so we choose this!
+1. Set the global locale to UTF-8 using Boost.Locale
+2. Convert line by line from the content stored like UTF-8
+    ```c++
+    for (auto& line : fileContents[fileName]) {
+        // Handles both ASCII and UTF-8 multi-byte characters
+        line = boost::locale::to_lower(line);  
+    }
+    ```
 
 ---
-
 I'm usign macOs and I cannot use c++26, because AppleClang doesnt support, so we have to get another way to read and interpret differents encodings.
 After some online reading we found external libraries and choose the `ICU (International Componentes for Unicode)`. 
 1. **Extract the encoding**

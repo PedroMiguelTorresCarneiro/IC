@@ -1,4 +1,6 @@
 <CHAPTER ID=0>
+😃
+
 
 <SPEAKER ID=1 LANGUAGE="FR" NAME="Berès">
 Fru talman! Med kommissionens ordförande närvarande vill jag passa på att vända mig till honom i ett allvarligt ärende. Varje år anordnar Europarörelsen i Frankrike den 9 maj en mycket viktig dag, Europadagen. I år vill vi ha euron som tema. Sedan september månad har denna rörelse begärt ert stöd för att finansiera denna dag, som inte kan organiseras utan ert stöd. Men vi har hittills inte fått några garantier när det gäller utbetalningen av kommissionens bidrag. Om vi inte får en garanti inom den här veckan måste Europarörelsen i Frankrike avstå från att anordna Europadagen. Enligt min mening vore det ytterst skadligt för vår gemensamma sak, som vi mobiliserar oss för med alla våra krafter.
@@ -2694,4 +2696,5 @@ Jag förklarar debatten avslutad.
 Omröstningen kommer att äga rum i morgon kl. 12.00.
 <P>
 (Sammanträdet avslutades kl. 00.20.)
+😃
 
