@@ -4,9 +4,12 @@ cmake_minimum_required(VERSION 3.10)
 # Defines the name of the project.
 project(TextFileProject)
 
-# Sets the C++ standard version for the project to C++17.
-# in order to use std::filesystem for listing the files in a directory.
-set(CMAKE_CXX_STANDARD 17)
+# Sets the C++ standard version for the project to C++26.
+# to use text encoding to deal with UTF-8 encoding
+set(CMAKE_CXX_STANDARD 26)
+
+# Ensure that the compiler enforces the C++ standard.
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Specifies the name of the output executable and the source files to be compiled.
 # - `partI` name of executable file.
