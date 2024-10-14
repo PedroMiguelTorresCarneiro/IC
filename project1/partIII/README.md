@@ -61,18 +61,20 @@ In order to be more easy to collaborating with others, as CMake will handle the 
 ### **Option selection**
 To implement the command definition I adopt a grammar-like structure:
 ```java
-COMMAND: 
-        "-diff" arg arg ("-display")* 
-        | "-mse" arg arg
-        | "-psnr" arg arg
-        | arg ("-display")*
-        | "-hist" arg;
+COMMAND :   "-diff" arg arg ("-display")* 
+        |   "-mse" arg arg
+        |   "-psnr" arg arg
+        |   arg ("-display")*
+        |   "-hist" arg
+        ;
 
-arg:    "-load" IMAGE ("-grayscale")* ("-gaussian" NUM NUM)* ("-quantization" NUM)* ;
+arg     :    "-load" IMAGE ("-grayscale")* ("-gaussian" NUM NUM)* ("-quantization" NUM)* ("-channels")* ("-hist")*
+        ;
 
-IMAGE:  path_to_image; 
+IMAGE   :  path_to_image
+        ; 
 
-NUM:    [0 9]+;
+NUM     :    [0 9]+;
 
 ```
 1. **COMMAND:**
