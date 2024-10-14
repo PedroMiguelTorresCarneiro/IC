@@ -12,6 +12,7 @@
     sudo apt-get install libsfml-dev
 #Windows:
     Download the files directly from the SFML website
+```
 
 - **Build and Run**
     ```bash
