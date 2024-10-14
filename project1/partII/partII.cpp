@@ -31,6 +31,7 @@ string getAudioFIle(){
 int main()
 {  
     int option = 0;
+    int level = 0;
     
     string filename ="";
 
@@ -44,7 +45,8 @@ int main()
         std::cout << "3 - Get details from audio file"<<std::endl;
         std::cout << "4 - Show file waveform"<<std::endl;
         std::cout << "5 - Show histogram of amplitudes"<<std::endl;
-        std::cout << "6 - Quit"<<std::endl;
+        std::cout << "6 - Quantize audio"<<std::endl;
+        std::cout << "7 - Quit"<<std::endl;
         std::cout<<"-----------------------------------------------"<<std::endl;
         std::cin >> option;
 
@@ -65,6 +67,11 @@ int main()
                 histogram(filename);
                 break;
             case 6:
+                std::cout << "Number of quantization levels: "<<std::endl;
+                std::cin >> level;
+                quantize(filename, level);
+                break;
+            case 7:
                 std::cout<< "Bye Bye!"<<std::endl;
                 break;
             default:

@@ -5,9 +5,8 @@
 #include <unistd.h>
 #include <string>
 #include <SFML/Graphics.hpp>
+#include <cmath>
 
-
-//using namespace std;
 
 //-----------------------------PLAY THE AUDIO FILE-----------------------------------------
 int playAudio(string filename) {
@@ -119,6 +118,57 @@ int plotWaveform(string filename){
     return 0;
 }
 
+//---------------------------------SHOW THE WAVEFORM BUT USING SAMPLES----------------------------------------
+int plotWaveform(string filename, std::vector<sf::Int16> quantizedSamples){
+    sf::SoundBuffer buffer;
+    if (!buffer.loadFromFile(filename))
+    {
+        std::cerr << "Error loading sound file" << std::endl;
+        return -1;
+    }
+
+    std::vector<sf::Int16>  samples = quantizedSamples;
+    std::size_t sampleCount = buffer.getSampleCount();
+
+    //unsigned int sampleRate = buffer.getSampleRate(); 
+    unsigned int channelCount = buffer.getChannelCount();
+
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Waveform");
+
+    sf::VertexArray waveform(sf::LinesStrip);
+
+    // Resize elements to fit the window
+    float timeScale = 800.0f / (sampleCount / channelCount); 
+    float amplitudeScale = 300.0f / 32768.0f; // Map amplitude to half window height (300 pixels)
+
+    for (std::size_t i = 0; i < sampleCount; i += channelCount) // skip half the channels becasue it's stereo
+    {
+        float x = i * timeScale / channelCount;
+
+        float y = 300.0f - samples[i] * amplitudeScale; // 300.0f is half of window height
+
+        waveform.append(sf::Vertex(sf::Vector2f(x, y), sf::Color::Green));
+    }
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+
+        window.clear(sf::Color::Black);
+
+        window.draw(waveform);
+
+        window.display();
+    }
+
+    return 0;
+}
+
 //---------------------------------SHOW THE HISTOGRAM----------------------------------------
 int histogram(string filename){
     sf::SoundBuffer buffer;
@@ -163,4 +213,45 @@ int histogram(string filename){
         std::cout<<"["<<binMin<<" to "<<binMax<<"] : ";
         std::cout << " (" << bins[i] << ")\n";
     }
+
+    return 0;
+}
+
+//--------------------------------- QUANTIZE THE AUDIO ----------------------------------------
+
+int quantize(string filename, int level){
+    sf::SoundBuffer buffer;
+    if (!buffer.loadFromFile(filename))
+    {
+        std::cerr << "Error loading sound file" << std::endl;
+        return -1;
+    }
+
+    const sf::Int16* samples = buffer.getSamples();
+    std::size_t sampleCount = buffer.getSampleCount();
+
+    int amplMax = 32767;
+    int amplMin = -32768;
+
+    //define step size
+    float stepSize = (amplMax - amplMin) / float(level);
+
+    //vector to keep quantized samples
+    std::vector<sf::Int16> quantizedSamples(sampleCount);
+
+    for (std::size_t i=0; i<sampleCount; ++i){
+        float normalizedSample = (samples[i] - amplMin) / float(amplMax - amplMin);
+
+        int quantizedLevel = std::round(normalizedSample * (level - 1));
+
+        quantizedLevel = std::max(0, std::min(quantizedLevel, level - 1));
+
+
+        quantizedSamples[i] = amplMin + quantizedLevel * stepSize;
+    }
+
+    plotWaveform(filename);
+    plotWaveform(filename, quantizedSamples);
+
+    return 0;
 }
