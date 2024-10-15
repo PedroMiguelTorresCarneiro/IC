@@ -25,4 +25,27 @@
 
     Or, just:
     
+    ```bash
     $ sh run.sh
+    ```
+## **Audio with SFML**
+Sfml is a library that allows us to maipulate audio in a number of ways.
+```md
+    buffer.loadFromFile(filename) ->load the audio file
+    sound.setBuffer(buffer)
+    sound.play() ->play the sound
+```
+### **Raw audio data**
+Sfml contains a variety of functions to extract the raw data from an audio file.
+```md
+    buffer.getSamples() -> gives us a pointer to an array with the samples that make up the audio file
+    buffer.getSampleCount() -> gives us the number of samples
+    buffer.getSampleRate() -> gives us the number of samples per second
+    buffer.getChannelCount() ->gives us the number of channesl (ex. 1 is mono, 2 is stereo)
+```
+
+## **Waveforms**
+The waveform of an audio file represents how the different amplitude values along the length of the file. We must be carefull however, in the samples array half the samples belong to the right channel and the other half belong to the left channel (for stereo audio), so we must skip every other sample.
+```md
+    for (std::size_t i = 0; i < sampleCount; i += channelCount) 
+```

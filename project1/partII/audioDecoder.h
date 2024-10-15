@@ -15,7 +15,7 @@ using namespace std;
 int playAudio(string filename);
 int getDetails(string filename);
 int plotWaveform(string filename);
-int plotWaveform(string filename, std::vector<sf::Int16> quantizedSamples);
+void plotTwoWaveforms(string filename, const std::vector<sf::Int16>& quantizedSamples);
 int histogram(string filename);
 int quantize(string filename, int level);
 #endif

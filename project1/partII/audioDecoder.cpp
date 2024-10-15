@@ -70,8 +70,7 @@ int getDetails(string filename){
 //---------------------------------SHOW THE WAVEFORM----------------------------------------
 int plotWaveform(string filename){
     sf::SoundBuffer buffer;
-    if (!buffer.loadFromFile(filename))
-    {
+    if (!buffer.loadFromFile(filename)){
         std::cerr << "Error loading sound file" << std::endl;
         return -1;
     }
@@ -87,11 +86,10 @@ int plotWaveform(string filename){
     sf::VertexArray waveform(sf::LinesStrip);
 
     // Resize elements to fit the window
-    float timeScale = 800.0f / (sampleCount / channelCount); 
-    float amplitudeScale = 300.0f / 32768.0f; // Map amplitude to half window height (300 pixels)
+    float timeScale = 800.0f / (sampleCount / channelCount); //map the x axis
+    float amplitudeScale = 300.0f / 32768.0f; // map the y axis to half the window height(because of positive and negative amplitudes)
 
-    for (std::size_t i = 0; i < sampleCount; i += channelCount) // skip half the channels becasue it's stereo
-    {
+    for (std::size_t i = 0; i < sampleCount; i += channelCount){ // skip half the channels becasue it's stereo
         float x = i * timeScale / channelCount;
 
         float y = 300.0f - samples[i] * amplitudeScale; // 300.0f is half of window height
@@ -99,8 +97,7 @@ int plotWaveform(string filename){
         waveform.append(sf::Vertex(sf::Vector2f(x, y), sf::Color::Green));
     }
 
-    while (window.isOpen())
-    {
+    while (window.isOpen()){
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -118,62 +115,65 @@ int plotWaveform(string filename){
     return 0;
 }
 
-//---------------------------------SHOW THE WAVEFORM BUT USING SAMPLES----------------------------------------
-int plotWaveform(string filename, std::vector<sf::Int16> quantizedSamples){
+
+
+//---------------------------------PLOT TWO WAVEFORMS FOR COMPARISON----------------------------------------
+void plotTwoWaveforms(string filename, const std::vector<sf::Int16>& quantizedSamples) {
     sf::SoundBuffer buffer;
-    if (!buffer.loadFromFile(filename))
-    {
+    if (!buffer.loadFromFile(filename)) {
         std::cerr << "Error loading sound file" << std::endl;
-        return -1;
+        return;
     }
 
-    std::vector<sf::Int16>  samples = quantizedSamples;
+    const sf::Int16* originalSamples = buffer.getSamples();
     std::size_t sampleCount = buffer.getSampleCount();
-
-    //unsigned int sampleRate = buffer.getSampleRate(); 
     unsigned int channelCount = buffer.getChannelCount();
+    
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Waveform Comparison");
 
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Waveform");
+    sf::VertexArray originalWaveform(sf::LinesStrip);
+    sf::VertexArray quantizedWaveform(sf::LinesStrip);
 
-    sf::VertexArray waveform(sf::LinesStrip);
+    // Resize elements
+    float timeScale = 800.0f / (sampleCount / channelCount); //map the x axis
+    float amplitudeScale = 300.0f / 32768.0f; // map the y axis to half the window height(because of positive and negative amplitudes)
 
-    // Resize elements to fit the window
-    float timeScale = 800.0f / (sampleCount / channelCount); 
-    float amplitudeScale = 300.0f / 32768.0f; // Map amplitude to half window height (300 pixels)
 
-    for (std::size_t i = 0; i < sampleCount; i += channelCount) // skip half the channels becasue it's stereo
-    {
+    // Plot original samples 
+    for (std::size_t i = 0; i < sampleCount; i += channelCount) {
         float x = i * timeScale / channelCount;
-
-        float y = 300.0f - samples[i] * amplitudeScale; // 300.0f is half of window height
-
-        waveform.append(sf::Vertex(sf::Vector2f(x, y), sf::Color::Green));
+        float y = 150.0f - originalSamples[i] * amplitudeScale; // Upper half
+        originalWaveform.append(sf::Vertex(sf::Vector2f(x, y), sf::Color::Green));
     }
 
-    while (window.isOpen())
-    {
+    // Plot quantized samples 
+    for (std::size_t i = 0; i < sampleCount; i += channelCount) {
+        float x = i * timeScale / channelCount;
+        float y = 150.0f + 300.0f + quantizedSamples[i] * amplitudeScale; //300.0f is the space between the two waveforms
+        quantizedWaveform.append(sf::Vertex(sf::Vector2f(x, y), sf::Color::Red));
+    }
+
+    while (window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event))
-        {
+        while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
         }
 
         window.clear(sf::Color::Black);
 
-        window.draw(waveform);
+        window.draw(originalWaveform);
+
+        window.draw(quantizedWaveform);
 
         window.display();
     }
-
-    return 0;
 }
 
 //---------------------------------SHOW THE HISTOGRAM----------------------------------------
 int histogram(string filename){
     sf::SoundBuffer buffer;
-    if (!buffer.loadFromFile(filename))
-    {
+    if (!buffer.loadFromFile(filename)){
         std::cerr << "Error loading sound file" << std::endl;
         return -1;
     }
@@ -221,8 +221,7 @@ int histogram(string filename){
 
 int quantize(string filename, int level){
     sf::SoundBuffer buffer;
-    if (!buffer.loadFromFile(filename))
-    {
+    if (!buffer.loadFromFile(filename)){
         std::cerr << "Error loading sound file" << std::endl;
         return -1;
     }
@@ -250,8 +249,8 @@ int quantize(string filename, int level){
         quantizedSamples[i] = amplMin + quantizedLevel * stepSize;
     }
 
-    plotWaveform(filename);
-    plotWaveform(filename, quantizedSamples);
+    //compare the original and quantized audio
+    plotTwoWaveforms(filename, quantizedSamples); 
 
     return 0;
 }

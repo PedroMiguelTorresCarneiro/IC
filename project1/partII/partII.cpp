@@ -28,8 +28,7 @@ string getAudioFIle(){
     return path;
 }
 
-int main()
-{  
+int main(){
     int option = 0;
     int level = 0;
     
