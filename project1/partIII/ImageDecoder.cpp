@@ -235,7 +235,7 @@ void ImageDecoder::createGrayscaleHistogram(const std::vector<std::vector<uchar>
         1 - Create a new matrix for the blurred image.
         2 - Create a Gaussian kernel.
         3 - Normalize the kernel.
-        4 - Apply the Gaussian blur to each channel (B, G, R).
+        4 - Apply the Gaussian blur to each channel (B, G, R) or the grayscale image.
         5 - Convolve the Gaussian kernel with the image.
         6 - Assign the new pixel value to the blurred image.
         7 - Return the blurred image.
