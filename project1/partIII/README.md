@@ -326,16 +326,17 @@ In this formula we use the `stepSize` to distribute the quantized color on the h
     >- *RGB* : The number of **colors**
 
 ---
-**USE THIS COMMAND TO SEE THE ALTERARIONS ON PIXELS**
-```bash
--hist -load "../../../datasets/image/boat.ppm" -quantization 7
-```
-![Quantization levels 7](../partIII/imgs/qt7.png)
-
-```bash
--hist -load "../../../datasets/image/boat.ppm" -quantization 3
-```
-![Quantization levels 7](../partIII/imgs/qt3.png)
+**SHOWING THE RESULT OF QUANTIZATION**
+<p align="center">
+    <figure style="display:inline-block; margin-right: 10px;">
+        <img src="../partIII/imgs/qt7_hist.png" alt="Quantization levels 3" width="300"/>
+        <figcaption>-hist -load "../../../datasets/image/boat.ppm" -quantization 7</figcaption>
+    </figure>
+    <figure style="display:inline-block;">
+        <img src="../partIII/imgs/qt3_hist.png" alt="Quantization levels 3" width="300"/>
+        <figcaption>-hist -load "../../../datasets/image/boat.ppm" -quantization 3</figcaption>
+    </figure>
+</p>
 
 ---
 
@@ -345,6 +346,20 @@ In this formula we use the `stepSize` to distribute the quantized color on the h
     - **Detail loss:**
         - <u>**higher levels**</u>: Preserve more detail
         - <u>**lower levels**</u>: Significant detail loss *(2 bits mean only 4 levels, resulting in more uniform areas)*
+       
+
+        <p align="center">
+            <figure style="display:inline-block; margin-right: 10px;">
+                <img src="../partIII/imgs/qt7_display.png" alt="Quantization levels 3" width="300"/>
+                <figcaption>Quantization level : 7</figcaption>
+            </figure>
+            <figure style="display:inline-block;">
+                <img src="../partIII/imgs/qt2_display.png" alt="Quantization levels 3" width="300"/>
+                <figcaption>Quantization level : 2</figcaption>
+            </figure>
+        </p>
+
+
     - **Compression:**
         - <u>**higher levels**</u>: Weak compression
         - <u>**lower levels**</u>: Strong compression (fewer bits are used to represent each pixel)
