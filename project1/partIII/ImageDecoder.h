@@ -31,6 +31,8 @@ public:
     // ----------------------------------------------- Create Histogram
     void createHistogram(const cv::Mat& image);
 
+    void executePythonScript(const std::string& scriptName, const std::string& mode, const std::string& dataFilePath);
+
     // ----------------------------------------------- Apply Gaussian Blur to the Image
     cv::Mat applyGaussianBlur(const cv::Mat& image, int kernelSize, double sigma);
 

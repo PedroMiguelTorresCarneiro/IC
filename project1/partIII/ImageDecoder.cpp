@@ -1,7 +1,9 @@
 #include "ImageDecoder.h" // ------------------- Include the header, not the .cpp file
 #include <iostream> // ------------------------- for std::cout
 #include <iomanip> // -------------------------- for std::setw
-
+#include <sstream>  // -------------------------- for std::ostringstream
+#include <cstdlib>  // -------------------------- for system
+#include <fstream>  // Include for file handling
 
 // Constructor
 ImageDecoder::ImageDecoder() {
@@ -228,6 +230,13 @@ void ImageDecoder::createGrayscaleHistogram(const std::vector<std::vector<uchar>
     std::cout << std::endl;
 }
 
+
+void ImageDecoder::executePythonScript(const std::string& scriptName, const std::string& mode, const std::string& data) {
+    // Construct the command to call the Python script
+    std::string command = "python3 ../" + scriptName + " " + mode + " \"" + data + "\"";
+    system(command.c_str());  // Execute the command
+}
+
 // ------------------------------------------------------------------------------------------------
 // ---------------------------------| Create Histogram | -----------------------------------------
 // ------------------------------------------------------------------------------------------------
@@ -238,17 +247,63 @@ void ImageDecoder::createHistogram(const cv::Mat& image) {
         return;
     }
 
-    // Check the number of channels
     int channels = image.channels();
 
     if (channels == 1) {
         // Grayscale image
         std::cout << "Creating histogram for grayscale image..." << std::endl;
-        // Add logic for grayscale histogram here in the future
+
+        // Initialize histogram for grayscale (256 bins)
+        std::vector<int> histogram(256, 0);
+
+        // Calculate the histogram
+        for (int i = 0; i < image.rows; i++) {
+            for (int j = 0; j < image.cols; j++) {
+                uchar pixelValue = image.at<uchar>(i, j);
+                histogram[pixelValue]++;
+            }
+        }
+
+        std::ostringstream oss;
+        for (int i = 0; i < 256; ++i) {
+            oss << histogram[i] << " ";
+        }
+        executePythonScript("plot_histogram.py", "grayscale", oss.str());
+
     } else if (channels == 3) {
-        // Color image (BGR)
+        // BGR image
         std::cout << "Creating histogram for color image (BGR)..." << std::endl;
-        // Add logic for color histogram here in the future
+
+        // Initialize histograms for B, G, R channels (each has 256 bins)
+        std::vector<int> blueHistogram(256, 0);
+        std::vector<int> greenHistogram(256, 0);
+        std::vector<int> redHistogram(256, 0);
+
+        // Calculate the histograms for each channel
+        for (int i = 0; i < image.rows; i++) {
+            for (int j = 0; j < image.cols; j++) {
+                cv::Vec3b pixel = image.at<cv::Vec3b>(i, j);
+                blueHistogram[pixel[0]]++;
+                greenHistogram[pixel[1]]++;
+                redHistogram[pixel[2]]++;
+            }
+        }
+
+        // Write the histograms to a file
+        std::ostringstream oss;
+        for (int i = 0; i < 256; ++i) {
+            oss << blueHistogram[i] << " ";
+        }
+        oss << ",";  // Separate the channels
+        for (int i = 0; i < 256; ++i) {
+            oss << greenHistogram[i] << " ";
+        }
+        oss << ",";  // Separate the channels
+        for (int i = 0; i < 256; ++i) {
+            oss << redHistogram[i] << " ";
+        }
+
+        executePythonScript("plot_histogram.py", "bgr", oss.str());
     } else {
         std::cout << "Error: Unsupported image type!" << std::endl;
     }
