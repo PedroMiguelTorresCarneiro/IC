@@ -61,14 +61,14 @@ In order to be more easy to collaborating with others, as CMake will handle the 
 ### **Option selection**
 To implement the command definition I adopt a grammar-like structure:
 ```java
-COMMAND :   "-diff" arg arg ("-display")* 
-        |   "-mse" arg arg
-        |   "-psnr" arg arg
+COMMAND :   "-diff" arg "," arg  ("-display")* 
+        |   "-mse" arg "," arg 
+        |   "-psnr" arg "," arg
         |   arg ("-display")*
-        |   "-hist" arg
+        |   "-hist" (arg | "-diff" arg "," arg )
         ;
 
-arg     :    "-load" IMAGE ("-grayscale")* ("-gaussian" NUM NUM)* ("-quantization" NUM)* ("-channels")* ("-hist")*
+arg     :    "-load" IMAGE ("-grayscale")* ("-gaussian" NUM NUM)* ("-quantization" NUM)* ("-channels")* ("-highPass")*
         ;
 
 IMAGE   :  path_to_image
@@ -98,21 +98,30 @@ A command can be:
 4. **NUM:**
     - ***Integer*** value.
 
-### COMMAND EXAMPLES:
+## COMMAND EXAMPLES:
+1. -diff arg , arg (-display)*
 ```bash
-./ImageDecoder -load "../../../datasets/image/boat.ppm" -display
+./ImageDecoder -diff -load "../../../datasets/image/boat.ppm" , -load "../../../datasets/image/boat.ppm" -gaussian 5 1 -display
 ```
-
+2. -mse arg , arg
 ```bash
-./ImageDecoder -load "../../../datasets/image/boat.ppm" -gaussian 9 1 -display
+./ImageDecoder -mse -load "../../../datasets/image/boat.ppm" -highPass , -load "../../../datasets/image/girl.ppm" -quantization 4
 ```
-
+3.  -psnr arg , arg
 ```bash
-./ImageDecoder -diff -load "../../../datasets/image/boat.ppm" -quantization 150 -load "../../../datasets/image/boat.ppm" -display
+./ImageDecoder -psnr -load "../../../datasets/image/boat.ppm" -highPass , -load "../../../datasets/image/girl.ppm" -highPass
 ```
-
+4. arg (-display)*
 ```bash
-./ImageDecoder -load "../../../datasets/image/boat.ppm" -quantization 150 -display
+./ImageDecoder -load "../../../datasets/image/boat.ppm" -grayscale -gaussian 5 1 -quantization 5 -display
+```
+5. -hist arg
+```bash
+./ImageDecoder -hist -load "../../../datasets/image/boat.ppm" -grayscale -quantization 5 
+```
+6. -hist -diff arg , arg
+```bash
+./ImageDecoder -hist -diff -load "../../../datasets/image/boat.ppm" , -load "../../../datasets/image/girl.ppm" -highPass 
 ```
 
 ---
@@ -177,79 +186,6 @@ The weights are determined by perceptual factors that ensure the grayscale image
     - Pixel (3,2): R: 121 , G: 103 , B: 49   | Gray: 102 
     - Pixel (3,3): R: 124 , G: 103 , B: 50   | Gray: 103
 ```
----
-
-### **Histogram Grayscale**
-For the purpose of printing on the terminal the histogram have the height between [0,  32] (255/8) and for best fit on terminal only print each 8th intensity value.
-
-```plaintext 
-MONARCH.PPM                                                                                                                         
-                                                    *                                                                          
-                                                    *                                                                          
-                                                    *                                                                          
-                                                    *                                                                          
-                            *                       *                                                                          
-                            *                       *                                                                          
-                            *                       *   *                                                                      
-                            *       *               *   *                                                                      
-                            *       *   *           *   *   *                                                                  
-                            *       *   *       *   *   *   *                                                                  
-                            *       *   *       *   *   *   *                                                                  
-                            *       *   *       *   *   *   *                                                                  
-                            *   *   *   *   *   *   *   *   *                                                                  
-                            *   *   *   *   *   *   *   *   *                                                                  
-                            *   *   *   *   *   *   *   *   *                                                                  
-                            *   *   *   *   *   *   *   *   *                                                                  
-                        *   *   *   *   *   *   *   *   *   *                                                                  
-                        *   *   *   *   *   *   *   *   *   *                                                                  
-                        *   *   *   *   *   *   *   *   *   *                                                                  
-                        *   *   *   *   *   *   *   *   *   *   *                                                              
-                        *   *   *   *   *   *   *   *   *   *   *                                                              
-                        *   *   *   *   *   *   *   *   *   *   *   *                                                          
-                        *   *   *   *   *   *   *   *   *   *   *   *           *               *   *                          
-                        *   *   *   *   *   *   *   *   *   *   *   *   *       *   *           *   *                          
-                    *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *                          
-                    *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *           *              
-                *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *              
-0   8  16  24  32  40  48  56  64  72  80  88  96 104 112 120 128 136 144 152 160 168 176 184 192 200 208 216 224 232 240 248 
-```
-**High Concentration in Midtones(120-180)**: This suggests that much of the image is composed of midtones (not too dark or too bright), giving it a balanced contrast. Not having neither much withes neither blacks !
-
-    
-```plaintext 
-AIRPLANE.PPM                                                                                                                         
-                                                                                                        *                      
-                                                                                                        *                      
-                                                                                                        *                      
-                                                                                                        *                      
-                                                                                                        *                      
-                                                                                                        *                      
-                                                                                                    *   *                      
-                                                                                                    *   *                      
-                                                                                                    *   *                      
-                                                                                                    *   *                      
-                                                                                                    *   *   *                  
-                                                                                                    *   *   *                  
-                                                                                                    *   *   *                  
-                                                                                                    *   *   *                  
-                                                                                                    *   *   *                  
-                                                                                                    *   *   *                  
-                                                                                                    *   *   *                  
-                                                                                                    *   *   *                  
-                                                                                                *   *   *   *                  
-                                                                                                *   *   *   *                  
-                                                                                                *   *   *   *                  
-                                                                                                *   *   *   *                  
-                                                                                                *   *   *   *                  
-                                                                                                *   *   *   *                  
-                                                                                            *   *   *   *   *                  
-                                                *   *   *   *                               *   *   *   *   *                  
-                                            *   *   *   *   *   *               *   *   *   *   *   *   *   *                  
-                                    *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *                  
-0   8  16  24  32  40  48  56  64  72  80  88  96 104 112 120 128 136 144 152 160 168 176 184 192 200 208 216 224 232 240 248 
-```
-**High Concentration in the Highlights(200-216)**: This means the image is highly dominated by highlights(whites), with many bright regions. What is understandable because *airplane.ppm* is a image of a plane above snow montains.
-
 ---
 
 ###  **Gaussian blur filter** 
@@ -388,6 +324,20 @@ In this formula we use the `stepSize` to distribute the quantized color on the h
 
     >- *Grayscale* : The number of different **gray shades**
     >- *RGB* : The number of **colors**
+
+---
+**USE THIS COMMAND TO SEE THE ALTERARIONS ON PIXELS**
+```bash
+-hist -load "../../../datasets/image/boat.ppm" -quantization 7
+```
+![Quantization levels 7](../imgs/qt7.png)
+
+```bash
+-hist -load "../../../datasets/image/boat.ppm" -quantization 3
+```
+![Quantization levels 7](../imgs/qt3.png)
+
+---
 
 <br>
 
