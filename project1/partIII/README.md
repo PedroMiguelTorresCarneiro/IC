@@ -311,8 +311,7 @@ In this formula we use the `stepSize` to distribute the quantized color on the h
     - **Pixel representation**: 
         - Three intensity values: **R** `8 bits`, **G** `8 bits`, **B** `8 bits`.
     - **Quantization process**: 
-        - Reducing the intensity levels for each channel (R, G, B), mapped to original `8bits gamma` 
-        
+        - Reducing the intensity levels for each channel (R, G, B), mapped to original `8bits gamma`    
 <br>
 
 #### - <u>QUANTIZATION LEVELS</u>:
@@ -325,14 +324,10 @@ In this formula we use the `stepSize` to distribute the quantized color on the h
     >- *Grayscale* : The number of different **gray shades**
     >- *RGB* : The number of **colors**
 
----
-**SHOWING THE RESULT OF QUANTIZATION**
-
-
-| -quantization 7 | -quantization 3 |
+| Quantization level : 7 (boat.ppm & boat.ppm - grayscale) | Quantization level : 3 (boat.ppm & boat.ppm - grayscale)|
 |----------------|----------------|
 | ![Quantization 7](../partIII/imgs/qt7_hist.png) | ![Quantization 3](../partIII/imgs/qt3_hist.png) |
-
+| ![Quantization 7](../partIII/imgs/qt7_gs_hist.png) | ![Quantization 3](../partIII/imgs/qt3_gs_hist.png) |
 
 </p>
 
@@ -344,19 +339,10 @@ In this formula we use the `stepSize` to distribute the quantized color on the h
     - **Detail loss:**
         - <u>**higher levels**</u>: Preserve more detail
         - <u>**lower levels**</u>: Significant detail loss *(2 bits mean only 4 levels, resulting in more uniform areas)*
-       
 
-        <p align="center">
-            <figure style="display:inline-block; margin-right: 10px;">
-                <img src="../partIII/imgs/qt7_display.png" alt="Quantization levels 3" width="300"/>
-                <figcaption>Quantization level : 7</figcaption>
-            </figure>
-            <figure style="display:inline-block;">
-                <img src="../partIII/imgs/qt2_display.png" alt="Quantization levels 3" width="300"/>
-                <figcaption>Quantization level : 2</figcaption>
-            </figure>
-        </p>
-
+        | Quantization level : 7 (boat.ppm) | Quantization level : 2 (boat.ppm) |
+        |------------------------|------------------------|
+        | ![Quantization levels 7](../partIII/imgs/qt7_display.png) | ![Quantization levels 2](../partIII/imgs/qt2_display.png) |
 
     - **Compression:**
         - <u>**higher levels**</u>: Weak compression
