@@ -265,23 +265,42 @@ cv::Mat ImageDecoder::applyGaussianBlur(const cv::Mat& image, int kernelSize, do
         }
     }
 
-    // Apply Gaussian blur to each channel (B, G, R)
-    for (int row = halfSize; row < image.rows - halfSize; ++row) {
-        for (int col = halfSize; col < image.cols - halfSize; ++col) {
-            cv::Vec3d newPixelValue(0, 0, 0);  // Temporary variable to store new pixel value
+    // Check if the image is grayscale or color
+    if (image.channels() == 1) {  // Grayscale image
+        for (int row = halfSize; row < image.rows - halfSize; ++row) {
+            for (int col = halfSize; col < image.cols - halfSize; ++col) {
+                double newPixelValue = 0.0;
 
-            // Convolve the Gaussian kernel with the image (for each color channel)
-            for (int i = -halfSize; i <= halfSize; i++) {
-                for (int j = -halfSize; j <= halfSize; j++) {
-                    cv::Vec3b pixel = image.at<cv::Vec3b>(row + i, col + j);
-                    newPixelValue[0] += pixel[0] * kernel[i + halfSize][j + halfSize]; // Blue
-                    newPixelValue[1] += pixel[1] * kernel[i + halfSize][j + halfSize]; // Green
-                    newPixelValue[2] += pixel[2] * kernel[i + halfSize][j + halfSize]; // Red
+                // Convolve the Gaussian kernel with the grayscale image
+                for (int i = -halfSize; i <= halfSize; i++) {
+                    for (int j = -halfSize; j <= halfSize; j++) {
+                        uchar pixel = image.at<uchar>(row + i, col + j);
+                        newPixelValue += pixel * kernel[i + halfSize][j + halfSize];
+                    }
                 }
-            }
 
-            // Assign the new pixel value to the blurred image
-            blurredImage.at<cv::Vec3b>(row, col) = newPixelValue;
+                // Assign the new pixel value to the blurred image
+                blurredImage.at<uchar>(row, col) = cv::saturate_cast<uchar>(newPixelValue);
+            }
+        }
+    } else if (image.channels() == 3) {  // Color image (BGR)
+        for (int row = halfSize; row < image.rows - halfSize; ++row) {
+            for (int col = halfSize; col < image.cols - halfSize; ++col) {
+                cv::Vec3d newPixelValue(0, 0, 0);  // Temporary variable to store new pixel value
+
+                // Convolve the Gaussian kernel with the color image (for each color channel)
+                for (int i = -halfSize; i <= halfSize; i++) {
+                    for (int j = -halfSize; j <= halfSize; j++) {
+                        cv::Vec3b pixel = image.at<cv::Vec3b>(row + i, col + j);
+                        newPixelValue[0] += pixel[0] * kernel[i + halfSize][j + halfSize]; // Blue
+                        newPixelValue[1] += pixel[1] * kernel[i + halfSize][j + halfSize]; // Green
+                        newPixelValue[2] += pixel[2] * kernel[i + halfSize][j + halfSize]; // Red
+                    }
+                }
+
+                // Assign the new pixel value to the blurred image
+                blurredImage.at<cv::Vec3b>(row, col) = newPixelValue;
+            }
         }
     }
 
@@ -436,11 +455,14 @@ double ImageDecoder::calculatePSNR(const cv::Mat& image1, const cv::Mat& image2)
         5 - For color images, quantize each channel separately.
         6 - Return the quantized image.
 */
-cv::Mat ImageDecoder::imageQuantization(const cv::Mat& image, int quantizationLevels) {
+cv::Mat ImageDecoder::imageQuantization(const cv::Mat& image, int bits) {
     if (image.empty()) { // --------------------------------------------------------- Check if the input image is valid
         std::cout << "Error: Image is empty!" << std::endl;
         return cv::Mat(); // -------------------------------------------------------- Return an empty image
     }
+
+    // Calculate the number of quantization levels from bits
+    int quantizationLevels = std::pow(2, bits);
 
     if (quantizationLevels < 2 || quantizationLevels > 256) { // -------------------- Assert quantization range of values
         std::cout << "Error: Number of quantization levels must be between 2 and 256!" << std::endl;
@@ -448,6 +470,9 @@ cv::Mat ImageDecoder::imageQuantization(const cv::Mat& image, int quantizationLe
     }
 
     cv::Mat quantizedImage; // ------------------------------------------------------ Create a new Mat for the quantized image
+    
+    // Calculate the step size based on quantization levels
+    int stepSize = 256 / quantizationLevels;
 
     if (image.channels() == 1) { // ------------------------------------------------- Check for GRAYSCALE image
         quantizedImage = cv::Mat::zeros(image.size(), image.type()); // ------------- Create an empty image for quantization
@@ -455,19 +480,10 @@ cv::Mat ImageDecoder::imageQuantization(const cv::Mat& image, int quantizationLe
         for (int row = 0; row < image.rows; ++row) {
             for (int col = 0; col < image.cols; ++col) {
                 uchar pixelValue = image.at<uchar>(row, col);
-                
-                // ------------------------------------------------------------------ Apply quantization directly from the MATH FORMULA
-                /*
-                    WE can apply quantization scalling it back to get the image more visually correct
-                    using this we reduce the values for example for 4 but scalling them to de sclae 0 to 255 
-                    in order to maintaint the color for example , and only reduce the number 
-                    of variants of thar color pixel
 
-                    DIRECT QUANTIZATION: 
-                        - best aprouch to reduce the size of the image/ compressing.
-                */
-                uchar quantizedValue = std::round((pixelValue / 255.0) * (quantizationLevels - 1));
-                
+                // Apply the quantization formula
+                uchar quantizedValue = std::round(pixelValue / stepSize) * stepSize;
+
                 quantizedImage.at<uchar>(row, col) = quantizedValue;
             }
         }
@@ -480,8 +496,8 @@ cv::Mat ImageDecoder::imageQuantization(const cv::Mat& image, int quantizationLe
                 for (int col = 0; col < channels[i].cols; ++col) { 
                     uchar pixelValue = channels[i].at<uchar>(row, col);
 
-                    // -------------------------------------------------------------- Apply quantization directly from the MATH FORMULA
-                    uchar quantizedValue = std::round((pixelValue / 255.0) * (quantizationLevels - 1));
+                    // Apply the quantization formula
+                    uchar quantizedValue = std::round(pixelValue / stepSize) * stepSize;
 
                     channels[i].at<uchar>(row, col) = quantizedValue; // ------------ Assign the quantized value to the channel
                 }
@@ -496,8 +512,6 @@ cv::Mat ImageDecoder::imageQuantization(const cv::Mat& image, int quantizationLe
 
     return quantizedImage; // ------------------------------------------------------- Return the quantized image
 }
-
-
 
 
 // Save the image to a file

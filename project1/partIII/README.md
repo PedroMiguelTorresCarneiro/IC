@@ -108,7 +108,7 @@ A command can be:
 ```
 
 ```bash
-./ImageDecoder -diff -load "../../../datasets/image/boat.ppm" -load "../../../datasets/image/girl.ppm" -display
+./ImageDecoder -diff -load "../../../datasets/image/boat.ppm" -quantization 150 -load "../../../datasets/image/boat.ppm" -display
 ```
 
 ```bash
@@ -358,47 +358,46 @@ This processe reduce the number of bits to represent each pixel, compressing the
 ### **Mathematical Formula for Quantization**
 
 $$
-Q(x) = \text{round} \left( \frac{x - \text{min}}{\text{max} - \text{min}} \times (L - 1) \right)
+Q(x) = \text{round}\left( \frac{x}{\text{stepSize}} \right) \times \text{stepSize} \quad,\quad \text{stepSize} = \left( \frac{256}{2^{q}} \right)
 $$
 
-    - x , pixel value.
-    - min and max , minimum and maximum possible pixel values 
-    - L , nº of quantization levels.
-in our case:
+    - x , pixel value
+    - q , quantization level(nº bits) 
 
-$$
-Q(x) = \text{round} \left( \frac{x \times (L - 1) }{\text{255}}  \right)
-$$
-
+In this formula we use the `stepSize` to distribute the quantized color on the hole gamma of colors.
 
 - ***Grayscale Image***:
     - **Pixel representation**: 
         - Single intensity value [*0 to 256*] `8 bits`.
     - **Quantization process**: 
-        - Reducing the number of intensity levels. 
-            - ***EXAMPLE:*** reducing 256 levels `8-bit image` to 16 levels `4-bit image`, results in fewer distinct shades of gray.
+        - Reducing the number of intensity levels, mapped to original `8bits gamma` 
 - ***RGB Image***:
     - **Pixel representation**: 
         - Three intensity values: **R** `8 bits`, **G** `8 bits`, **B** `8 bits`.
     - **Quantization process**: 
-        - Reducing the intensity levels for each channel (R, G, B).
+        - Reducing the intensity levels for each channel (R, G, B), mapped to original `8bits gamma` 
         
 <br>
 
 #### - <u>QUANTIZATION LEVELS</u>:
-- Refers to the number of diferent intensity values that a pixel can take after quantization.
-    
-    - *Grayscale* : how many gray shades 
-    - *RGB* : how may colors can be represented    
+- Refers to the number of $bits$ to represent diferent intensity values ($2^{bits}$) that a pixel can take after quantization.
+
+    - **1-bit quantization** => 2 intensity levels $(2^1 = 2)$.
+    - **2-bit quantization** => 4 intensity levels $(2^2 = 4)$.
+    - **8-bit quantization** => `ORIGINAL IMAGE` 256 intensity levels $(2^8 = 256)$.
+
+    >- *Grayscale* : The number of different **gray shades**
+    >- *RGB* : The number of **colors**
+
 <br>
 
 - **Effects of Quantization Levels on Image**:
     - **Detail loss:**
-        - <u>higher levels</u>: retain most of the detail
-        - <u>lower levels</u>: significant detail loss
+        - <u>**higher levels**</u>: Preserve more detail
+        - <u>**lower levels**</u>: Significant detail loss *(2 bits mean only 4 levels, resulting in more uniform areas)*
     - **Compression:**
-        - <u>higher levels</u>: weak compression
-        - <u>lower levels</u>: strong compression
+        - <u>**higher levels**</u>: Weak compression
+        - <u>**lower levels**</u>: Strong compression (fewer bits are used to represent each pixel)
 
     `As you can see above, compression and detail loss are inversely related`
 <br>
@@ -406,10 +405,10 @@ $$
 ### Comparing the original image with the quantized one using MSE and PSNR to evaluate the quality.
 Comparing the original image with the quantized one using ***MSE*** and ***PSNR*** show us how much image quantization affects the visual quality of the image. 
 
-| stats | Quantization Lvl = 2 | Quantization Lvl = 150 | Quantization Lvl = 230 | 
+| stats | Quantization Lvl = 2bits | Quantization Lvl = 5bits | Quantization Lvl = 7bits | 
 |-------|---------|---------|---------|
-| **MSE** | 19680.2 | 3431.54 | 206.671 |
-| **PSNR** | 5.19051 dB | 12.7759 dB | 24.978 dB |
+| **MSE** | 1172.41 | 17.3985 | 0.495516 |
+| **PSNR** | 17.44 dB | 35.7257 dB | 51.1802 dB |
 
 - At a `quantization level of 2`, the <u>MSE is significantly high</u> (19680.2), indicating a substantial difference from the original image, with many pixels changing drastically. Correspondingly, the <u>PSNR is low</u> (5.19 dB), reflecting a notable loss of detail and image degradation. 
 - As the `quantization levels increase (150 and 230)` the <u>MSE decreases</u>, indicating fewer differences between the quantized and original images. The <u>PSNR values rise</u>, showing a clearer and more accurate image with less noticeable degradation.
