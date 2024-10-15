@@ -327,15 +327,13 @@ In this formula we use the `stepSize` to distribute the quantized color on the h
 
 ---
 **SHOWING THE RESULT OF QUANTIZATION**
-<p align="center">
-    <figure style="display:inline-block; margin-right: 10px;">
-        <img src="../partIII/imgs/qt7_hist.png" alt="Quantization levels 3" width="300"/>
-        <figcaption>-quantization 7</figcaption>
-    </figure>
-    <figure style="display:inline-block;">
-        <img src="../partIII/imgs/qt3_hist.png" alt="Quantization levels 3" width="300"/>
-        <figcaption>-quantization 3</figcaption>
-    </figure>
+
+
+| -quantization 7 | -quantization 3 |
+|----------------|----------------|
+| ![Quantization 7](../partIII/imgs/qt7_hist.png) | ![Quantization 3](../partIII/imgs/qt3_hist.png) |
+
+
 </p>
 
 ---
