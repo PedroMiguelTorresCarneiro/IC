@@ -330,12 +330,12 @@ In this formula we use the `stepSize` to distribute the quantized color on the h
 ```bash
 -hist -load "../../../datasets/image/boat.ppm" -quantization 7
 ```
-![Quantization levels 7](../imgs/qt7.png)
+![Quantization levels 7](../partIII/imgs/qt7.png)
 
 ```bash
 -hist -load "../../../datasets/image/boat.ppm" -quantization 3
 ```
-![Quantization levels 7](../imgs/qt3.png)
+![Quantization levels 7](../partIII/imgs/qt3.png)
 
 ---
 
