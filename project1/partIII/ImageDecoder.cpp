@@ -2,6 +2,7 @@
 #include <iostream> // ------------------------- for std::cout
 #include <iomanip> // -------------------------- for std::setw
 
+
 // Constructor
 ImageDecoder::ImageDecoder() {
     // Initialization if necessary
@@ -228,6 +229,33 @@ void ImageDecoder::createGrayscaleHistogram(const std::vector<std::vector<uchar>
 }
 
 // ------------------------------------------------------------------------------------------------
+// ---------------------------------| Create Histogram | -----------------------------------------
+// ------------------------------------------------------------------------------------------------
+void ImageDecoder::createHistogram(const cv::Mat& image) {
+    // Check if the image is valid
+    if (image.empty()) {
+        std::cout << "Error: Image is empty!" << std::endl;
+        return;
+    }
+
+    // Check the number of channels
+    int channels = image.channels();
+
+    if (channels == 1) {
+        // Grayscale image
+        std::cout << "Creating histogram for grayscale image..." << std::endl;
+        // Add logic for grayscale histogram here in the future
+    } else if (channels == 3) {
+        // Color image (BGR)
+        std::cout << "Creating histogram for color image (BGR)..." << std::endl;
+        // Add logic for color histogram here in the future
+    } else {
+        std::cout << "Error: Unsupported image type!" << std::endl;
+    }
+}
+
+
+// ------------------------------------------------------------------------------------------------
 // ---------------------------------| Apply Gaussian Blur to the Image | --------------------------
 // ------------------------------------------------------------------------------------------------
 /*
@@ -305,6 +333,55 @@ cv::Mat ImageDecoder::applyGaussianBlur(const cv::Mat& image, int kernelSize, do
     }
 
     return blurredImage;  // Return the blurred image
+}
+
+// -------------------------------------------------------------------------------------------------
+// ---------------------------------| Apply High-Pass Filter | -------------------------------------
+// -------------------------------------------------------------------------------------------------
+/*
+    Steps to Manually Apply a High-Pass Filter to an Image:
+        1 - Create a low-pass (blurred) version of the image usign gaussian blur .
+        --------------------------------------------------------------------- Already done in the [applyGaussianBlur]
+        2 - Create a new matrix to store the high-pass filtered image.
+        3 - Subtract the blurred (low-pass) image from the original image to get the high-pass result.
+        4 - Ensure the pixel value remains in the valid range [0, 255].
+        5 - Return the high-pass filtered image.
+*/
+cv::Mat ImageDecoder::applyHighPassFilter(const cv::Mat& image) {
+    // Define fixed kernel size and sigma for Gaussian blur (low-pass filter)
+    int kernelSize = 5;  // Fixed kernel size (must be odd)
+    double sigma = 1.0;  // Fixed sigma value
+
+    // 1. Create a low-pass (blurred) version of the image
+    cv::Mat lowPassImage = cv::Mat::zeros(image.size(), image.type());
+    lowPassImage = applyGaussianBlur(image, kernelSize, sigma); // Use the existing Gaussian blur function
+
+    // 2. Create a Mat to store the high-pass filtered image
+    cv::Mat highPassImage = cv::Mat::zeros(image.size(), image.type());
+
+    // 3. Subtract the blurred (low-pass) image from the original image to get the high-pass result
+    for (int row = 0; row < image.rows; ++row) {
+        for (int col = 0; col < image.cols; ++col) {
+            if (image.channels() == 1) { // Grayscale image
+                int highPassValue = image.at<uchar>(row, col) - lowPassImage.at<uchar>(row, col);
+                // Ensure pixel value remains in the valid range [0, 255]
+                highPassImage.at<uchar>(row, col) = cv::saturate_cast<uchar>(highPassValue);
+            } else if (image.channels() == 3) { // Color image (BGR)
+                cv::Vec3b originalPixel = image.at<cv::Vec3b>(row, col);
+                cv::Vec3b blurredPixel = lowPassImage.at<cv::Vec3b>(row, col);
+                cv::Vec3b highPassPixel;
+
+                for (int channel = 0; channel < 3; ++channel) {
+                    int highPassValue = originalPixel[channel] - blurredPixel[channel];
+                    highPassPixel[channel] = cv::saturate_cast<uchar>(highPassValue);
+                }
+
+                highPassImage.at<cv::Vec3b>(row, col) = highPassPixel;
+            }
+        }
+    }
+
+    return highPassImage;
 }
 
 // ------------------------------------------------------------------------------------------------

@@ -28,8 +28,14 @@ public:
     // ----------------------------------------------- Create Grayscale Histogram
     void createGrayscaleHistogram(const std::vector<std::vector<uchar>>& grayscaleImage);
 
+    // ----------------------------------------------- Create Histogram
+    void createHistogram(const cv::Mat& image);
+
     // ----------------------------------------------- Apply Gaussian Blur to the Image
     cv::Mat applyGaussianBlur(const cv::Mat& image, int kernelSize, double sigma);
+
+    // ----------------------------------------------- Apply High Pass Filter to the Image
+    cv::Mat applyHighPassFilter(const cv::Mat& image);
 
     // ----------------------------------------------- Calculate Absolute Difference
     cv::Mat calculateAbsoluteDifference(const cv::Mat& image1, const cv::Mat& image2);
