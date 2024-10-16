@@ -99,29 +99,30 @@ A command can be:
     - ***Integer*** value.
 
 ## COMMAND EXAMPLES:
-1. -diff arg , arg (-display)*
+
+1. **Abs. differece between `image1` and `image1 -blured`**
 ```bash
 ./ImageDecoder -diff -load "../../../datasets/image/boat.ppm" , -load "../../../datasets/image/boat.ppm" -gaussian 5 1 -display
 ```
-2. -mse arg , arg
+2. **Mean Squared Error between `image1 -highPass filter` and `image1 -quantized to 4bits`**
 ```bash
-./ImageDecoder -mse -load "../../../datasets/image/boat.ppm" -highPass , -load "../../../datasets/image/girl.ppm" -quantization 4
+./ImageDecoder -mse -load "../../../datasets/image/girl.ppm" -highPass , -load "../../../datasets/image/girl.ppm" -quantization 4
 ```
-3.  -psnr arg , arg
+3. **Peak Signal-to-Noise Ratio between `image1 -highPass filter` and `image1 -quantized to 4bits`**
 ```bash
-./ImageDecoder -psnr -load "../../../datasets/image/boat.ppm" -highPass , -load "../../../datasets/image/girl.ppm" -highPass
+./ImageDecoder -psnr -load "../../../datasets/image/girl.ppm" -highPass , -load "../../../datasets/image/girl.ppm" -quantization 4
 ```
-4. arg (-display)*
+4. **Display an `image -blured -quantized to 5bits`** 
 ```bash
 ./ImageDecoder -load "../../../datasets/image/boat.ppm" -grayscale -gaussian 5 1 -quantization 5 -display
 ```
-5. -hist arg
+5. **Histogram of an `image -grayscale -quantized to 5bits`**
 ```bash
 ./ImageDecoder -hist -load "../../../datasets/image/boat.ppm" -grayscale -quantization 5 
 ```
-6. -hist -diff arg , arg
+6. **Histogram of the matrix of absolute difference between `image1` and `image1 -highPass filter`**
 ```bash
-./ImageDecoder -hist -diff -load "../../../datasets/image/boat.ppm" , -load "../../../datasets/image/girl.ppm" -highPass 
+./ImageDecoder -hist -diff -load "../../../datasets/image/boat.ppm" , -load "../../../datasets/image/boat.ppm" -highPass 
 ```
 
 ---
@@ -161,31 +162,36 @@ The problem facing on this is how much each channel weights during the fusion of
 $$
 G(x) = 0.299 * Red + 0.587 * Green + 0.114 * Blue
 $$
-
-
 The weights are determined by perceptual factors that ensure the grayscale image looks natural to the human eye.
-- Table with pixel channels ( **RGB | Grayscale**)
+
+
+### Visual demonstration
+| **Color image** (boat.ppm) | **Grayscale image** (boat.ppm) |
+|----------------------------|--------------------------------|
+|  ![Color](../partIII/imgs/gs_color.png) | ![Grayscale](../partIII/imgs/gs_grayscale.png) | 
+
+### Pixel values before `(RGB)` and after `(GRAYSCALE)` convertion
 ```md
-    - Pixel (0,0): R: 95  , G: 90  , B: 39   | Gray: 85  
-    - Pixel (0,1): R: 98  , G: 90  , B: 41   | Gray: 86  
-    - Pixel (0,2): R: 99  , G: 90  , B: 42   | Gray: 87  
-    - Pixel (0,3): R: 105 , G: 94  , B: 45   | Gray: 91  
-    - Pixel (0,4): R: 108 , G: 96  , B: 46   | Gray: 93  
-    - Pixel (1,0): R: 116 , G: 103 , B: 52   | Gray: 101 
-    - Pixel (1,1): R: 119 , G: 105 , B: 56   | Gray: 103 
-    - Pixel (1,2): R: 120 , G: 106 , B: 57   | Gray: 104 
-    - Pixel (1,3): R: 122 , G: 105 , B: 57   | Gray: 104 
-    - Pixel (1,4): R: 124 , G: 106 , B: 56   | Gray: 105 
-    - Pixel (2,0): R: 121 , G: 103 , B: 49   | Gray: 102 
-    - Pixel (2,1): R: 121 , G: 102 , B: 51   | Gray: 101 
-    - Pixel (2,2): R: 120 , G: 101 , B: 50   | Gray: 100 
-    - Pixel (2,3): R: 125 , G: 106 , B: 54   | Gray: 105 
-    - Pixel (2,4): R: 124 , G: 106 , B: 51   | Gray: 105 
-    - Pixel (3,0): R: 118 , G: 99  , B: 45   | Gray: 98  
-    - Pixel (3,1): R: 120 , G: 102 , B: 47   | Gray: 101 
-    - Pixel (3,2): R: 121 , G: 103 , B: 49   | Gray: 102 
-    - Pixel (3,3): R: 124 , G: 103 , B: 50   | Gray: 103
+    - Pixel (0,0): R: 101 , G: 0   , B: 0    | Gray: 30  
+    - Pixel (0,1): R: 10  , G: 0   , B: 88   | Gray: 13  
+    - Pixel (0,2): R: 19  , G: 0   , B: 78   | Gray: 14  
+    - Pixel (0,3): R: 18  , G: 0   , B: 109  | Gray: 17  
+    - Pixel (1,0): R: 123 , G: 0   , B: 0    | Gray: 36  
+    - Pixel (1,1): R: 135 , G: 129 , B: 82   | Gray: 125 
+    - Pixel (1,2): R: 131 , G: 126 , B: 86   | Gray: 122 
+    - Pixel (1,3): R: 122 , G: 115 , B: 81   | Gray: 113 
+    - Pixel (2,0): R: 126 , G: 0   , B: 0    | Gray: 37  
+    - Pixel (2,1): R: 129 , G: 139 , B: 76   | Gray: 128 
+    - Pixel (2,2): R: 139 , G: 136 , B: 78   | Gray: 130 
+    - Pixel (2,3): R: 128 , G: 120 , B: 82   | Gray: 118 
+    - Pixel (3,0): R: 123 , G: 0   , B: 0    | Gray: 36  
+    - Pixel (3,1): R: 136 , G: 120 , B: 97   | Gray: 122 
+    - Pixel (3,2): R: 134 , G: 140 , B: 93   | Gray: 132 
+    - Pixel (3,3): R: 127 , G: 130 , B: 97   | Gray: 125 
 ```
+Result of the following command:
+> ./ImageDecoder -load "../../../datasets/image/boat.ppm" -channels 
+
 ---
 
 ###  **Gaussian blur filter** 
