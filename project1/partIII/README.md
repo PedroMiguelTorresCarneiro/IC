@@ -162,6 +162,7 @@ The problem facing on this is how much each channel weights during the fusion of
 $$
 G(x) = 0.299 * Red + 0.587 * Green + 0.114 * Blue
 $$
+
 The weights are determined by perceptual factors that ensure the grayscale image looks natural to the human eye.
 
 
