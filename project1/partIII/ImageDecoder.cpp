@@ -404,8 +404,8 @@ cv::Mat ImageDecoder::applyGaussianBlur(const cv::Mat& image, int kernelSize, do
 */
 cv::Mat ImageDecoder::applyHighPassFilter(const cv::Mat& image) {
     // Define fixed kernel size and sigma for Gaussian blur (low-pass filter)
-    int kernelSize = 5;  // Fixed kernel size (must be odd)
-    double sigma = 1.0;  // Fixed sigma value
+    int kernelSize = 9;  // Fixed kernel size (must be odd)
+    double sigma = 2;  // Fixed sigma value
 
     // 1. Create a low-pass (blurred) version of the image
     cv::Mat lowPassImage = cv::Mat::zeros(image.size(), image.type());
