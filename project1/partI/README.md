@@ -255,6 +255,6 @@ We got an python script to plot the histogram command with some thresholds in or
     
     | Histogram of 3Grams Frequencies (ep-11-06-22-011.txt) |
     |-------------------------------|
-    | ![NGramFreq](../partI/imgs/3gramFreq.png) |
+    | ![NGramFreq](../partI/imgs/3GramFreq.png) |
     | `./TextDecoder -hist -nGrams 3 -load ../../../datasets/text/pt/ep-11-06-22-011.txt -lower -punct` |
 
