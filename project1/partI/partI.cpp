@@ -113,139 +113,196 @@ int main() {
 }
 
 */
+using namespace std;
+
+
+vector<vector<string>> parseArgs(const vector<string>& args) {
+    vector<vector<string>> result;
+    vector<string> loadArgs;
+
+    for (size_t i = 0; i < args.size(); ++i) {
+        if (args[i] == "-load") {
+            loadArgs.push_back(args[i]);  // Capture -load
+            loadArgs.push_back(args[++i]);  // Capture file path
+        } else if (args[i] == "-lower" || args[i] == "-punct" || args[i] == "-num" || args[i] == "-display") {
+            loadArgs.push_back(args[i]);  // Capture flags like -lower, -punct, -display
+        }
+    }
+
+    result.push_back(loadArgs);
+    return result;
+}
+
+vector<vector<string>> parseCOMMAND(vector<string> args) {
+    vector<vector<string>> result;
+    vector<string> command;
+    vector<string> fileArgs;
+    vector<string> displayArgs = {"-display", "false"};  // Default display flag to false
+    vector<string> histArgs = {"-hist", "false"};  // Default histogram flag to false
+    int nGramsValue = 0;
+
+    // Handle the first command argument
+    command.push_back(args[0]);
+
+    // Iterate over the rest of the arguments
+    for (size_t i = 1; i < args.size(); ++i) {
+        if (args[0] == "-nGrams") {
+            // Ensure the next argument is the N value for N-grams
+            if (i + 1 < args.size() && args[i].find_first_not_of("0123456789") == string::npos) {
+                nGramsValue = stoi(args[i]);  // Parse N value
+                command.push_back(to_string(nGramsValue));
+                ++i;  // Skip the next argument as it's already processed
+            } else {
+                cerr << "Error: Missing or invalid N value for -nGrams.\n";
+                break;
+            }
+        }
+
+        if (args[i] == "-load") {
+            fileArgs.push_back(args[i]);   // Add -load argument
+            fileArgs.push_back(args[++i]); // Add file path
+        } else if (args[i] == "-lower" || args[i] == "-punct" || args[i] == "-num") {
+            fileArgs.push_back(args[i]);   // Add options like -lower or -punct
+        } else if (args[i] == "-display") {
+            displayArgs[1] = "true";  // Set display flag to true
+        } else if (args[i] == "-hist") {
+            histArgs[1] = "true";  // Set histogram flag to true
+        }
+    }
+
+    result.push_back(command);
+    result.push_back(fileArgs);
+    result.push_back(displayArgs);
+    result.push_back(histArgs);
+
+    return result;
+}
+
+
+void applyTransformations(TextFileReader& reader, const vector<string>& transformations, const string& loadedFileName) {
+    for (const auto& transform : transformations) {
+        if (transform == "-lower") {
+            reader.convertToLowercase(loadedFileName);  // Convert to lowercase
+        } else if (transform == "-punct") {
+            reader.removePunctuation(loadedFileName);  // Remove punctuation
+        } else if (transform == "-display") {
+            reader.printFileContent(loadedFileName);  // Display content
+        } else if (transform == "-num") {
+            reader.removeNumbers(loadedFileName);  // Remove numbers
+        }
+    }
+}
 
 int main(int argc, char* argv[]) {
+    // Set the global locale to UTF-8 using Boost.Locale
     try {
-        // Set the global locale to UTF-8 using Boost.Locale
-        std::locale::global(boost::locale::generator().generate("en_US.UTF-8"));
-    } catch (const std::runtime_error& e) {
-        std::cerr << "Locale setup failed: " << e.what() << std::endl;
+        locale::global(boost::locale::generator().generate("en_US.UTF-8"));
+    } catch (const runtime_error& e) {
+        cerr << "Locale setup failed: " << e.what() << endl;
         return -1;
     }
 
-    if (argc < 3) {
-        cout << "Usage: ./TextDecoder <command> [options]\n";
-        cout << "Commands: \n";
-        cout << "  -load <file-path> [-lower] [-punct] [-display] [-charFreq | -wordFreq | -nGrams <N>]\n";
-        cout << "  -charFreq -load <file-path> [-lower] [-punct] [-display]\n";
-        cout << "  -wordFreq -load <file-path> [-lower] [-punct] [-display]\n";
-        cout << "  -nGrams <N> -load <file-path> [-lower] [-punct] [-display]\n";
-        return -1;
+    TextFileReader reader;  // Assuming you have a TextFileReader class to handle text operations
+    vector<string> args(argv + 1, argv + argc);  // Gather arguments into a vector
+    vector<vector<string>> result;
+
+    string loadedFileName;  // Non-const variable to store the loaded file name
+
+    // First, check if the command is related to loading and transformations
+    if (args[0] == "-load") {
+        cout << "-load" << endl;
+        result = parseArgs(args);
+        const string& filePath = result[0][1];  // Capture the file path
+
+        // Load the file and apply transformations
+        if (reader.loadFile(filePath, loadedFileName)) {
+            applyTransformations(reader, result[0], loadedFileName);  // Apply transformations on the loaded file
+        } else {
+            cerr << "Error: Could not load file: " << filePath << endl;
+            return -1;
+        }
     }
+    // Handle character frequency command
+    else if (args[0] == "-charFreq") {
+        result = parseCOMMAND(args);
+        const string& filePath = result[1][1];
 
-    TextFileReader reader;
-    string loadedFileName;
-    bool lowercase = false, removePunctuation = false, display = false;
-    int nGramsValue = 0;
-    string filePath;
-    string command = argv[1];
-    
-    // Check if the first argument is "-load"
-    if (command == "-load") {
-        if (argc < 3) {
-            cout << "\nError: Missing file path after '-load'.\n\n";
+        if (reader.loadFile(filePath, loadedFileName)) {
+            applyTransformations(reader, result[1], loadedFileName);  // Apply transformations
+            reader.calculateCharsFrequency(loadedFileName, result[3][1] == "true");  // Calculate char frequency
+        } else {
+            cerr << "Error: Could not load file: " << filePath << endl;
             return -1;
         }
+    }
+    // Handle word frequency command
+    else if (args[0] == "-wordFreq") {
+        result = parseCOMMAND(args);
+        const string& filePath = result[1][1];
 
-        filePath = argv[2];  // The file path is the next argument
-
-        // Load the file
-        if (!reader.loadFile(filePath, loadedFileName)) {
-            cout << "Error: Could not load file: " << filePath << "\n";
+        if (reader.loadFile(filePath, loadedFileName)) {
+            applyTransformations(reader, result[1], loadedFileName);  // Apply transformations
+            reader.calculateWordsFrequency(loadedFileName, result[3][1] == "true");  // Calculate word frequency
+        } else {
+            cerr << "Error: Could not load file: " << filePath << endl;
             return -1;
         }
+    }
+    // Handle N-grams frequency command
+    else if (args[0] == "-nGrams") {
+        cout << "-nGrams" << endl;
 
-        // Process remaining options starting from index 3
-        for (int i = 3; i < argc; ++i) {
-            string option = argv[i];
+        // Pass the entire argument list to parseCOMMAND (including nGrams value)
+        result = parseCOMMAND(args);
 
-            if (option == "-lower") {
-                lowercase = true;
-            } else if (option == "-punct") {
-                removePunctuation = true;
-            } else if (option == "-display") {
-                display = true;
-            } else if (option == "-charFreq") {
-                reader.calculateCharsFrequency(loadedFileName);
-                return 0;
-            } else if (option == "-wordFreq") {
-                reader.calculateWordsFrequency(loadedFileName);
-                return 0;
-            } else if (option == "-nGrams") {
-                if (i + 1 < argc) {
-                    nGramsValue = stoi(argv[++i]);
-                    reader.calculateNgramsFrequency(loadedFileName, nGramsValue);
-                    return 0;
-                } else {
-                    cout << "Error: Missing number after -nGrams.\n";
-                    return -1;
+        // Get the N-grams value directly from the parsed result
+        int nGramsValue = stoi(result[0][1]);  // result[0][1] contains the N value
+        cout << "nGramsValue: " << nGramsValue << endl;
+
+        const string& filePath = result[1][1];  // Get the file path
+
+        // Load file and apply transformations
+        if (reader.loadFile(filePath, loadedFileName)) {
+            applyTransformations(reader, result[1], loadedFileName);  // Apply transformations (like -lower, -punct)
+            reader.calculateNgramsFrequency(loadedFileName, nGramsValue, result[3][1] == "true");  // Calculate N-grams
+        } else {
+            cerr << "Error: Could not load file: " << filePath << endl;
+            return -1;
+        }
+    }
+    // Handle histogram flag
+    else if (args[0] == "-hist") {
+        if (args[1] == "-charFreq" || args[1] == "-wordFreq" || args[1] == "-nGrams") {
+            vector<string> subArgs(args.begin() + 1, args.end());
+            result = parseCOMMAND(subArgs);
+            const string& filePath = result[1][1];
+
+            if (reader.loadFile(filePath, loadedFileName)) {
+                applyTransformations(reader, result[1], loadedFileName);  // Apply transformations
+
+                if (subArgs[0] == "-charFreq") {
+                    reader.calculateCharsFrequency(loadedFileName, true);  // Enable histogram for char frequency
+                } else if (subArgs[0] == "-wordFreq") {
+                    reader.calculateWordsFrequency(loadedFileName, true);  // Enable histogram for word frequency
+                } else if (subArgs[0] == "-nGrams") {
+                    int nGramsValue = stoi(result[0][1]);
+                    reader.calculateNgramsFrequency(loadedFileName, nGramsValue, true);  // Enable histogram for N-grams
                 }
             } else {
-                cout << "Error: Unknown option: " << option << "\n";
+                cerr << "Error: Could not load file: " << filePath << endl;
                 return -1;
             }
+        } else {
+            cerr << "Error: Invalid histogram option.\n";
+            return -1;
         }
-
-        // Apply transformations after loading the file
-        if (lowercase) {
-            reader.convertToLowercase(loadedFileName);
-            cout << "File content converted to lowercase.\n";
-        }
-        if (removePunctuation) {
-            reader.removePunctuation(loadedFileName);
-            cout << "Punctuation removed from file content.\n";
-        }
-        if (display) {
-            reader.printFileContent(loadedFileName);
-        }
-    } else if (command == "-nGrams" || command == "-charFreq" || command == "-wordFreq") {
-        // Handle operations like nGrams, charFreq, or wordFreq before -load
-        if (command == "-nGrams") {
-            if (argc < 5) {
-                cout << "Error: Missing number after -nGrams and file path.\n";
-                return -1;
-            }
-
-            nGramsValue = stoi(argv[2]);
-
-            if (string(argv[3]) != "-load") {
-                cout << "Error: Missing '-load' argument for nGrams.\n";
-                return -1;
-            }
-
-            filePath = argv[4];
-            if (!reader.loadFile(filePath, loadedFileName)) {
-                cout << "Error: Could not load file: " << filePath << "\n";
-                return -1;
-            }
-
-            // Apply nGrams after loading the file
-            reader.calculateNgramsFrequency(loadedFileName, nGramsValue);
-
-        } else if (command == "-charFreq" || command == "-wordFreq") {
-            // Check for "-load"
-            if (argc < 4 || string(argv[2]) != "-load") {
-                cout << "Error: Missing '-load' argument for " << command << ".\n";
-                return -1;
-            }
-
-            filePath = argv[3];
-            if (!reader.loadFile(filePath, loadedFileName)) {
-                cout << "Error: Could not load file: " << filePath << "\n";
-                return -1;
-            }
-
-            // Perform the operation based on the command
-            if (command == "-charFreq") {
-                reader.calculateCharsFrequency(loadedFileName);
-            } else if (command == "-wordFreq") {
-                reader.calculateWordsFrequency(loadedFileName);
-            }
-        }
-    } else {
-        cout << "Unknown command: " << command << "\n";
+    }
+    else {
+        cerr << "Error: Unknown command.\n";
         return -1;
     }
 
     return 0;
 }
+
+
