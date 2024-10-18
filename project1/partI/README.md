@@ -34,9 +34,10 @@ COMMAND	:	arg ("-display")*
 		|	"-charFreq" arg 
 		|	"-wordFreq" arg
 		|	"-nGrams" NUM arg
+        |   "-hist" ("-charFreq" arg | "-wordFreq" arg | "-nGrams" NUM arg)
 		;
 
-arg		:	"-load" TEXT ("-lower")* ("-punct")* 
+arg		:	"-load" TEXT ("-lower")* ("-punct")* ("-num")*
         ;
 
 TEXT	:	path_to_text 
@@ -151,22 +152,109 @@ The ***<u>first byte of a UTF-8 sequence</u>*** tells you how many bytes the cha
     To store the file name , and all the lines of that file, giving the suport to add various files to this structure
 ---
 ### convertToLowercase
-There is no simple pattern to covert upper cases in lower cases beside ASCII chars. So we use the fucntion `toLower()`in ASCII chars and the external libraries like **ICU** aor **Boost.locale** for the non-ASCII chars.
-Boost.locale is simpler to use, so we choose this!
-1. Set the global locale to UTF-8 using Boost.Locale
-2. Convert line by line from the content stored like UTF-8
+
+1. **PROBLEM**:
+- inicially we only convert the ASCII chars to $lowercase$ and we have something like this:
+    ```plaintext
+        Inês Águia ---> converting to lowercase --> inês Águia 
+    ``` 
+    As you can see the non-ASCII chars weren't converted to lower case.
+2. **SOLUTION**:
+- There is no simple pattern to convert $uppercase$ on $lowercase$ beside for the ASCII chars.
+- Boost.locale:
+    1. We set the variabel locale to UTF-8
     ```c++
-    for (auto& line : fileContents[fileName]) {
-        // Handles both ASCII and UTF-8 multi-byte characters
-        line = boost::locale::to_lower(line);  
-    }
-    ```
+        locale::global(boost::locale::generator().generate("en_US.UTF-8"));
+    ``` 
+    - In `en_GB.UTF-8` : 
+        - **en** : language
+        - **US** : Country/Region
+        - **UTF-8** : character encoding <br>
+        - there are a lots of diferentes combinations: 
+            - `locale -a` to see them all
+    - for example we are working with ***GREEK*** language the lower case have two forms depending on the position of the letter on the word.
+        - **Σ** (sigma) :
+            - **σ** : Used when it's in the middle of a word.
+            - **ς** : Used when it's at the end of a word.
+        - So we can use this to get the Boost.locale more precise depending on the language we are working.
+    - there are other thinks altered by this:
+        - currency (`£` or `€` - pound sterling or EURO)
+        - number formating (`1 000,00` instead of `1,000.00`)
+        - text direction (Hebrew is `RTL` - right to left) 
+        - spelling differences ( `colour` instead of `color`)
+        - Date (`DD/MM/YYYY` instead of `MM/DD/YYYY`)
+    2. Convert char by char:
+    ```c++
+        for (auto& line : fileContents[fileName]) {
+            for (auto& utf8Char : line) {
+                // Convert the character to lowercase
+                utf8Char = boost::locale::to_lower(utf8Char);  
+            }
+        }
+    ``` 
+
+3. **LIMITATIONS**
+- Using `en_US.UTF-8` we can convert all the basica european languages (English, French German, Spanish) is the most maintainf *locale*. 
+- this will be ok for all except the following that have specific rules:
+    - Greek
+    - Turkish 
+    - Eastern Europe ( Czech, Polish, etc..)
+    - Arabic languages  
+
+### After this solution the result
+```
+    Inês Águia ---> ines águia
+```
 
 ---
-I'm usign macOs and I cannot use c++26, because AppleClang doesnt support, so we have to get another way to read and interpret differents encodings.
-After some online reading we found external libraries and choose the `ICU (International Componentes for Unicode)`. 
-1. **Extract the encoding**
-    - `uchardet_open`   -> creates a charset detector
-    - `ucsdet_setText`  -> sets the imput text for analysis *(4kb)*
-    - `ucsdet_detect`   -> generates a guess about the encoding based on the input text
-    - `ucsdet_getName`  -> retrieves the encoding name
+### remove Punctuation
+
+In the first run I only remove the punctuation and I got the following:
+- **PROBLEM**
+    ```plaitext
+        NAME="Hannes Swoboda"> ---> remove punctuation ---> NAMEHannes Swoboda
+    ```
+    - This is a mistake... because were removing the punctuation only, and removing the punctuation only make us combine words.
+- **SOLUTION**
+    1. **Switch punctuation with `' '`** 
+        - creates another problem we got a lot of duplicate,triplicated,.. `' '`
+    2. **Remove duplicated `' '`**
+    ```plaitext
+        NAME="Hannes Swoboda"> ---> remove punctuation ---> NAME Hannes Swoboda
+    ```
+---
+### remove Numbers
+We aditionally create a function to remove the numbers in order to get stats only about letters:
+- Frequency of determinated letter to understand to what is the most used letter in a language , or the most used letters. With this we can try to create words knowing the percentage in wich each letter appear in a language.
+
+
+(SE TIVER TEMPO FAZER UM BRINCADEIRA PARA CONSTRUIR ALGUMAS PALAVRAS)
+
+
+---
+
+### HISTOGRAM
+We got an python script to plot the histogram command with some thresholds in order to interpretate the values:
+- chars :
+    - appear all the values
+
+    | Histogram of Char Frequencies (ep-11-06-22-011.txt) |
+    |-------------------------------|
+    | ![CharFreq](../partI/imgs/charFreq.png) |
+    | `./TextDecoder -hist -charFreq -load ../../../datasets/text/pt/ep-11-06-22-011.txt -lower -punct` |
+
+- words :
+    - appear only the words above 5 of frequency 
+
+    | Histogram of Word Frequencies (ep-11-06-22-011.txt) |
+    |-------------------------------|
+    | ![WordFreq](../partI/imgs/wordFreq.png) |
+    | `./TextDecoder -hist -wordFreq -load ../../../datasets/text/pt/ep-11-06-22-011.txt -lower -punct` |
+- nGrams :
+    - apper only the ngrams above 2 of frequency
+    
+    | Histogram of 3Grams Frequencies (ep-11-06-22-011.txt) |
+    |-------------------------------|
+    | ![NGramFreq](../partI/imgs/3gramFreq.png) |
+    | `./TextDecoder -hist -nGrams 3 -load ../../../datasets/text/pt/ep-11-06-22-011.txt -lower -punct` |
+
