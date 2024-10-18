@@ -87,10 +87,12 @@ A command can be:
 
 2. **arg:**
     - `-load` *IMAGE* --> load the *IMAGE*
-    - <u>Optionally</u>, following operations can be applied to the loaded image:
+    - <u>Optionally</u>, following operations can be applied to the loaded image **in whatever order wanted**:
         - `-grayscale` -->  Grayscale conversion
         - `-gaussian` *NUM* *NUM* --> Apply Gaussian-blur <***kernel size***> <***sigma***> 
         - `-quantization` *NUM* --> Quantize <***nº levels***>.
+        - `-channels` --> show RGB channels values and the comparing with grayscale values
+        - `-highPass` --> Apply a HighPass filter 
 
 3. **IMAGE:**
     - ***Path*** where the image is stored.
@@ -371,4 +373,98 @@ Comparing the original image with the quantized one using ***MSE*** and ***PSNR*
 
 > This coherence between quantization levels and error metrics demonstrates that as the number of quantization levels increases, more details are preserved, and the image quality improves.
 
+---
+### **HighPass Filter**
+With the function that already have I try to make another "filters" and I found the $HighPass filter$, that is somehow a simplistic <u>edge detector</u>.
+
+In theory:
+
+$$
+    \text{HighPass Filter} = Image - \text{LowPassFilter}
+$$
+
+```
+    LowPass Filter --> Gaussian blur filter to remove the high frequencies detail `edges` 
+```
+
+- This difference will highlight what we try to remove with the lowPass Filter, so the `edges will appear`.
+
+| **Original Image** (arial.ppm) | **Image with HighPass filter** (arial.ppm) |
+|--------------------------------|--------------------------------------------|
+| ![Original](../partIII/imgs/arial.png) | ![HighPass Filter](../partIII/imgs/arial_highpass.png) |
+| `./ImageDecoder -load "../../../datasets/image/arial.ppm" -display` | `./ImageDecoder -load "../../../datasets/image/arial.ppm" -highPass -display` |
+
+
+But now we depared ourselves with a problem... the image after this transformation got a **`FRAME`**. Why this appear? 
+
+1. Interpreting the result:
+    - **darker zones** => $HighPass filter$ result is **low** => **small differences** between original and blured image ==> **`MINIMAL CHANGE`**
+    - **brighter zones** => $HighPass filter$ result is **high** => **larger differences** between original and blured image ==> **`LARGER CHANGE`**
+
+<br>
+
+So we have big differences in the frame of the image and the problem can only reside on the $LowPass filter$, aka <u>gaussian blur filter</u>:
+
+### The effect is not being applyed to border in the same way as the rest of the pixels from the image.
+
+```
+    - KERNEKL 3x3 for all
+
+     PIXEL (5x5)           PIXEL (1x5)       PIXEL (0x0)
+    .___.___.___.          .___.___.         .___.___.
+    |___|___|___|          |___|___|         |_x_|___|
+    |___|_x_|___|          |_X_|___|         |___|___|
+    |___|___|___|          |___|___|
+
+```
+With this representation we can see the problem. The **3x3 kernel** is applied to every pixel, but at the image borders, the kernel doesn’t have sufficient surrounding pixel values for `convolution`, causing distortions like the "frame" effect
+
+- **Solutions**:
+    - ***Replicate border***
+        - border pixels are copied from the nearest edge of the image
+        ```
+            - KERNEKL 3x3 for all
+
+            PIXEL (5x5)             PIXEL (1x5)           PIXEL (0x0)
+            .___.___.___.          .___.___.___.         .___.___.___.
+            |_1_|_2_|_3_|          |_/_|_1_|_2_|         |_/_|_/_|_/_|
+            |_4_|_X_|_6_|          |_/_|_X_|_4_|         |_/_|_X_|_2_|
+            |_7_|_8_|_9_|          |_/_|_5_|_6_|         |_/_|_3_|_4_|
+
+            - AFTER REPLICATE
+
+            PIXEL (5x5)             PIXEL (1x5)           PIXEL (0x0)
+            .___.___.___.          .___.___.___.         .___.___.___.
+            |_1_|_2_|_3_|          |_1_|_1_|_2_|         |_X_|_X_|_2_|
+            |_4_|_X_|_6_|          |_X_|_X_|_4_|         |_X_|_X_|_2_|
+            |_7_|_8_|_9_|          |_5_|_5_|_6_|         |_3_|_3_|_4_|
+
+        ```
+
+    - ***Reflect border***
+        - the pixels outside the border are reflected acress the edge 
+        ```
+            - KERNEKL 3x3 for all
+
+            PIXEL (5x5)             PIXEL (1x5)           PIXEL (0x0)
+            .___.___.___.          .___.___.___.         .___.___.___.
+            |_1_|_2_|_3_|          |_/_|_1_|_2_|         |_/_|_/_|_/_|
+            |_4_|_X_|_6_|          |_/_|_X_|_4_|         |_/_|_X_|_2_|
+            |_7_|_8_|_9_|          |_/_|_5_|_6_|         |_/_|_3_|_4_|
+
+            - AFTER REFLECT
+
+            PIXEL (5x5)             PIXEL (1x5)           PIXEL (0x0)
+            .___.___.___.          .___.___.___.         .___.___.___.
+            |_1_|_2_|_3_|          |_2_|_1_|_2_|         |_4_|_3_|_4_|
+            |_4_|_X_|_6_|          |_4_|_X_|_4_|         |_2_|_X_|_2_|
+            |_7_|_8_|_9_|          |_6_|_5_|_6_|         |_4_|_3_|_4_|
+
+        ```
+
+| **Original Image** (arial.ppm) | **Image with HighPass filter** (arial.ppm) |
+|--------------------------------|--------------------------------------------|
+| ![Original](../partIII/imgs/arial.png) | ![HighPass Filter](../partIII/imgs/hp_replicate.png) |
+| `./ImageDecoder -load "../../../datasets/image/arial.ppm" -display` | `./ImageDecoder -load "../../../datasets/image/arial.ppm" -highPass -display` |
+|  | using OpenCv function to calculate the *GaussianFilter* with BORDER_REPLICATE |
 ---

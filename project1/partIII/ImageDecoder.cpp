@@ -405,11 +405,13 @@ cv::Mat ImageDecoder::applyGaussianBlur(const cv::Mat& image, int kernelSize, do
 cv::Mat ImageDecoder::applyHighPassFilter(const cv::Mat& image) {
     // Define fixed kernel size and sigma for Gaussian blur (low-pass filter)
     int kernelSize = 9;  // Fixed kernel size (must be odd)
-    double sigma = 2;  // Fixed sigma value
+    double sigma = 2;    // Fixed sigma value
 
-    // 1. Create a low-pass (blurred) version of the image
+    // 1. Create a low-pass (blurred) version of the image with proper border handling
     cv::Mat lowPassImage = cv::Mat::zeros(image.size(), image.type());
-    lowPassImage = applyGaussianBlur(image, kernelSize, sigma); // Use the existing Gaussian blur function
+    //lowPassImage = applyGaussianBlur(image, kernelSize, sigma); // Gaussian blur with border handling
+    
+    cv::GaussianBlur(image, lowPassImage, cv::Size(kernelSize, kernelSize), sigma, sigma, cv::BORDER_REPLICATE);
 
     // 2. Create a Mat to store the high-pass filtered image
     cv::Mat highPassImage = cv::Mat::zeros(image.size(), image.type());
@@ -419,7 +421,7 @@ cv::Mat ImageDecoder::applyHighPassFilter(const cv::Mat& image) {
         for (int col = 0; col < image.cols; ++col) {
             if (image.channels() == 1) { // Grayscale image
                 int highPassValue = image.at<uchar>(row, col) - lowPassImage.at<uchar>(row, col);
-                // Ensure pixel value remains in the valid range [0, 255]
+                // Ensure pixel value remains in the valid range [0, 255] with saturate_cast
                 highPassImage.at<uchar>(row, col) = cv::saturate_cast<uchar>(highPassValue);
             } else if (image.channels() == 3) { // Color image (BGR)
                 cv::Vec3b originalPixel = image.at<cv::Vec3b>(row, col);
@@ -438,6 +440,7 @@ cv::Mat ImageDecoder::applyHighPassFilter(const cv::Mat& image) {
 
     return highPassImage;
 }
+
 
 // ------------------------------------------------------------------------------------------------
 // ---------------------------------| Calculate Absolute Difference | ----------------------------
