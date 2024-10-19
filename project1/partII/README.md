@@ -49,3 +49,12 @@ The waveform of an audio file represents how the different amplitude values alon
 ```md
     for (std::size_t i = 0; i < sampleCount; i += channelCount) 
 ```
+
+To draw the waveform, we used the sfml sf::VertexArray with the sf::LineStrip property to draw lines based on the amplitude values.
+
+![Waveform](../partII/figures/Waveform.jpg) 
+Example of a waveform being displayed
+
+## **Quantization**
+
+Quantization is the process with which we reduce the number of bits needed to represent an audio file by reducing the number of amplitude values the samples can have. This, however, results in loss of audio quality.

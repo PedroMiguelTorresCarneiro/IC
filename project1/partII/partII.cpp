@@ -66,10 +66,13 @@ int main(){
                 histogram(filename);
                 break;
             case 6:
+            {
                 std::cout << "Number of quantization levels: "<<std::endl;
                 std::cin >> level;
-                quantize(filename, level);
+                std::vector<sf::Int16> quantizedSamples = quantize(filename, level);
+                plotTwoWaveforms(filename, quantizedSamples);
                 break;
+            }
             case 7:
                 std::cout<< "Bye Bye!"<<std::endl;
                 break;

@@ -17,5 +17,5 @@ int getDetails(string filename);
 int plotWaveform(string filename);
 void plotTwoWaveforms(string filename, const std::vector<sf::Int16>& quantizedSamples);
 int histogram(string filename);
-int quantize(string filename, int level);
+std::vector<sf::Int16> quantize(string filename, int level);
 #endif

@@ -219,11 +219,10 @@ int histogram(string filename){
 
 //--------------------------------- QUANTIZE THE AUDIO ----------------------------------------
 
-int quantize(string filename, int level){
+std::vector<sf::Int16> quantize(string filename, int level){
     sf::SoundBuffer buffer;
     if (!buffer.loadFromFile(filename)){
         std::cerr << "Error loading sound file" << std::endl;
-        return -1;
     }
 
     const sf::Int16* samples = buffer.getSamples();
@@ -250,7 +249,5 @@ int quantize(string filename, int level){
     }
 
     //compare the original and quantized audio
-    plotTwoWaveforms(filename, quantizedSamples); 
-
-    return 0;
+    return quantizedSamples;
 }
