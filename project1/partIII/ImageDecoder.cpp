@@ -443,6 +443,88 @@ cv::Mat ImageDecoder::applyHighPassFilter(const cv::Mat& image) {
 
 
 // ------------------------------------------------------------------------------------------------
+// ---------------------------------| Rotate Image | ----------------------------------------------
+// ------------------------------------------------------------------------------------------------
+/*
+    Steps to Manually Rotate an Image:
+        1 - Calculate the center of the image.
+        2 - Convert the angle to radians.
+        3 - Create an output image with the same size and type.
+        4 - Iterate over each pixel in the output image.
+        5 - Calculate the coordinates of the original pixel after rotation.
+        6 - Check if the calculated coordinates are inside the image bounds.
+        7 - Assign the pixel value to the rotated image.
+        8 - Return the rotated image.
+*/
+cv::Mat ImageDecoder::rotateImage(const cv::Mat& image, double angleDegrees) {
+    printf("Rotating image by %.2f degrees\n", angleDegrees);
+    // Calculate the center of the image
+    cv::Point2f center(image.cols / 2.0, image.rows / 2.0);
+    
+    // Convert angle to radians
+    double angleRadians = angleDegrees * CV_PI / 180.0;
+
+    // Create an output image
+    cv::Mat rotatedImage = cv::Mat::zeros(image.size(), image.type());
+
+    // Iterate over each pixel in the output image
+    for (int row = 0; row < rotatedImage.rows; ++row) {
+        for (int col = 0; col < rotatedImage.cols; ++col) {
+            // Calculate the coordinates of the original pixel
+            int x = static_cast<int>((col - center.x) * cos(angleRadians) + 
+                                     (row - center.y) * sin(angleRadians) + center.x);
+            int y = static_cast<int>(-(col - center.x) * sin(angleRadians) + 
+                                     (row - center.y) * cos(angleRadians) + center.y);
+            
+            // Check if the calculated coordinates are inside the image bounds
+            if (x >= 0 && x < image.cols && y >= 0 && y < image.rows) {
+                rotatedImage.at<cv::Vec3b>(row, col) = image.at<cv::Vec3b>(y, x);
+            }
+        }
+    }
+    return rotatedImage;
+    
+}
+
+
+// ------------------------------------------------------------------------------------------------
+// ---------------------------------| Invert Colors | ---------------------------------------------
+// ------------------------------------------------------------------------------------------------
+/*
+    Steps to Manually Invert Colors in an Image:
+        1 - Create a new matrix to store the inverted image.
+        2 - Iterate over each pixel in the image.
+        3 - Check if the image is grayscale or RGB.
+        4 - Invert the pixel values for each channel (B, G, R).
+        5 - Assign the inverted pixel value to the new image.
+        6 - Return the inverted image.
+*/
+cv::Mat ImageDecoder::invertColors(const cv::Mat& image) {
+    cv::Mat invertedImage = cv::Mat::zeros(image.size(), image.type());
+
+    for (int row = 0; row < image.rows; ++row) {
+        for (int col = 0; col < image.cols; ++col) {
+            if (image.channels() == 1) {
+                // Grayscale image
+                uchar pixel = image.at<uchar>(row, col);
+                invertedImage.at<uchar>(row, col) = 255 - pixel;
+            } else if (image.channels() == 3) {
+                // Color image (BGR)
+                cv::Vec3b pixel = image.at<cv::Vec3b>(row, col);
+                invertedImage.at<cv::Vec3b>(row, col)[0] = 255 - pixel[0];  // Blue channel
+                invertedImage.at<cv::Vec3b>(row, col)[1] = 255 - pixel[1];  // Green channel
+                invertedImage.at<cv::Vec3b>(row, col)[2] = 255 - pixel[2];  // Red channel
+            }
+        }
+    }
+
+    return invertedImage;
+}
+
+
+
+
+// ------------------------------------------------------------------------------------------------
 // ---------------------------------| Calculate Absolute Difference | ----------------------------
 // ------------------------------------------------------------------------------------------------
 /*

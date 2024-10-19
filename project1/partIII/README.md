@@ -68,7 +68,7 @@ COMMAND :   "-diff" arg "," arg  ("-display")*
         |   "-hist" (arg | "-diff" arg "," arg )
         ;
 
-arg     :    "-load" IMAGE ("-grayscale")* ("-gaussian" NUM NUM)* ("-quantization" NUM)* ("-channels")* ("-highPass")*
+arg     :    "-load" IMAGE ("-grayscale")* ("-gaussian" NUM NUM)* ("-quantization" NUM)* ("-channels")* ("-highPass")* ("-rotate" NUM)*
         ;
 
 IMAGE   :  path_to_image
@@ -93,6 +93,7 @@ A command can be:
         - `-quantization` *NUM* --> Quantize <***nº levels***>.
         - `-channels` --> show RGB channels values and the comparing with grayscale values
         - `-highPass` --> Apply a HighPass filter 
+        - `-rotate` *NUM* --> Rotate the image $NUMº$ 
 
 3. **IMAGE:**
     - ***Path*** where the image is stored.
@@ -467,4 +468,21 @@ With this representation we can see the problem. The **3x3 kernel** is applied t
 | ![Original](../partIII/imgs/arial.png) | ![HighPass Filter](../partIII/imgs/hp_replicate.png) |
 | `./ImageDecoder -load "../../../datasets/image/arial.ppm" -display` | `./ImageDecoder -load "../../../datasets/image/arial.ppm" -highPass -display` |
 |  | using OpenCv function to calculate the *GaussianFilter* with BORDER_REPLICATE |
+
 ---
+### ROTATE PICTURE
+
+1. Rotation Function (Manual Implementation)
+Steps for rotation:
+
+For each pixel in the new (rotated) image, compute where that pixel comes from in the original image.
+Use an inverse rotation formula.
+Assign the pixel from the original image to the new position in the rotated image.
+
+---
+### INVERT COLORS
+
+2. Invert Colors Function (Manual Implementation)
+Steps for inverting colors:
+
+For each pixel, subtract the pixel's color value from the maximum intensity (255 for 8-bit images).

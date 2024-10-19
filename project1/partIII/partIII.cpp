@@ -99,15 +99,17 @@ std::vector<std::vector<std::string>> parseARG(std::vector<std::string> args) {
             loadArgs.push_back(args[i]);
             loadArgs.push_back(args[++i]);  // The path to the image
         } else if (args[i] == "-grayscale" || args[i] == "-gaussian" || args[i] == "-quantization" ||
-                   args[i] == "-channels" || args[i] == "-highPass") {
+                   args[i] == "-channels" || args[i] == "-highPass" || args[i] == "-rotate" || args[i] == "-invert") {
             loadArgs.push_back(args[i]);
 
-            // If -gaussian or -quantization requires values, parse them
+            // If -gaussian or -quantization or -rotate requires values, parse them
             if (args[i] == "-gaussian") {
                 loadArgs.push_back(args[++i]);  // Kernel size
                 loadArgs.push_back(args[++i]);  // Sigma
             } else if (args[i] == "-quantization") {
                 loadArgs.push_back(args[++i]);  // Quantization level
+            } else if (args[i] == "-rotate") {
+                loadArgs.push_back(args[++i]);  // Angle
             }
         } else if (args[i] == "-display") {
             loadArgs.push_back(args[i]);
@@ -161,6 +163,7 @@ std::vector<std::vector<std::string>> parseCOMMAND(std::vector<std::string> args
 
 cv::Mat applyTransformations(cv::Mat image, const std::vector<std::string>& transformations) {
     ImageDecoder decoder;  // Assume you have an instance of ImageDecoder class to handle operations
+    bool imageLoaded = false;  // Track whether the image has been loaded
 
     for (size_t i = 0; i < transformations.size(); ++i) {
         if (transformations[i] == "-load") {
@@ -170,33 +173,71 @@ cv::Mat applyTransformations(cv::Mat image, const std::vector<std::string>& tran
                 std::cerr << "Error: Could not load image from path: " << imagePath << std::endl;
                 return image;
             }
-            //std::cout << "Loaded image from: " << imagePath << std::endl;
+            imageLoaded = true;  // Set the flag to indicate the image has been loaded
+            std::cout << "Loaded image from: " << imagePath << std::endl;
         } 
         else if (transformations[i] == "-grayscale") {
-            //std::cout << "Applying grayscale transformation" << std::endl;
+            if (!imageLoaded) {
+                std::cerr << "Error: Image must be loaded before applying transformations" << std::endl;
+                return image;
+            }
+            std::cout << "Applying grayscale transformation" << std::endl;
             image = decoder.convertToGrayscale(decoder.splitChannels(image));
         } 
         else if (transformations[i] == "-gaussian") {
+            if (!imageLoaded) {
+                std::cerr << "Error: Image must be loaded before applying transformations" << std::endl;
+                return image;
+            }
             int kernelSize = std::stoi(transformations[++i]);
             double sigma = std::stod(transformations[++i]);
-            //std::cout << "Applying gaussian blur with kernel size: " << kernelSize << " and sigma: " << sigma << std::endl;
+            std::cout << "Applying gaussian blur with kernel size: " << kernelSize << " and sigma: " << sigma << std::endl;
             image = decoder.applyGaussianBlur(image, kernelSize, sigma);
         } 
         else if (transformations[i] == "-quantization") {
+            if (!imageLoaded) {
+                std::cerr << "Error: Image must be loaded before applying transformations" << std::endl;
+                return image;
+            }
             int quantizationLevel = std::stoi(transformations[++i]);
-            //std::cout << "Applying quantization with level: " << quantizationLevel << std::endl;
+            std::cout << "Applying quantization with level: " << quantizationLevel << std::endl;
             image = decoder.imageQuantization(image, quantizationLevel);
         } 
         else if (transformations[i] == "-channels") {
-            //std::cout << "Displaying image channels" << std::endl;
+            if (!imageLoaded) {
+                std::cerr << "Error: Image must be loaded before applying transformations" << std::endl;
+                return image;
+            }
+            std::cout << "Displaying image channels" << std::endl;
             decoder.displayChannels(decoder.splitChannels(image), decoder.convertToGrayscale(decoder.splitChannels(image)));
         } 
         else if (transformations[i] == "-highPass") {
-            //std::cout << "Applying high pass filter" << std::endl;
+            if (!imageLoaded) {
+                std::cerr << "Error: Image must be loaded before applying transformations" << std::endl;
+                return image;
+            }
+            std::cout << "Applying high pass filter" << std::endl;
             image = decoder.applyHighPassFilter(image);
         } 
+        else if (transformations[i] == "-rotate") {
+            if (!imageLoaded) {
+                std::cerr << "Error: Image must be loaded before applying transformations" << std::endl;
+                return image;
+            }
+            double angle = std::stod(transformations[++i]);
+            std::cout << "Rotating the image by " << angle << " degrees" << std::endl;
+            image = decoder.rotateImage(image, angle);
+        }
+        else if (transformations[i] == "-invert") {
+            if (!imageLoaded) {
+                std::cerr << "Error: Image must be loaded before applying transformations" << std::endl;
+                return image;
+            }
+            std::cout << "Inverting the colors of the image" << std::endl;
+            image = decoder.invertColors(image);
+        } 
         else if (transformations[i] == "-display") {
-            //std::cout << "Displaying the image" << std::endl;
+            std::cout << "Displaying the image" << std::endl;
             decoder.displayImage(image);  // Display the final image
         }
     }

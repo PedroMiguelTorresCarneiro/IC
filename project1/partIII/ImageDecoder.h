@@ -39,6 +39,12 @@ public:
     // ----------------------------------------------- Apply High Pass Filter to the Image
     cv::Mat applyHighPassFilter(const cv::Mat& image);
 
+    // ----------------------------------------------- Apply a Rotation to the Image
+    cv::Mat rotateImage(const cv::Mat& image, double angleDegrees);
+
+    // ----------------------------------------------- Apply Filter to INVERT the Colors
+    cv::Mat invertColors(const cv::Mat& image);
+
     // ----------------------------------------------- Calculate Absolute Difference
     cv::Mat calculateAbsoluteDifference(const cv::Mat& image1, const cv::Mat& image2);
 
