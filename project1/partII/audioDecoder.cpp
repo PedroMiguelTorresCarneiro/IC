@@ -251,3 +251,36 @@ std::vector<sf::Int16> quantize(string filename, int level){
     //compare the original and quantized audio
     return quantizedSamples;
 }
+
+//--------------------------------- CALCULATE MSE ----------------------------------------
+//remember, higher MSE = bigger difference betwenn audio
+
+double MSE(const std::vector<sf::Int16>& quantizedSamples, string filename){
+    sf::SoundBuffer buffer;
+    if (!buffer.loadFromFile(filename)){
+        std::cerr << "Error loading sound file" << std::endl;
+        return -1.0;
+    }
+
+    const sf::Int16* originalSamples = buffer.getSamples();
+    std::size_t sampleCount = buffer.getSampleCount();
+
+    if(quantizedSamples.size() != sampleCount){
+        std::cerr<<"Sample count must be equal!"<<std::endl;
+        return -1.0;
+    }
+
+    double mse = 0.0;
+
+    for(std::size_t i = 0; i<sampleCount; ++i){
+
+        //difference betwenn original and quantized samples, then squared
+        double difference = static_cast<double>(originalSamples[i] - quantizedSamples[i]);
+        mse += pow(difference, 2); 
+    }
+
+    //calculate the average
+    mse /= static_cast<double>(sampleCount);
+
+    return mse;
+}

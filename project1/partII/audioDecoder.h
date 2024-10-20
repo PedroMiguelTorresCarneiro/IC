@@ -18,4 +18,5 @@ int plotWaveform(string filename);
 void plotTwoWaveforms(string filename, const std::vector<sf::Int16>& quantizedSamples);
 int histogram(string filename);
 std::vector<sf::Int16> quantize(string filename, int level);
+double MSE(const std::vector<sf::Int16>& quantizedSamples, string filename);
 #endif
