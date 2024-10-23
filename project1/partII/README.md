@@ -20,13 +20,44 @@
     cd build
     cmake ..
     make
-    ./SoundDecoder
+    ```
+    Then, choose what action you want to perfrom and run the respective command.
+    Examples:
+    <br>
+    Get audio file details:
+    - You can change the "sample01.wav" to whichever file you want 
+    ```bash
+    ./SoundDecoder details ../../../datasets/audio/sample01.wav
     ```
 
-    Or, just:
-    
+    Get audio file waveform:
+
     ```bash
-    $ sh run.sh
+    ./SoundDecoder waveform ../../../datasets/audio/sample01.wav
+    ```
+
+    Get audio file histogram:
+
+    ```bash
+    ./SoundDecoder histogram ../../../datasets/audio/sample01.wav
+    ```
+
+    Quantize and compare audio:
+    - You can change the "45" to how many quantization levels you want
+    ```bash
+    ./SoundDecoder quantize ../../../datasets/audio/sample01.wav 45
+    ```
+
+    Quantize and show MSE:
+
+    ```bash
+    ./SoundDecoder MSE ../../../datasets/audio/sample01.wav 45
+    ```
+
+    Quantize and show SNR:
+
+    ```bash
+    ./SoundDecoder SNR ../../../datasets/audio/sample01.wav 45
     ```
 ## **Audio with SFML**
 Sfml is a library that allows us to maipulate audio in a number of ways.
