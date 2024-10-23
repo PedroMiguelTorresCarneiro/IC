@@ -189,7 +189,7 @@ int histogram(string filename){
     int binSize = (amplMax - amplMin)/binCount;
 
     for (std::size_t i=0; i<sampleCount; i++){
-        //haven't differentiated between L and R channels, need to get on that
+
         int binIndex = (samples[i] - amplMin)/binSize; 
 
         //ensure that the bin is withing the specified range
@@ -234,7 +234,6 @@ std::vector<sf::Int16> quantize(string filename, int level){
     //define step size
     float stepSize = (amplMax - amplMin) / float(level);
 
-    //vector to keep quantized samples
     std::vector<sf::Int16> quantizedSamples(sampleCount);
 
     for (std::size_t i=0; i<sampleCount; ++i){
@@ -281,6 +280,7 @@ double MSE(const std::vector<sf::Int16>& quantizedSamples, string filename){
 }
 
 //--------------------------------- CALCULATE SNR ----------------------------------------
+//this time is different, the higher the SNR the less difference there is
 
 double SNR(const std::vector<sf::Int16>& quantizedSamples, string filename, double mse){
     sf::SoundBuffer buffer;

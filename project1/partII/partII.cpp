@@ -7,9 +7,81 @@
 
 using namespace std;
 
+int main(int argc, char* argv[]){
+    
+    std::string choice = argv[1];
 
+    if(choice == "details"){
 
+        if(argc < 2){
+            std::cout<<"Not enough arguments"<<std::endl;
+            return -1;
+        }
 
+        string filename = argv[2];
+        getDetails(filename);
+
+    }else if(choice == "waveform"){
+        if(argc < 2){
+            std::cout<<"Not enough arguments"<<std::endl;
+            return -1;
+        }
+        
+        string filename = argv[2];
+        plotWaveform(filename);
+
+    }else if(choice == "histogram"){
+        if(argc < 2){
+            std::cout<<"Not enough arguments"<<std::endl;
+            return -1;
+        }
+        
+        string filename = argv[2];
+        histogram(filename);
+
+    }else if(choice == "quantize"){
+        if(argc < 3){
+            std::cout<<"Not enough arguments"<<std::endl;
+            return -1;
+        }
+        
+        string filename = argv[2];
+        int level = atoi(argv[3]);
+        std::vector<sf::Int16> quantizedSamples = quantize(filename, level);
+        plotTwoWaveforms(filename, quantizedSamples);
+
+    }else if(choice == "MSE"){
+        if(argc < 3){
+            std::cout<<"Not enough arguments"<<std::endl;
+            return -1;
+        }
+        
+        string filename = argv[2];
+        int level = atoi(argv[3]);
+        std::vector<sf::Int16> quantizedSamples = quantize(filename, level);
+        std::cout<< MSE(quantizedSamples, filename) <<std::endl;
+
+    }else if(choice == "SNR"){
+        if(argc < 3){
+            std::cout<<"Not enough arguments"<<std::endl;
+            return -1;
+        }
+        
+        string filename = argv[2];
+        int level = atoi(argv[3]);
+        std::vector<sf::Int16> quantizedSamples = quantize(filename, level);
+        double mse = MSE(quantizedSamples, filename);
+        std::cout<<SNR(quantizedSamples, filename, mse)<<std::endl;
+
+    }else{
+        std::cout<<"Invalid option";
+        return -1;
+    }
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////Old menu interaction//////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 string getAudioFIle(){
     string start = "../../../datasets/audio/sample0";
     string finish =".wav";
@@ -99,3 +171,4 @@ int main(){
     }
     
 }
+*/
