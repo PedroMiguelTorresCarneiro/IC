@@ -13,7 +13,7 @@ int playAudio(string filename) {
     sf::SoundBuffer buffer;
 
     if (!buffer.loadFromFile(filename)){
-        std::cout<<"Invalid file!\n";
+        std::cerr << "Invalid file!" << std::endl;
         return -1;
     }
 
@@ -37,7 +37,7 @@ int getDetails(string filename){
     sf::SoundBuffer buffer;
 
     if (!buffer.loadFromFile(filename)){
-        std::cout<<"Invalid file!\n";
+        std::cerr << "Invalid file!" << std::endl;
         return -1;
     }
 
@@ -71,7 +71,7 @@ int getDetails(string filename){
 int plotWaveform(string filename){
     sf::SoundBuffer buffer;
     if (!buffer.loadFromFile(filename)){
-        std::cerr << "Error loading sound file" << std::endl;
+        std::cerr << "Invalid file!" << std::endl;
         return -1;
     }
 
@@ -121,7 +121,7 @@ int plotWaveform(string filename){
 void plotTwoWaveforms(string filename, const std::vector<sf::Int16>& quantizedSamples) {
     sf::SoundBuffer buffer;
     if (!buffer.loadFromFile(filename)) {
-        std::cerr << "Error loading sound file" << std::endl;
+        std::cerr << "Invalid file!" << std::endl;
         return;
     }
 
@@ -174,7 +174,7 @@ void plotTwoWaveforms(string filename, const std::vector<sf::Int16>& quantizedSa
 int histogram(string filename){
     sf::SoundBuffer buffer;
     if (!buffer.loadFromFile(filename)){
-        std::cerr << "Error loading sound file" << std::endl;
+        std::cerr << "Invalid file!" << std::endl;
         return -1;
     }
 
@@ -222,7 +222,7 @@ int histogram(string filename){
 std::vector<sf::Int16> quantize(string filename, int level){
     sf::SoundBuffer buffer;
     if (!buffer.loadFromFile(filename)){
-        std::cerr << "Error loading sound file" << std::endl;
+        std::cerr << "Invalid file!" << std::endl;
     }
 
     const sf::Int16* samples = buffer.getSamples();
@@ -253,22 +253,17 @@ std::vector<sf::Int16> quantize(string filename, int level){
 }
 
 //--------------------------------- CALCULATE MSE ----------------------------------------
-//remember, higher MSE = bigger difference betwenn audio
+//remember, higher MSE = bigger difference between audio
 
 double MSE(const std::vector<sf::Int16>& quantizedSamples, string filename){
     sf::SoundBuffer buffer;
     if (!buffer.loadFromFile(filename)){
-        std::cerr << "Error loading sound file" << std::endl;
+        std::cerr << "Invalid file!" << std::endl;
         return -1.0;
     }
 
     const sf::Int16* originalSamples = buffer.getSamples();
     std::size_t sampleCount = buffer.getSampleCount();
-
-    if(quantizedSamples.size() != sampleCount){
-        std::cerr<<"Sample count must be equal!"<<std::endl;
-        return -1.0;
-    }
 
     double mse = 0.0;
 
@@ -284,3 +279,32 @@ double MSE(const std::vector<sf::Int16>& quantizedSamples, string filename){
 
     return mse;
 }
+
+//--------------------------------- CALCULATE SNR ----------------------------------------
+
+double SNR(const std::vector<sf::Int16>& quantizedSamples, string filename, double mse){
+    sf::SoundBuffer buffer;
+    if (!buffer.loadFromFile(filename)){
+        std::cerr << "Invalid file!" << std::endl;
+        return -1.0;
+    }
+
+    const sf::Int16* originalSamples = buffer.getSamples();
+    std::size_t sampleCount = buffer.getSampleCount();
+
+    double signalPower = 0.0;
+    double noisePower = 0.0;
+    double SNR = 0.0;
+
+    for(std::size_t i = 0; i<sampleCount; ++i){
+        signalPower += std::pow(static_cast<double>(originalSamples[i]), 2);
+    }
+
+    //we must multiply by sampleCount becasue mse is an average and we want total noise power
+    noisePower = mse * sampleCount;
+    
+
+    SNR = 10.0 * std::log10(signalPower / noisePower);
+
+    return SNR;
+} 

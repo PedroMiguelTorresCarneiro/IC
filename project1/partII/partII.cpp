@@ -46,6 +46,7 @@ int main(){
         std::cout << "5 - Show histogram of amplitudes"<<std::endl;
         std::cout << "6 - Quantize audio"<<std::endl;
         std::cout << "7 - Calculate and show MSE"<<std::endl;
+        std::cout << "8 - Calculate and show SNR"<<std::endl;
         std::cout<<"-----------------------------------------------"<<std::endl;
         std::cin >> option;
 
@@ -79,6 +80,15 @@ int main(){
                 std::cin >> level;
                 std::vector<sf::Int16> quantizedSamples = quantize(filename, level);
                 std::cout<< MSE(quantizedSamples, filename) <<std::endl;
+                break;
+            }
+            case 8:
+                {
+                std::cout << "Number of quantization levels: "<<std::endl;
+                std::cin >> level;
+                std::vector<sf::Int16> quantizedSamples = quantize(filename, level);
+                double mse = MSE(quantizedSamples, filename);
+                std::cout<<SNR(quantizedSamples, filename, mse)<<std::endl;
                 break;
             }
 
