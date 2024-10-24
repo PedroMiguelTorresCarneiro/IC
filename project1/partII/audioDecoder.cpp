@@ -181,37 +181,75 @@ int histogram(string filename){
     const sf::Int16* samples = buffer.getSamples();
     std::size_t sampleCount = buffer.getSampleCount();
 
-
-    int binCount = 30; //number of bins, could be changed
+    int binCount = 30; // number of bins
     int amplMax = 32767;
     int amplMin = -32768;
-    std::vector<int> bins(binCount, 0); //range of the bins
-    int binSize = (amplMax - amplMin)/binCount;
+    int binSize = (amplMax - amplMin) / binCount;
 
-    for (std::size_t i=0; i<sampleCount; i++){
+    // Vectors to hold mid and side channels
+    std::vector<int> midChannel(sampleCount / 2, 0);
+    std::vector<int> sideChannel(sampleCount / 2, 0);
+    std::vector<int> midHistogram(binCount, 0);
+    std::vector<int> sideHistogram(binCount, 0);
 
-        int binIndex = (samples[i] - amplMin)/binSize; 
 
-        //ensure that the bin is withing the specified range
-        if(binIndex<0){
-            binIndex = 0;
-        }else if(binIndex >= binCount){
-            binIndex = binCount - 1;
-        }
-
-        bins[binIndex]++;
+    for (std::size_t i = 0; i < sampleCount; i += 2) {
+        // MID channel: (L + R) / 2
+        midChannel[i / 2] = (samples[i] + samples[i + 1]) / 2;
+        // SIDE channel: (L - R) / 2 
+        sideChannel[i / 2] = (samples[i] - samples[i + 1]) / 2;
     }
 
-    int binMaxCount = *std::max_element(bins.begin(), bins.end());
 
-    //print the histogram
+    for (std::size_t i = 0; i < sampleCount / 2; i++) {
+        int midIndex = (midChannel[i] - amplMin) / binSize;
 
-    for(int i = 0; i<binCount; ++i){
+        // Ensure that the bin index is within range
+        if (midIndex < 0) {
+            midIndex = 0;
+        } else if (midIndex >= binCount) {
+            midIndex = binCount - 1;
+        }
+
+        midHistogram[midIndex]++;
+    }
+
+
+    for (std::size_t i = 0; i < sampleCount / 2; i++) {
+        int sideIndex = (sideChannel[i] - amplMin) / binSize;
+
+        // Ensure that the bin index is within range
+        if (sideIndex < 0) {
+            sideIndex = 0;
+        } else if (sideIndex >= binCount) {
+            sideIndex = binCount - 1;
+        }
+
+        sideHistogram[sideIndex]++;
+    }
+
+    
+
+    //print mid histogram
+    std::cout<<"MID Channel"<<std::endl;
+    for (int i = 0; i < binCount; ++i) {
         int binMin = amplMin + i * binSize;
         int binMax = binMin + binSize;
 
-        std::cout<<"["<<binMin<<" to "<<binMax<<"] : ";
-        std::cout << " (" << bins[i] << ")\n";
+        std::cout << "[" << binMin << " to " << binMax << "] : ";
+        std::cout << " (" << midHistogram[i] << ")\n";
+    }
+    
+    std::cout<<"\n"<<std::endl;
+    
+    //print side histogram
+    std::cout<<"SIDE Channel"<<std::endl;
+    for (int i = 0; i < binCount; ++i) {
+        int binMin = amplMin + i * binSize;
+        int binMax = binMin + binSize;
+
+        std::cout << "[" << binMin << " to " << binMax << "] : ";
+        std::cout << " (" << sideHistogram[i] << ")\n";
     }
 
     return 0;
