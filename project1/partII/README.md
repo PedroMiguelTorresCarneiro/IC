@@ -22,10 +22,16 @@
     make
     ```
     Then, choose what action you want to perfrom and run the respective command.
+    
+    The commands to run the program are executed according to the following structure:
+    ```bash
+    ./SoundDecoder option fileName [quantizationLevels]
+    ```
+    Where option is the intended operation and the quantizationLevels are optional.
     Examples:
     <br>
     Get audio file details:
-    - You can change the "sample01.wav" to whichever file you want 
+    
     ```bash
     ./SoundDecoder details ../../../datasets/audio/sample01.wav
     ```
@@ -43,7 +49,7 @@
     ```
 
     Quantize and compare audio:
-    - You can change the "45" to how many quantization levels you want
+    
     ```bash
     ./SoundDecoder quantize ../../../datasets/audio/sample01.wav 45
     ```
@@ -59,6 +65,8 @@
     ```bash
     ./SoundDecoder SNR ../../../datasets/audio/sample01.wav 45
     ```
+
+    In any of these examples, you may replace "sample01.wav" with whichever file you want and "45" with however many quantization levels you want.
 ## **Audio with SFML**
 Sfml is a library that allows us to maipulate audio in a number of ways.
 ```md
@@ -86,6 +94,72 @@ To draw the waveform, we used the sfml sf::VertexArray with the sf::LineStrip pr
 ![Waveform](../partII/figures/Waveform.jpg) 
 Example of a waveform being displayed
 
+
+## **Histogram**
+
+- **MID Channel:**
+    In audio processing, the MID channel represents the sound that is common between both left and right channels (mono audio). We can calculate it in the following manner:
+
+    $$
+        MID = \frac{L+R}{2}
+    $$
+    With L being the left channel and R being the right channel. By caclulating the average between the two, we can see the similarities between both channels.
+    Here we can see the distribution of the amplitude values of this channel through a histogram.
+
+    <p align="center">
+        <img src="../partII/figures/MIDHistogram.jpg">
+    <p align="center">
+    Histogram of amplitude values for the Sample01.wav file
+    
+<br>
+
+- **SIDE Channel**
+    The SIDE channel on the other hand highlights the differences between the left and right channel.
+    $$
+        SIDE = \frac{L-R}{2}
+    $$
+
+    This difference between channels is the essence of stereo audio.
+    The distribution of the amplitude values of this channel is as follows.
+
+    <p align="center">
+        <img src="../partII/figures/SIDEHistogram.jpg">
+    <p align="center">
+    Histogram of amplitude values for the Sample01.wav file
+    
+
+
 ## **Quantization**
 
-Quantization is the process with which we reduce the number of bits needed to represent an audio file by reducing the number of amplitude values the samples can have. This, however, results in loss of audio quality.
+Quantization is the process of reducing the number of bits needed to represent a piece of information. In terms of audio, this is done by reducing the number of different amplitude values needed to represent an audio signal. This will decresae the size of the required data, however, it will also result in loss of audio quality.
+Quantization is done according to the following formula:
+
+$$
+    Q = round(\frac{x-xmin}{stepSize})*stepSize +  xmin
+$$
+
+In this formula, X is the amplitude value, xmin is the minimum amplitude value and stepSize is calculated as follows
+
+$$
+    S = \frac{xmax-xmin}{L}
+$$
+    <p align="center">
+    With L being the quantization level.
+
+There are two major types of quantization:
+-  **Non unifrom quantization**: Where the quantization intervals are of different sizes. This allows us to allocate more levels to the most common values to lose less of the original information.
+
+-  **Unifrom quantization**: Where the quantization intervals are all the same size. This is much easier to implement, however it introduces more error.
+
+After quantizing an audio sample (through uniform quantization), we then compare it with the original by plotting the waveforms.
+
+<p align="center">
+    <img src="../partII/figures/Quantized.jpg">
+<p align="center">
+    Sample01.wav: orignal(top), and quantized (bottom)
+    with a quantization level of 45
+
+As was said, quantization aims to reduce the amount of bits needed to represent the audio, achieving this by reducing the amount of different amplitude levels. So, as we can see in the image above, the quantized waveform seems "blockier", this is because each vertical line represents a different amplitude value and, as is the goal of quantization, we reduced that number.
+    
+
+## **MSE**

@@ -275,13 +275,7 @@ std::vector<sf::Int16> quantize(string filename, int level){
     std::vector<sf::Int16> quantizedSamples(sampleCount);
 
     for (std::size_t i=0; i<sampleCount; ++i){
-        float normalizedSample = (samples[i] - amplMin) / float(amplMax - amplMin);
-
-        int quantizedLevel = std::round(normalizedSample * (level - 1));
-
-        quantizedLevel = std::max(0, std::min(quantizedLevel, level - 1));
-
-
+        int quantizedLevel = std::round((samples[i] - amplMin) / stepSize);
         quantizedSamples[i] = amplMin + quantizedLevel * stepSize;
     }
 
