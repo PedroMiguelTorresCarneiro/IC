@@ -163,3 +163,68 @@ As was said, quantization aims to reduce the amount of bits needed to represent 
     
 
 ## **MSE**
+
+The Mean Squared Error (MSE) is a metric used to qualify the difference between two signals by measuring the squared differences of the two signals.
+It is calculated using the following formula:
+
+$$
+    \frac{\sum (x[i]-y[i])²}{N}
+$$
+
+<p align="center">
+    Where x and y are the signals and N is the number of samples in the signal
+
+We can use MSE to compare a quantized audio and it's original sample, calculating a metric to show us how different they are. The higher the MSE the more different the two samples are.
+
+Using the command:
+```bash
+./SoundDecoder MSE ../../../datasets/audio/sample01.wav 45
+```
+
+We calculate that, the MSE for the file "sample01.wav" and it's quantized version with a quantization level of 45 is 176620.
+
+Now, if we increase the quantization level to 55:
+```bash
+./SoundDecoder MSE ../../../datasets/audio/sample01.wav 55
+```
+
+We get and MSE value of 118407. This way we can confirm that, the more we decrease the number of levels when performing quantization, the more different the two signals become (by loss of information, as we stated above).
+
+## **SNR**
+
+The Signal to Noise Ration (SNR) is a metric that compares the level of the desired signal with the the level of background noise, measured in decibels (dB).
+It is calculated according to the following formula:
+
+$$
+    SNR = 10 * log \frac{Psignal}{Pnoise}
+$$
+<p align="center">
+    Where Psignal is the strength of the signal and Pnoise is the strength of the noise
+
+We can calculate the strength of the signal the following way:
+
+$$
+    Psignal = \frac{\sum (x[i])²}{N}
+$$
+
+And we can use the MSE calculated previously as the power of the noise because, as was stated, MSE calculated the differences between the two samples, which is essentially, the noise.
+
+Unlike in MSE, SNR, in a way, measures the similarities between the two samples (measuring how much of the orignal signal there still is compared to the noise). So in SNR (unlike MSE), a higher value indicates bigger similarities bewteen the two sounds.
+
+We can repeat the steps we used in MSE to verify this.
+By comparing the file "sample01.wav" with it's quantized version using 45 quantization levels:
+
+```bash
+./SoundDecoder SNR ../../../datasets/audio/sample01.wav 45
+```
+
+We get the value 19,3675.
+
+Now, repating the process but increasing the quantization levels to 55:
+
+```bash
+./SoundDecoder SNR ../../../datasets/audio/sample01.wav 55
+```
+
+We get the value 21,1042. 
+As we can see, a higher value indicates a more similar sound, as we expected by increasing the number of quantization levels.
