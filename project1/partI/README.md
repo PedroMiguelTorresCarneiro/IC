@@ -184,14 +184,10 @@ The ***<u>first byte of a UTF-8 sequence</u>*** tells you how many bytes the cha
     ```
     After this depending on the calculated number, we join the bytes in a *string* to make a *multi-byte char*.
 3. **Store the result:**  in the appropriate structure for further processing
-
-$$
-\begin{array}{c}
-\texttt{map\textless string, list\textless vector\textless string \textgreater \textgreater \textgreater} \\
-\Leftrightarrow \\
-\texttt{map\textless fileName, list\textless vector\textless lines \textgreater \textgreater \textgreater}
-\end{array}
-$$
+    
+    `map<string, list<vector<string>>>`
+    ⇔
+    `map<fileName, list<vector<lines>>>`
 
     To store the file name and all the lines of that file, allowing various files to be added to this structure.
 ---
