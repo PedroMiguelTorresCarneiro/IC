@@ -139,6 +139,7 @@ To draw the waveform, we used the sfml sf::VertexArray with the sf::LineStrip pr
 
 - **SIDE Channel**
 The SIDE channel on the other hand highlights the differences between the left and right channel.
+
 $$
     SIDE = \frac{L-R}{2}
 $$
