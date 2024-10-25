@@ -6,6 +6,8 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include <cmath>
+#include <random>
+#include <vector>
 
 
 //-----------------------------PLAY THE AUDIO FILE-----------------------------------------
@@ -129,7 +131,9 @@ void plotTwoWaveforms(string filename, const std::vector<sf::Int16>& quantizedSa
     std::size_t sampleCount = buffer.getSampleCount();
     unsigned int channelCount = buffer.getChannelCount();
     
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Waveform Comparison");
+    sf::RenderWindow window1(sf::VideoMode(800, 600), "Original samples");
+
+    sf::RenderWindow window2(sf::VideoMode(800, 600), "Modified Samples");
 
     sf::VertexArray originalWaveform(sf::LinesStrip);
     sf::VertexArray quantizedWaveform(sf::LinesStrip);
@@ -142,32 +146,46 @@ void plotTwoWaveforms(string filename, const std::vector<sf::Int16>& quantizedSa
     // Plot original samples 
     for (std::size_t i = 0; i < sampleCount; i += channelCount) {
         float x = i * timeScale / channelCount;
-        float y = 150.0f - originalSamples[i] * amplitudeScale; // Upper half
+        float y = 300.0f - originalSamples[i] * amplitudeScale; 
         originalWaveform.append(sf::Vertex(sf::Vector2f(x, y), sf::Color::Green));
     }
 
     // Plot quantized samples 
     for (std::size_t i = 0; i < sampleCount; i += channelCount) {
         float x = i * timeScale / channelCount;
-        float y = 150.0f + 300.0f + quantizedSamples[i] * amplitudeScale; //300.0f is the space between the two waveforms
+        float y = 300.0f + quantizedSamples[i] * amplitudeScale;
         quantizedWaveform.append(sf::Vertex(sf::Vector2f(x, y), sf::Color::Red));
     }
 
-    while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
+    while (window1.isOpen()) {
+        sf::Event event1;
+        while (window1.pollEvent(event1)) {
+            if (event1.type == sf::Event::Closed)
+                window1.close();
         }
 
-        window.clear(sf::Color::Black);
+        window1.clear(sf::Color::Black);
 
-        window.draw(originalWaveform);
+        window1.draw(originalWaveform);
 
-        window.draw(quantizedWaveform);
 
-        window.display();
+        window1.display();
+
+        sf::Event event2;
+        while (window2.pollEvent(event2)) {
+            if (event2.type == sf::Event::Closed)
+                window2.close();
+        }
+
+        window2.clear(sf::Color::Black);
+
+
+        window2.draw(quantizedWaveform);
+
+        window2.display();
+    
     }
+
 }
 
 //---------------------------------SHOW THE HISTOGRAM----------------------------------------
@@ -341,7 +359,7 @@ double SNR(const std::vector<sf::Int16>& quantizedSamples, string filename, doub
     return SNR;
 } 
 
-//---------------------------------Play quantized audio----------------------------------------
+//---------------------------------PLAY QUANTIZED AUDIO----------------------------------------
 
 void playFromSamples(const std::vector<sf::Int16>& samples, string filename) {
 
@@ -358,7 +376,7 @@ void playFromSamples(const std::vector<sf::Int16>& samples, string filename) {
 
     sf::SoundBuffer buffer;
     if (!buffer.loadFromSamples(samples.data(), samples.size(), channelCount, sampleRate)) {
-        std::cerr << "Error loading sound buffer!" << std::endl;
+        std::cerr << "Buffer error!" << std::endl;
         return;
     }
 
@@ -369,4 +387,36 @@ void playFromSamples(const std::vector<sf::Int16>& samples, string filename) {
     while (sound.getStatus() == sf::Sound::Playing) {
         sf::sleep(sf::milliseconds(100));
     }
+}
+
+//---------------------------------ADD NOISE TO AUDIO----------------------------------------
+
+std::vector<sf::Int16> addNoise(const std::string& filename, float noiseLevel) {
+    sf::SoundBuffer buffer;
+    if (!buffer.loadFromFile(filename)) {
+        std::cerr << "Error loading sound file" << std::endl;
+        return {};
+    }
+
+    const sf::Int16* samples = buffer.getSamples();
+    std::size_t sampleCount = buffer.getSampleCount();
+
+    std::vector<sf::Int16> noisySamples(sampleCount);
+
+    std::default_random_engine randomGenerator; //random noise generator
+    std::uniform_real_distribution<float> noiseDistribution(-noiseLevel, noiseLevel);
+
+    for (std::size_t i = 0; i < sampleCount; ++i) {
+        float noise = noiseDistribution(randomGenerator);
+
+        int noisySample = samples[i] + static_cast<int>(noise);
+
+        // Clamp to valid range
+        if (noisySample < -32768) noisySample = -32768;
+        if (noisySample > 32767) noisySample = 32767;
+
+        noisySamples[i] = static_cast<sf::Int16>(noisySample);
+    }
+
+    return noisySamples;
 }

@@ -84,6 +84,17 @@ int main(int argc, char* argv[]){
         std::vector<sf::Int16> quantizedSamples = quantize(filename, level);
         playFromSamples(quantizedSamples, filename);
 
+    }else if(choice == "noise"){
+        if(argc < 3){
+            std::cout<<"Not enough arguments"<<std::endl;
+            return -1;
+        }
+        
+        string filename = argv[2];
+        int noise = atoi(argv[3]);
+        std::vector<sf::Int16> noisySamples = addNoise(filename, noise);
+        plotTwoWaveforms(filename, noisySamples);
+
     }else{
         std::cout<<"Invalid option";
         return -1;
