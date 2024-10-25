@@ -186,7 +186,11 @@ The ***<u>first byte of a UTF-8 sequence</u>*** tells you how many bytes the cha
 3. **Store the result:**  in the appropriate structure for further processing
 
     $$
-    \texttt{map<string, list<vector<string>>>} \Leftrightarrow \texttt{map<fileName, list<vector<lines>>>}
+    \begin{array}{c}
+    \texttt{map<string, list<vector<string>>>} \\
+    \Leftrightarrow \\
+    \texttt{map<fileName, list<vector<lines>>>}
+    \end{array}
     $$
 
     To store the file name and all the lines of that file, allowing various files to be added to this structure.
