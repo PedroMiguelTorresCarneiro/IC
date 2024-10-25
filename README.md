@@ -21,5 +21,3 @@
      73775 : Pedro Carneiro
      73882 : Inês Águia  
      102567 : Pedro Azevedo
-     102631 : João Oliveira 
-    
