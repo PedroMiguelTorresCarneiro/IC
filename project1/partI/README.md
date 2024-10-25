@@ -187,9 +187,9 @@ The ***<u>first byte of a UTF-8 sequence</u>*** tells you how many bytes the cha
 
     $$
     \begin{array}{c}
-    \texttt{map<string, list<vector<string>>>} \\
+    \texttt{map\textless string, list\textless vector\textless string \textgreater \textgreater \textgreater} \\
     \Leftrightarrow \\
-    \texttt{map<fileName, list<vector<lines>>>}
+    \texttt{map\textless fileName, list\textless vector\textless lines \textgreater \textgreater \textgreater}
     \end{array}
     $$
 
