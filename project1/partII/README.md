@@ -1,9 +1,11 @@
 # IC - Information and Coding (2024/25)
 
+Return to the main README : [Project 1 - README](../../project1/readme.md)
 --
 # PROJECT 1 : Part II
+Author: João Oliveira
 
-- **Installing Boost.locale** (to work with UTF-8 encoding)
+- **Installing SFML** 
 ```bash
 #macOs:
     Dowload the files from the SFML website, the cmake file will locate it 
@@ -28,6 +30,7 @@
     ./SoundDecoder option fileName [quantizationLevels || noiselevel]
     ```
     Where option is the intended operation and the quantizationLevels / noiseLevels are optional.
+
     Examples:
     <br>
     Get audio file details:
@@ -84,7 +87,7 @@
     ./SoundDecoder noisePlay ../../../datasets/audio/sample01.wav 15000
     ```
     
-    In any of these examples, you may replace "sample01.wav" with whichever file you want, "45" with however many quantization levels you want and "15000" with the amount of oise you want to add.
+    In any of these examples, you may replace "sample01.wav" with whichever file you want, "45" with however many quantization levels you want and "15000" with the amount of noise you want to add.
 ## **Audio with SFML**
 Sfml is a library that allows us to maipulate audio in a number of ways.
 ```md
@@ -102,7 +105,7 @@ Sfml contains a variety of functions to extract the raw data from an audio file.
 ```
 
 ## **Waveforms**
-The waveform of an audio file represents how the different amplitude values along the length of the file. We must be carefull however, in the samples array half the samples belong to the right channel and the other half belong to the left channel (for stereo audio), so we must skip every other sample.
+The waveform of an audio file represents how the different amplitude values change along the length of the file. We must be carefull however, in the samples array half the samples belong to the right channel and the other half belong to the left channel (for stereo audio), so we must skip every other sample.
 ```md
     for (std::size_t i = 0; i < sampleCount; i += channelCount) 
 ```
@@ -123,6 +126,7 @@ To draw the waveform, we used the sfml sf::VertexArray with the sf::LineStrip pr
     $$
         MID = \frac{L+R}{2}
     $$
+
     With L being the left channel and R being the right channel. By caclulating the average between the two, we can see the similarities between both channels.
     Here we can see the distribution of the amplitude values of this channel through a histogram.
 
@@ -134,18 +138,18 @@ To draw the waveform, we used the sfml sf::VertexArray with the sf::LineStrip pr
 <br>
 
 - **SIDE Channel**
-    The SIDE channel on the other hand highlights the differences between the left and right channel.
-    $$
-        SIDE = \frac{L-R}{2}
-    $$
+The SIDE channel on the other hand highlights the differences between the left and right channel.
+$$
+    SIDE = \frac{L-R}{2}
+$$
 
-    This difference between channels is the essence of stereo audio.
-    The distribution of the amplitude values of this channel is as follows.
+This difference between channels is the essence of stereo audio.
+The distribution of the amplitude values of this channel is as follows.
 
-    <p align="center">
-        <img src="../partII/figures/SIDEHistogram.jpg">
-    <p align="center">
-    Histogram of amplitude values for the Sample01.wav file
+<p align="center">
+    <img src="../partII/figures/SIDEHistogram.jpg">
+<p align="center">
+Histogram of amplitude values for the Sample01.wav file
     
 
 
@@ -260,7 +264,7 @@ As we can see, a higher value indicates a more similar sound, as we expected by 
 
 In audio processing, noise is an unwanted alteration of the audio samples, it drowns out the original audio and causes a lower audio quality in general.
 
-In our work, we use a random number generator to generate a random amount of noise which we then add to our original samples. The noise level is the amount of noise we add to the audio, it can range from 0 to 32767 (32767 is the max range of the amplitude values). For a good test value, we recommend using a noise level ranging from 10000 to 15000, this way the noise is noticeable but now overwhelming.
+In our work, we use a random number generator to generate a random amount of noise which we then add to our original samples. The noise level is the amount of noise we add to the audio, it can range from 0 to 32767 (32767 is the max range of the amplitude values). For a good test value, we recommend using a noise level ranging from 10000 to 15000, this way the noise is noticeable but not overwhelming.
 
 By running
 ```bash
