@@ -367,8 +367,9 @@ In this formula we use the `stepSize` to distribute the quantized color on the h
 | Quantization level : 7 (boat.ppm & boat.ppm - grayscale) | Quantization level : 3 (boat.ppm & boat.ppm - grayscale)|
 |----------------|----------------|
 | ![Quantization 7](../partIII/imgs/qt7_hist.png) | ![Quantization 3](../partIII/imgs/qt3_hist.png) |
+| `./ImageDecoder -hist -load "../../../datasets/image/boat.ppm" -quantization 7 ` | `./ImageDecoder -hist -load "../../../datasets/image/boat.ppm" -quantization 3 ` |
 | ![Quantization 7](../partIII/imgs/qt7_gs_hist.png) | ![Quantization 3](../partIII/imgs/qt3_gs_hist.png) |
-
+| `./ImageDecoder -hist -load "../../../datasets/image/boat.ppm" -grayscale -quantization 7 ` | `./ImageDecoder -hist -load "../../../datasets/image/boat.ppm" -grayscale -quantization 3 ` |
 </p>
 
 ---
@@ -383,6 +384,7 @@ In this formula we use the `stepSize` to distribute the quantized color on the h
         | Quantization level : 7 (boat.ppm) | Quantization level : 2 (boat.ppm) |
         |------------------------|------------------------|
         | ![Quantization levels 7](../partIII/imgs/qt7_display.png) | ![Quantization levels 2](../partIII/imgs/qt2_display.png) |
+        | `./ImageDecoder -load "../../../datasets/image/boat.ppm" -quantization 7 -display` | `./ImageDecoder -load "../../../datasets/image/boat.ppm" -quantization 2 -display`|
 
     - **Compression:**
         - <u>**higher levels**</u>: Weak compression
@@ -540,11 +542,11 @@ Contrast Enhancement (Histogram Equalization) , redistributes brightness to bala
 
 >  Often used in medical imaging and satellite imagery to enhance details, and also in photography to improve contrast.
 
-| **Original Image** (satelite.jpeg) | **Image with CONSTRAST ENHANCEMENT filter** (satelite.jpeg) |
+| **Original Image** (satelite.jpeg) | **Image with CONTRAST ENHANCEMENT filter** (satelite.jpeg) |
 |--------------------------------|--------------------------------------------|
 | ![Original](../partIII/imgs/satelite_original.png) | ![HighPass Filter](../partIII/imgs/satelite_contrast.png) |
 | `./ImageDecoder -load "../../../datasets/image/satelite.jpeg" -display ` | `./ImageDecoder -load "../../../datasets/image/satelite.jpeg" -contrast -display ` |
-| **Original Image** (castle.jpg) | **Image with CONSTRAST ENHANCEMENT filter** (castle.jpg) |
+| **Original Image** (castle.jpg) | **Image with CONTRAST ENHANCEMENT filter** (castle.jpg) |
 | ![Original](../partIII/imgs/castle_original.png) | ![HighPass Filter](../partIII/imgs/castle_contrast.png) |
 | `./ImageDecoder -load "../../../datasets/image/castle.jpg" -display ` | `./ImageDecoder -load "../../../datasets/image/castle.jpg" -contrast -display ` |
 
