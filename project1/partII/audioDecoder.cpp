@@ -340,3 +340,33 @@ double SNR(const std::vector<sf::Int16>& quantizedSamples, string filename, doub
 
     return SNR;
 } 
+
+//---------------------------------Play quantized audio----------------------------------------
+
+void playFromSamples(const std::vector<sf::Int16>& samples, string filename) {
+
+    sf::SoundBuffer buff;
+
+    if (!buff.loadFromFile(filename)){
+        std::cerr << "Invalid file!" << std::endl;
+    }
+
+    std::size_t sampleCount = buff.getSampleCount();
+    std::size_t channelCount = buff.getChannelCount();
+    std::size_t sampleRate = buff.getSampleRate();
+
+
+    sf::SoundBuffer buffer;
+    if (!buffer.loadFromSamples(samples.data(), samples.size(), channelCount, sampleRate)) {
+        std::cerr << "Error loading sound buffer!" << std::endl;
+        return;
+    }
+
+    sf::Sound sound;
+    sound.setBuffer(buffer);
+    sound.play();
+
+    while (sound.getStatus() == sf::Sound::Playing) {
+        sf::sleep(sf::milliseconds(100));
+    }
+}

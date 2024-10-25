@@ -73,6 +73,17 @@ int main(int argc, char* argv[]){
         double mse = MSE(quantizedSamples, filename);
         std::cout<<SNR(quantizedSamples, filename, mse)<<std::endl;
 
+    }else if(choice == "qzPlay"){
+        if(argc < 3){
+            std::cout<<"Not enough arguments"<<std::endl;
+            return -1;
+        }
+        
+        string filename = argv[2];
+        int level = atoi(argv[3]);
+        std::vector<sf::Int16> quantizedSamples = quantize(filename, level);
+        playFromSamples(quantizedSamples, filename);
+
     }else{
         std::cout<<"Invalid option";
         return -1;

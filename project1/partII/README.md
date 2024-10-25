@@ -54,6 +54,12 @@
     ./SoundDecoder quantize ../../../datasets/audio/sample01.wav 45
     ```
 
+    Quantize and play audio:
+
+    ```bash
+    ./SoundDecoder qzPlay ../../../datasets/audio/sample01.wav 45
+    ```
+
     Quantize and show MSE:
 
     ```bash
@@ -66,6 +72,7 @@
     ./SoundDecoder SNR ../../../datasets/audio/sample01.wav 45
     ```
 
+    
     In any of these examples, you may replace "sample01.wav" with whichever file you want and "45" with however many quantization levels you want.
 ## **Audio with SFML**
 Sfml is a library that allows us to maipulate audio in a number of ways.
@@ -159,6 +166,13 @@ After quantizing an audio sample (through uniform quantization), we then compare
     Sample01.wav: orignal(top), and quantized (bottom)
     with a quantization level of 45
 
+We can also run:
+
+```bash
+./SoundDecoder qzPlay ../../../datasets/audio/sample01.wav 45
+```
+
+To play the quantized audio and verify that, the lower the quantization level, the lower the audio quality becomes.
 As was said, quantization aims to reduce the amount of bits needed to represent the audio, achieving this by reducing the amount of different amplitude levels. So, as we can see in the image above, the quantized waveform seems "blockier", this is because each vertical line represents a different amplitude value and, as is the goal of quantization, we reduced that number.
     
 

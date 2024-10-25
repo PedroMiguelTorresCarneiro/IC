@@ -20,4 +20,5 @@ int histogram(string filename);
 std::vector<sf::Int16> quantize(string filename, int level);
 double MSE(const std::vector<sf::Int16>& quantizedSamples, string filename);
 double SNR(const std::vector<sf::Int16>& quantizedSamples, string filename, double mse);
+void playFromSamples(const std::vector<sf::Int16>& samples, string filename);
 #endif
