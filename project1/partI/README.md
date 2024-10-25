@@ -479,7 +479,7 @@ We made a python script to plot the histogram as asked.
 
 But we got some barely readable histograms, and to turn them more readable with defined some thresholds:
 - **chars** :
-    - Appear all the values( from 0 to $ \infty $)
+    - Appear all the values( from 0 to ∞)
     - In order to analyse the chars only, we have to develop a new function to remove the number, as we will talk later on
 
     | Histogram of Char Frequencies (ep-11-06-22-011.txt) |
