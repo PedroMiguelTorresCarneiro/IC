@@ -32,7 +32,7 @@ COMMAND	    :	arg ("-display")*
 		    |	"-charFreq" arg 
 		    |	"-wordFreq" arg
 		    |	"-nGrams" NUM arg
-                |   "-hist" ("-charFreq" arg | "-wordFreq" arg | "-nGrams" NUM arg)
+                    |   "-hist" ("-charFreq" arg | "-wordFreq" arg | "-nGrams" NUM arg)
 		    ;
 
 arg		    :	"-load" TEXT ("-lower")* ("-punct")* ("-num")*
