@@ -5,7 +5,7 @@
 <p style="text-align: right;"><strong>Author:</strong> Pedro Carneiro</p>
 
 
-### **1º** OpenCv instalation
+### **1º** OpenCv installation
 
 ```md
 # macOs:
@@ -19,7 +19,7 @@
 ```
 
 ### **2º** SetUp enviroment
-In order to be more easy to collaborating with others, as CMake will handle the build configuration across differents enviroments
+In order to be easier to collaborate with others, **CMake** will handle the build configuration across different enviroments
 
 - 2.1 : **Create a *CMakeLists.txt***
     ```md
@@ -59,7 +59,7 @@ In order to be more easy to collaborating with others, as CMake will handle the 
 # NOTES:
 
 ### **Option selection**
-To implement the command definition I adopt a grammar-like structure:
+To implement the command definition we adopted a grammar-like structure:
 ```java
 COMMAND :   "-diff" arg "," arg  ("-display")* 
         |   "-mse" arg "," arg 
@@ -79,14 +79,14 @@ NUM     :    [0 9]+;
 ```
 1. **COMMAND:**
 A command can be:
-    - `-diff` *arg* *arg* --> Absolute difference between two images *[simple|altered]*, optionally followed by `-display`
-    - `-mse` *arg* *arg* --> Calculate the **MSE** between two images *[simple|altered]*
-    - `-psnr` *arg* *arg* --> Calculate the **PSNR** between two images *[simple|altered]*
+    - `-diff` ***arg*** ***arg*** --> Absolute difference between two images *[simple|altered]*, optionally followed by `-display`
+    - `-mse` ***arg*** ***arg*** --> Calculate the **MSE** between two images *[simple|altered]*
+    - `-psnr` ***arg*** ***arg*** --> Calculate the **PSNR** between two images *[simple|altered]*
     - `arg` --> *[simple|altered]*, optionally followed by `-display`
-    - `-hist` *arg* --> Display the histogram of a single image *[simple|altered]*
+    - `-hist` ***arg*** --> Display the histogram of a single image *[simple|altered]*
 
 2. **arg:**
-    - `-load` *IMAGE* --> load the *IMAGE*
+    - `-load` ***IMAGE*** --> load the *IMAGE*
     - <u>Optionally</u>, following operations can be applied to the loaded image **in whatever order wanted**:
         - `-grayscale` -->  Grayscale conversion
         - `-gaussian` ***NUM*** ***NUM*** --> Apply Gaussian-blur <***kernel size***> <***sigma***> 
@@ -146,7 +146,7 @@ when you load an image using *OpenCV’s* ***cv::imread()***, the pixel data is 
 
 ### **RGB Channels and Grayscale Appearance**
 ---
-Each channel contains intensity values for thar specific color (0 to 255).
+Each channel contains intensity values for that specific color (0 to 255).
 When displayed alone these single-channel matrices as an image, it appears **grayscale** because on a intensity scale:
 ```md
     - 0     : means no intensity (BLACK) 
@@ -168,22 +168,24 @@ To display an RGB image, *OpenCV* combines the 3 channels into a color image.
 ### **Grayscale Convertion**
 ---
 
-Is combining the 3 channels into a single channel representing the **light intensity** of each pixel.
-The problem facing on this is **how much each channel weights** during the fusion of the channels, for this we have the following formula:
+Consists of combining the 3 channels into a single channel representing the **light intensity** of each pixel.
+The problem we face on this: 
+- **how much each channel weights** during the fusion of the channels?
 
-### Mathematical formula 
+We can achieve this using the following formula:
 
 $$
 G(x) = 0.299 * Red + 0.587 * Green + 0.114 * Blue
 $$
 
-The weights are determined by perceptual factors that ensure the grayscale image looks natural to the human eye.
+Where the weights are determined by perceptual factors that ensure the grayscale image looks natural to the human eye.
 
 
 ### Visual demonstration
 | **Color image** (boat.ppm) | **Grayscale image** (boat.ppm) |
 |----------------------------|--------------------------------|
 |  ![Color](../partIII/imgs/gs_color.png) | ![Grayscale](../partIII/imgs/gs_grayscale.png) | 
+| `./ImageDecoder -load "../../../datasets/image/boat.ppm" -display`| `./ImageDecoder -load "../../../datasets/image/boat.ppm" -grayscale -display `| 
 
 ### Pixel values before `(RGB)` and after `(GRAYSCALE)` convertion
 ```md
@@ -215,11 +217,11 @@ Result of the following command:
 ---
 Tipically used to reduce image **noise** and reduce **detail**.
     
-A Gaussian blur filter uses a convoltion matrix (kernel) to smooth the image by averaging pixel values with their neighbors (usging a Gaussian function), for each of the 3 channels(RGB):
-- **Gaussian kernel**: created based on a kernel size and sigma;
+A Gaussian blur filter uses a convoltion matrix (kernel) to smooth the image by averaging pixel values with their neighbors (using a Gaussian function), for each of the 3 channels(RGB):
+- **Gaussian kernel**: created based on a kernel size and **$ \sigma $** ;
 - **Convoltion Operation**: of the image with the gaussian kernel for each channel
 
-***Convoltion**: is a mathematical operation on two functions , resultin in a third function:*
+***Convoltion***: is a mathematical operation of two functions, resulting in a third function:
 
 $$
 (f * g)(t) = \int_{-\infty}^{\infty} f(\tau)g(t - \tau) \, d\tau \equiv (f * g)(n) = \sum_{m=-\infty}^{\infty} f(m)g(n - m)
@@ -228,14 +230,14 @@ $$
 
 **How does kernel size and sigma affect the bluer effect?**
 1. **Sigma (σ) - Controls How Much Detail is Lost**: Sigma defines how much influence the neighboring pixels have when averaging a pixel's value.
-    - <u>Smaller sigma values</u>: will result in a subtle blur where only nearby pixels contribute significantly to the final value, preserving more details.
-    - <u>Larger sigma values</u>: will cause more pixels to contribute to the blur, making the result smoother and less detailed.
+    - <u>Smaller sigma values</u>: will result in a subtle blur where only nearby pixels contribute significantly to the final value, **preserving more details**.
+    - <u>Larger sigma values</u>: will cause more pixels to contribute to the blur, making the result smoother and **less detailed**.
 ```md    
     The larger the sigma, the more blurred the image becomes(more details are lost).
 ```
-2. **Kernel Size - Defines the Area Over Which the Blur is Applied**: Kernel size determines how large an area around each pixel is considered when applying the blur. 
+2. **Kernel Size - Defines the Area Over Which the Blur is Applied**: Kernel size determines how large an area ($x \times x $) around each pixel is considered when applying the blur. 
     ```md
-    # KERNEL SIZES must be ODD NUMBERS , because they represent a matrix around one specific pixel, so if we choose even number i didnt have a central pixel.
+    # KERNEL SIZES must be ODD NUMBERS, because they represent a matrix around one specific pixel, so if we choose an EVEN NUMBER I do not have a central pixel.
     ```
     - <u>A small kernel size</u>: only considers the nearest neighbors, so the **blur is localized** and affects only a small area.
     - <u>A larger kernel size</u>: means the algorithm will look at a wider area of the image, blurring a larger region around each pixel.
@@ -243,6 +245,11 @@ $$
     The larger the kernel size, the wider the area of the image that gets blurred, 
     causing the blur effect to spread over a larger region.
 ```
+### Visual demonstration
+| **Color image** (boat.ppm) | **Blur <7> <2> image** (boat.ppm) |
+|----------------------------|--------------------------------|
+|  ![Color](../partIII/imgs/gs_color.png) | ![Grayscale](../partIII/imgs/boat_blur_7_2.png) | 
+| `./ImageDecoder -load "../../../datasets/image/boat.ppm" -display`| `./ImageDecoder -load "../../../datasets/image/boat.ppm" -gaussian 7 2 -display `| 
 
 **CONCLUSION**
 - **SIGMA**: Dictates how much smoothing is done (higher sigma means more smoothing and more detail loss).
@@ -293,8 +300,6 @@ Tipically used to see how much a image changed :
     - <u>Lower MSE</u> =  **higher** similarity (less diffences)
     - <u>Higher MSE</u> = **lower** similarity (more differences)
 
-        ### Mathematical formula of MSE
-
 $$
 \text{MSE} = \frac{\sum \text{s}}{\text{p} \times \text{c}}
 $$
@@ -303,11 +308,9 @@ $$
             - p , total nº of pixels
             - c , number of channels  
          
-2. **PSNR (dB) quantify the quality of a reconstructed/compressed image** - mesuring the ratio between the maximum possible value and the noise ( difference between two images):
+2. **PSNR (dB) quantify the quality of a reconstructed/compressed image** - measuring the ratio between the maximum possible value and the noise ( difference between two images):
     - <u>Lower PSNR</u> = images have significant differences(more noise/distortions)
     - <u>Higher PSNR</u> = images are more similar(less noise/distortions)
-
-        ### Mathematical formula of PSNR
 
 $$
 \text{PSNR} = 10 \times \log_{10} \left( \frac{255^2}{\text{MSE}} \right)
@@ -327,9 +330,7 @@ $$
 ```md    
     - Reduction of bits used to represent an image, by reducing the number of distinct colors or intensity levels used to represent an image
 ```
-This processe reduce the number of bits to represent each pixel, compressing the image. However, quantization inherently introduces some loss of information, which can affect image quality.
-
-### **Mathematical Formula for Quantization**
+This process reduces the number of bits to represent each pixel, compressing the image. However, quantization inherently introduces some loss of information, which can affect image quality.
 
 $$
 Q(x) = \text{round}\left( \frac{x}{\text{stepSize}} \right) \times \text{stepSize} \quad,\quad \text{stepSize} = \left( \frac{256}{2^{q}} \right)
@@ -353,7 +354,7 @@ In this formula we use the `stepSize` to distribute the quantized color on the h
 <br>
 
 #### - <u>QUANTIZATION LEVELS</u>:
-- Refers to the number of $bits$ to represent diferent intensity values ($2^{bits}$) that a pixel can take after quantization.
+- Refers to the number of $bits$ to represent different intensity values ($2^{bits}$) that a pixel can take after quantization.
 
     - **1-bit quantization** => 2 intensity levels $(2^1 = 2)$.
     - **2-bit quantization** => 4 intensity levels $(2^2 = 4)$.
@@ -407,7 +408,7 @@ Comparing the original image with the quantized one using ***MSE*** and ***PSNR*
 
 ### **HighPass Filter**
 ---
-With the function that already have I try to make another "filters" and I found the $HighPass filter$, that is somehow a simplistic <u>edge detector</u>.
+With the function that already have I tried to make another "filter" and I found the $HighPass filter$, that is somehow a simplistic <u>edge detector</u>.
 
 In theory:
 
@@ -427,7 +428,7 @@ $$
 | `./ImageDecoder -load "../../../datasets/image/arial.ppm" -display` | `./ImageDecoder -load "../../../datasets/image/arial.ppm" -highPass -display` |
 
 
-But now we depared ourselves with a problem... the image after this transformation got a **`FRAME`**. Why this appear? 
+But now we depared ourselves with a problem... the image after this transformation got a **`FRAME`**. Why does this appear? 
 
 1. Interpreting the result:
     - **darker zones** => $HighPass filter$ result is **low** => **small differences** between original and blured image ==> **`MINIMAL CHANGE`**
@@ -437,7 +438,7 @@ But now we depared ourselves with a problem... the image after this transformati
 
 So we have big differences in the frame of the image and the problem can only reside on the $LowPass filter$, aka <u>gaussian blur filter</u>:
 
-### The effect is not being applyed to border in the same way as the rest of the pixels from the image.
+### The effect is not being applied to border in the same way as the rest of the pixels from the image.
 
 ```
     - KERNEKL 3x3 for all
@@ -449,7 +450,7 @@ So we have big differences in the frame of the image and the problem can only re
     |___|___|___|          |___|___|
 
 ```
-With this representation we can see the problem. The **3x3 kernel** is applied to every pixel, but at the image borders, the kernel doesn’t have sufficient surrounding pixel values for `convolution`, causing distortions like the "frame" effect
+With this representation we can see the problem. The **3x3 kernel** is applied to every pixel, but at the image borders, the kernel doesn’t have sufficient surrounding pixel values for `convoltion`, causing distortions like the "frame" effect
 
 - **Solutions**:
     - ***Replicate border***
@@ -501,17 +502,11 @@ With this representation we can see the problem. The **3x3 kernel** is applied t
 |  | using OpenCv function to calculate the *GaussianFilter* with BORDER_REPLICATE |
 
 ---
-### ROTATE PICTURE
 
-1. Rotation Function (Manual Implementation)
-Steps for rotation:
+<br>
 
-For each pixel in the new (rotated) image, compute where that pixel comes from in the original image.
-Use an inverse rotation formula.
-Assign the pixel from the original image to the new position in the rotated image.
-
----
 ### INVERT COLORS
+---
 Inverting Colors adjusts each pixel to its opposite hue, enhancing the image’s visual contrast and creating a unique visual effect. Darker areas become light, and light areas become dark, which can be particularly useful in creative photography, visual art, and certain technical fields where detecting outlines and patterns in a different light is beneficial.
 
 Invert Colors Function:
@@ -553,5 +548,5 @@ Contrast Enhancement (Histogram Equalization) , redistributes brightness to bala
 | `./ImageDecoder -load "../../../datasets/image/castle.jpg" -display ` | `./ImageDecoder -load "../../../datasets/image/castle.jpg" -contrast -display ` |
 
 Using this filter:
-1. We can more easly identify the different depths on the coastal sea bed
+1. We can easly identify the different depths on the coastal sea bed
 2. We can get more detail on a night picture 
