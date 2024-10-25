@@ -1,5 +1,6 @@
 # IC - Information and Coding (2024/25)
 
+Return to the main README : [Project 1 - README](../../project1/readme.md)
 ---
 # PROJECT 1 : Part III 
 <p style="text-align: right;"><strong>Author:</strong> Pedro Carneiro</p>
@@ -56,7 +57,7 @@ In order to be easier to collaborate with others, **CMake** will handle the buil
 
 ---
 ---
-# NOTES:
+# Relevante Information:
 
 ### **Option selection**
 To implement the command definition we adopted a grammar-like structure:

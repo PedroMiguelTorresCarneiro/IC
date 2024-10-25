@@ -2,22 +2,16 @@
 
 ## GROUP 12
 
-### *PROJECT 1*: 
-- **Part I** - Text Data Manipulation
-
-- **Part II** – Audio Data Manipulation
-
-- **Part III** – Image Data Processing
-
-- **Part IV** – Report and Peer Code Review
-
-### *PROJECT 2*:
-
-### *PROJECT 3*:
+| Project | Report link | Grade |
+|-----|-------|------|
+|*PROJECT 1* | [Project 1 - README](../IC/project1/readme.md) | -- |
+|*PROJECT 2* | -- | -- |
+|*PROJECT 3* | -- | -- |
 
 
 
+---
 ## MEMBERS:
-     73775 : Pedro Carneiro
-     73882 : Inês Águia  
+     73775  : Pedro Carneiro
+     73882  : Inês Águia  
      102631 : João Oliveira
