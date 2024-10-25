@@ -25,9 +25,9 @@
     
     The commands to run the program are executed according to the following structure:
     ```bash
-    ./SoundDecoder option fileName [quantizationLevels]
+    ./SoundDecoder option fileName [quantizationLevels || noiselevel]
     ```
-    Where option is the intended operation and the quantizationLevels are optional.
+    Where option is the intended operation and the quantizationLevels / noiseLevels are optional.
     Examples:
     <br>
     Get audio file details:
@@ -72,8 +72,19 @@
     ./SoundDecoder SNR ../../../datasets/audio/sample01.wav 45
     ```
 
+    Add noise to audio samples and compare:
+
+    ```bash
+    ./SoundDecoder noiseWave ../../../datasets/audio/sample01.wav 15000
+    ```
+
+    Add noise to audio samples and play them:
+
+    ```bash
+    ./SoundDecoder noisePlay ../../../datasets/audio/sample01.wav 15000
+    ```
     
-    In any of these examples, you may replace "sample01.wav" with whichever file you want and "45" with however many quantization levels you want.
+    In any of these examples, you may replace "sample01.wav" with whichever file you want, "45" with however many quantization levels you want and "15000" with the amount of oise you want to add.
 ## **Audio with SFML**
 Sfml is a library that allows us to maipulate audio in a number of ways.
 ```md
@@ -242,3 +253,31 @@ Now, repating the process but increasing the quantization levels to 55:
 
 We get the value 21,1042. 
 As we can see, a higher value indicates a more similar sound, as we expected by increasing the number of quantization levels.
+
+## **Noise**
+
+In audio processing, noise is an unwanted alteration of the audio samples, it drowns out the original audio and causes a lower audio quality in general.
+
+In our work, we use a random number generator to generate a random amount of noise which we then add to our original samples. The noise level is the amount of noise we add to the audio, it can range from 0 to 32767 (32767 is the max range of the amplitude values). For a good test value, we recommend using a noise level ranging from 10000 to 15000, this way the noise is noticeable but now overwhelming.
+
+By running
+```bash
+./SoundDecoder noiseWave ../../../datasets/audio/sample01.wav 15000
+```
+We can see how the noise affects the audio samples:
+
+<p align="center">
+    <img src="../partII/figures/OriginalNoise.jpg">
+<p align="center">
+    Original samples
+
+<p align="center">
+    <img src="../partII/figures/ModifiedNoise.jpg">
+<p align="center">
+    "Noisy" samples
+
+We can further verify how the audio quality is affected by listening to the noisy samples.
+```bash
+./SoundDecoder noisePlay ../../../datasets/audio/sample01.wav 15000
+```
+The loss of audio quality is quite evident when listening to it at higher noise levels.
