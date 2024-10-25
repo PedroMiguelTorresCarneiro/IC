@@ -523,6 +523,125 @@ cv::Mat ImageDecoder::invertColors(const cv::Mat& image) {
 
 
 
+// ---------------------------------------------------------------------------------------------------
+// ---------------------------------| CONTRAST ENHANCEMENT | -----------------------------------------
+// ---------------------------------------------------------------------------------------------------
+/*
+    Steps to Manually Enhance Contrast in an Image:
+        1 - Create a copy of the original image to store the result.
+        2 - Check if the image is grayscale or RGB.
+        3 - Calculate the histogram of the image.
+        4 - Compute the cumulative distribution function (CDF) of the histogram.
+        5 - Normalize the CDF to the range [0, 255].
+        6 - Create a mapping from old pixel values to new ones.
+        7 - Apply the transformation to the image.
+        8 - Return the contrast-enhanced image.
+*/
+cv::Mat ImageDecoder::histogramEqualization(const cv::Mat& image) {
+    // Create a copy of the original image to store the result
+    cv::Mat equalizedImage = cv::Mat::zeros(image.size(), image.type());
+
+    if (image.channels() == 1) {
+        // For Grayscale images (single-channel)
+        int hist[256] = {0};
+
+        // Step 1: Calculate histogram for grayscale image
+        for (int row = 0; row < image.rows; ++row) {
+            for (int col = 0; col < image.cols; ++col) {
+                uchar pixel = image.at<uchar>(row, col);
+                hist[pixel]++;
+            }
+        }
+
+        // Step 2: Normalize histogram to create CDF
+        int totalPixels = image.rows * image.cols;
+        float cdf[256] = {0};
+        cdf[0] = hist[0];
+
+        // Compute the CDF
+        for (int i = 1; i < 256; ++i) {
+            cdf[i] = cdf[i - 1] + hist[i];
+        }
+
+        // Normalize the CDF to the range [0, 255]
+        for (int i = 0; i < 256; ++i) {
+            cdf[i] = (cdf[i] - cdf[0]) / (totalPixels - cdf[0]) * 255.0;
+        }
+
+        // Step 3: Create the mapping from old pixel values to new ones
+        uchar mapping[256];
+        for (int i = 0; i < 256; ++i) {
+            mapping[i] = static_cast<uchar>(std::round(cdf[i]));
+        }
+
+        // Step 4: Apply the transformation to the grayscale image
+        for (int row = 0; row < image.rows; ++row) {
+            for (int col = 0; col < image.cols; ++col) {
+                uchar pixel = image.at<uchar>(row, col);
+                equalizedImage.at<uchar>(row, col) = mapping[pixel];
+            }
+        }
+    } else if (image.channels() == 3) {
+        // For RGB images (3-channel), process each channel independently
+        std::vector<int> histB(256, 0), histG(256, 0), histR(256, 0);
+
+        // Step 1: Calculate histogram for each channel
+        for (int row = 0; row < image.rows; ++row) {
+            for (int col = 0; col < image.cols; ++col) {
+                cv::Vec3b pixel = image.at<cv::Vec3b>(row, col);
+                histB[pixel[0]]++;  // Blue channel
+                histG[pixel[1]]++;  // Green channel
+                histR[pixel[2]]++;  // Red channel
+            }
+        }
+
+        // Step 2: Normalize histogram to create CDF for each channel
+        int totalPixels = image.rows * image.cols;
+        std::vector<float> cdfB(256, 0), cdfG(256, 0), cdfR(256, 0);
+
+        cdfB[0] = histB[0];
+        cdfG[0] = histG[0];
+        cdfR[0] = histR[0];
+
+        for (int i = 1; i < 256; ++i) {
+            cdfB[i] = cdfB[i - 1] + histB[i];
+            cdfG[i] = cdfG[i - 1] + histG[i];
+            cdfR[i] = cdfR[i - 1] + histR[i];
+        }
+
+        // Normalize the CDF to the range [0, 255]
+        for (int i = 0; i < 256; ++i) {
+            cdfB[i] = (cdfB[i] - cdfB[0]) / (totalPixels - cdfB[0]) * 255.0;
+            cdfG[i] = (cdfG[i] - cdfG[0]) / (totalPixels - cdfG[0]) * 255.0;
+            cdfR[i] = (cdfR[i] - cdfR[0]) / (totalPixels - cdfR[0]) * 255.0;
+        }
+
+        // Step 3: Create the mapping from old pixel values to new ones for each channel
+        uchar mappingB[256], mappingG[256], mappingR[256];
+        for (int i = 0; i < 256; ++i) {
+            mappingB[i] = static_cast<uchar>(std::round(cdfB[i]));
+            mappingG[i] = static_cast<uchar>(std::round(cdfG[i]));
+            mappingR[i] = static_cast<uchar>(std::round(cdfR[i]));
+        }
+
+        // Step 4: Apply the transformation to the RGB image
+        for (int row = 0; row < image.rows; ++row) {
+            for (int col = 0; col < image.cols; ++col) {
+                cv::Vec3b pixel = image.at<cv::Vec3b>(row, col);
+                equalizedImage.at<cv::Vec3b>(row, col)[0] = mappingB[pixel[0]];  // Blue channel
+                equalizedImage.at<cv::Vec3b>(row, col)[1] = mappingG[pixel[1]];  // Green channel
+                equalizedImage.at<cv::Vec3b>(row, col)[2] = mappingR[pixel[2]];  // Red channel
+            }
+        }
+    }
+
+    return equalizedImage;
+}
+
+
+
+
+
 
 // ------------------------------------------------------------------------------------------------
 // ---------------------------------| Calculate Absolute Difference | ----------------------------

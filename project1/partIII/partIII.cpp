@@ -99,7 +99,7 @@ std::vector<std::vector<std::string>> parseARG(std::vector<std::string> args) {
             loadArgs.push_back(args[i]);
             loadArgs.push_back(args[++i]);  // The path to the image
         } else if (args[i] == "-grayscale" || args[i] == "-gaussian" || args[i] == "-quantization" ||
-                   args[i] == "-channels" || args[i] == "-highPass" || args[i] == "-rotate" || args[i] == "-invert") {
+                   args[i] == "-channels" || args[i] == "-highPass" || args[i] == "-rotate" || args[i] == "-invert" || args[i] == "-contrast") {
             loadArgs.push_back(args[i]);
 
             // If -gaussian or -quantization or -rotate requires values, parse them
@@ -235,6 +235,14 @@ cv::Mat applyTransformations(cv::Mat image, const std::vector<std::string>& tran
             }
             std::cout << "Inverting the colors of the image" << std::endl;
             image = decoder.invertColors(image);
+        } 
+        else if (transformations[i] == "-contrast") {
+            if (!imageLoaded) {
+                std::cerr << "Error: Image must be loaded before applying transformations" << std::endl;
+                return image;
+            }
+            std::cout << "Enhance the CONTRAST of the image" << std::endl;
+            image = decoder.histogramEqualization(image);
         } 
         else if (transformations[i] == "-display") {
             std::cout << "Displaying the image" << std::endl;

@@ -45,6 +45,9 @@ public:
     // ----------------------------------------------- Apply Filter to INVERT the Colors
     cv::Mat invertColors(const cv::Mat& image);
 
+    // ----------------------------------------------- Apply Filter to Enhance the Contrast
+    cv::Mat histogramEqualization(const cv::Mat& image);
+
     // ----------------------------------------------- Calculate Absolute Difference
     cv::Mat calculateAbsoluteDifference(const cv::Mat& image1, const cv::Mat& image2);
 

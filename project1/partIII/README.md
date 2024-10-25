@@ -68,7 +68,7 @@ COMMAND :   "-diff" arg "," arg  ("-display")*
         |   "-hist" (arg | "-diff" arg "," arg )
         ;
 
-arg     :    "-load" IMAGE ("-grayscale")* ("-gaussian" NUM NUM)* ("-quantization" NUM)* ("-channels")* ("-highPass")* ("-rotate" NUM)*
+arg     :    "-load" IMAGE ("-grayscale")* ("-gaussian" NUM NUM)* ("-quantization" NUM)* ("-channels")* ("-highPass")* ("-rotate" NUM)* ("-invert")* ("-contrast")*
         ;
 
 IMAGE   :  path_to_image
@@ -89,11 +89,13 @@ A command can be:
     - `-load` *IMAGE* --> load the *IMAGE*
     - <u>Optionally</u>, following operations can be applied to the loaded image **in whatever order wanted**:
         - `-grayscale` -->  Grayscale conversion
-        - `-gaussian` *NUM* *NUM* --> Apply Gaussian-blur <***kernel size***> <***sigma***> 
-        - `-quantization` *NUM* --> Quantize <***nº levels***>.
+        - `-gaussian` ***NUM*** ***NUM*** --> Apply Gaussian-blur <***kernel size***> <***sigma***> 
+        - `-quantization` ***NUM*** --> Quantize <***nº levels***>.
         - `-channels` --> show RGB channels values and the comparing with grayscale values
         - `-highPass` --> Apply a HighPass filter 
-        - `-rotate` *NUM* --> Rotate the image $NUMº$ 
+        - `-rotate` ***NUM*** --> Rotate the image < **$ \alpha º$**> 
+        - `-invert` --> Invert the image colors
+        - `-contrast`--> Contrast enhancement
 
 3. **IMAGE:**
     - ***Path*** where the image is stored.
@@ -129,8 +131,10 @@ A command can be:
 ```
 
 ---
+<br>
 
 ### **BGR (Blue,Green, Red)** :
+---
 when you load an image using *OpenCV’s* ***cv::imread()***, the pixel data is stored in **BGR** order, with the Blue component first, followed by Green and then Red.
 ```md
     - pixel[0] = Blue
@@ -138,8 +142,10 @@ when you load an image using *OpenCV’s* ***cv::imread()***, the pixel data is 
     - pixel[2] = Red
 ```
 ---
+<br>
 
 ### **RGB Channels and Grayscale Appearance**
+---
 Each channel contains intensity values for thar specific color (0 to 255).
 When displayed alone these single-channel matrices as an image, it appears **grayscale** because on a intensity scale:
 ```md
@@ -147,18 +153,23 @@ When displayed alone these single-channel matrices as an image, it appears **gra
     - 255   : full intensity (WHITE)
 ```
 ---
-    
+<br>
+
 ### **OpenCv Displays RGB Images**:
+---
 To display an RGB image, *OpenCV* combines the 3 channels into a color image.
 ```md
     - The image appears in colors because the viewer assigns each channel to the specific color 
     and use the scale to control the intensity of each color(Red,Green,Blue)
 ```
 ---
+<br>
 
 ### **Grayscale Convertion**
+---
+
 Is combining the 3 channels into a single channel representing the **light intensity** of each pixel.
-The problem facing on this is how much each channel weights during the fusion of the channels, for this we have the following formula:
+The problem facing on this is **how much each channel weights** during the fusion of the channels, for this we have the following formula:
 
 ### Mathematical formula 
 
@@ -197,8 +208,11 @@ Result of the following command:
 > ./ImageDecoder -load "../../../datasets/image/boat.ppm" -channels 
 
 ---
+<br>
+
 
 ###  **Gaussian blur filter** 
+---
 Tipically used to reduce image **noise** and reduce **detail**.
     
 A Gaussian blur filter uses a convoltion matrix (kernel) to smooth the image by averaging pixel values with their neighbors (usging a Gaussian function), for each of the 3 channels(RGB):
@@ -235,7 +249,10 @@ $$
 - **KERNEL**: Defines the region of influence (larger kernel means the blur affects a wider area around each pixel).
 
 ---
+<br>
+
 ### **MATRIX OF ABSOLUTE DIFFERENCE**
+---
 The matrix of absolute differences between two images is a pixel-by-pixel comparison that helps quantify how much two images differ from each other.
         
 $$
@@ -249,16 +266,24 @@ $$
 Tipically used to see how much a image changed :
 - after a compression, 
 - temporal images, 
-- user resgistration align images
+- user resgistration < aligning images like when using the fnac.pt website>
 
-<br>
-
-Visual interpretation :
+### Visual interpretation :
 - <u>Brighter areas</u> : suggests **significant differences**
 - <u>Darker areas</u> : suggests **similarities**
 
+|**Original image** (boat.ppm) | **2lvl. Quantized image** (boat.ppm) | **Abs. Difference** (boat.ppm) |
+|-|-|----------------------------|
+| ![Color](../partIII/imgs/gs_color.png) | ![Color](../partIII/imgs/boat_quantized_2.png) |  ![Color](../partIII/imgs/diff_qt_normal.png) |
+| `./ImageDecoder -load "../../../datasets/image/boat.ppm" -display` | `./ImageDecoder -load "../../../datasets/image/boat.ppm" -quantization 2 -display` | ` ./ImageDecoder -diff -load "../../../datasets/image/boat.ppm" -quantization 2 , -load "../../../datasets/image/boat.ppm" -display;  `|
+
+- With this we can estimate the quantity of information lost during the process of quantization.
+
 ---
+<br>
+
 ###  **MSE and PNSR** 
+---
 ```md    
     - MSE   : Mean Squared Error
     - PSMR  : Peak Signal-to-Noise Ratio
@@ -295,7 +320,10 @@ $$
 - They are used together in image processing to quantify differences and the level of distortion in images
 
 ---
+<br>
+
 ###  **QUANTIZATION** 
+---
 ```md    
     - Reduction of bits used to represent an image, by reducing the number of distinct colors or intensity levels used to represent an image
 ```
@@ -375,7 +403,10 @@ Comparing the original image with the quantized one using ***MSE*** and ***PSNR*
 > This coherence between quantization levels and error metrics demonstrates that as the number of quantization levels increases, more details are preserved, and the image quality improves.
 
 ---
+<br>
+
 ### **HighPass Filter**
+---
 With the function that already have I try to make another "filters" and I found the $HighPass filter$, that is somehow a simplistic <u>edge detector</u>.
 
 In theory:
@@ -481,8 +512,46 @@ Assign the pixel from the original image to the new position in the rotated imag
 
 ---
 ### INVERT COLORS
+Inverting Colors adjusts each pixel to its opposite hue, enhancing the image’s visual contrast and creating a unique visual effect. Darker areas become light, and light areas become dark, which can be particularly useful in creative photography, visual art, and certain technical fields where detecting outlines and patterns in a different light is beneficial.
 
-2. Invert Colors Function (Manual Implementation)
-Steps for inverting colors:
+Invert Colors Function:
+- Steps for inverting colors:
+    1. For each pixel, subtract the pixel's color value from the maximum intensity (255 for 8-bit images).
+    2. Replace the original pixel value with the calculated inverted value.
 
-For each pixel, subtract the pixel's color value from the maximum intensity (255 for 8-bit images).
+| **Original Image** (manuscript.jpg) | **Image with Invertion Colors filter** (manuscript.jpg) |
+|--------------------------------|--------------------------------------------|
+| ![Original](../partIII/imgs/manuscript_original.png) | ![HighPass Filter](../partIII/imgs/manuscript_inverted.png) |
+| `./ImageDecoder -load "../../../datasets/image/manuscript.jpg" -display ` | `./ImageDecoder -load "../../../datasets/image/manuscript.jpg" -invert -display ` |
+| **Original Image** (letter.jpg) | **Image with CONSTRAST ENHANCEMENT filter** (letter.jpg) |
+| ![Original](../partIII/imgs/letter_original.png) | ![HighPass Filter](../partIII/imgs/letter_inverted.png) |
+| `./ImageDecoder -load "../../../datasets/image/letter.jpg" -display ` | `./ImageDecoder -load "../../../datasets/image/letter.jpg" -invert -display ` |
+
+- Inverted colors can make faint or faded text more readable by increasing the contrast in ways that are difficult to achieve with standard color or grayscale images.
+
+---
+<br>
+
+### CONSTRAST ENHANCEMENT
+---
+Contrast Enhancement (Histogram Equalization) , redistributes brightness to balance contrast, which helps darker images appear brighter by enhancing details in low-contrast areas.
+
+- Steps for Histogram Equalization:
+    1. Calculate the histogram of the image.
+    2. Normalize the histogram to create the cumulative distribution function (CDF).
+    3. Use the CDF to map the intensity values in the image to new values.
+    4. Apply the transformation to the original image.
+
+>  Often used in medical imaging and satellite imagery to enhance details, and also in photography to improve contrast.
+
+| **Original Image** (satelite.jpeg) | **Image with CONSTRAST ENHANCEMENT filter** (satelite.jpeg) |
+|--------------------------------|--------------------------------------------|
+| ![Original](../partIII/imgs/satelite_original.png) | ![HighPass Filter](../partIII/imgs/satelite_contrast.png) |
+| `./ImageDecoder -load "../../../datasets/image/satelite.jpeg" -display ` | `./ImageDecoder -load "../../../datasets/image/satelite.jpeg" -contrast -display ` |
+| **Original Image** (castle.jpg) | **Image with CONSTRAST ENHANCEMENT filter** (castle.jpg) |
+| ![Original](../partIII/imgs/castle_original.png) | ![HighPass Filter](../partIII/imgs/castle_contrast.png) |
+| `./ImageDecoder -load "../../../datasets/image/castle.jpg" -display ` | `./ImageDecoder -load "../../../datasets/image/castle.jpg" -contrast -display ` |
+
+Using this filter:
+1. We can more easly identify the different depths on the coastal sea bed
+2. We can get more detail on a night picture 
