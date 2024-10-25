@@ -109,8 +109,10 @@ The waveform of an audio file represents how the different amplitude values alon
 
 To draw the waveform, we used the sfml sf::VertexArray with the sf::LineStrip property to draw lines based on the amplitude values.
 
-![Waveform](../partII/figures/Waveform.jpg) 
-Example of a waveform being displayed
+<p align="center">
+        <img src="../partII/figures/Waveform.jpg">
+    <p align="center">
+    Example of a wavefile being displayed
 
 
 ## **Histogram**
