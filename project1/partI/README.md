@@ -1,5 +1,6 @@
 # IC - Information and Coding (2024/25)
 
+Return to the main README : [Project 1 - README](../../project1/readme.md)
 ---
 # PROJECT 1 : Part I
 <p style="text-align: right;"><strong>Author:</strong> Inês Águia</p>
