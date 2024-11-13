@@ -1,110 +1,99 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+#include <chrono>
+#include <cmath> // For ceil()
 #include "BitStream.h"
 
-// Function to write the header
-/*
-    writeHeader() function is used to write the header to the file.
-    It takes a BitStream object and a string as input.
-    It writes the header followed by a delimiter '#'.
-*/
-void writeHeader(BitStream &bitStream, const std::string &header) {
-    bitStream.writeString(header); // Write the header (number of meaningful bits)
-    bitStream.writeString("#");    // Use '#' as a delimiter to mark the end of the header
+using namespace std;
+
+// Function to write the header with padding information
+void writeHeader(BitStream &bitStream, int paddingBits) {
+    string paddingBitsStr = to_string(paddingBits);
+    bitStream.writeString(paddingBitsStr); // Write the number of padding bits as a string
+    bitStream.writeString("#");           // Use '#' as a delimiter to mark the end of the header
 }
 
-// Function to encode the input file
-/*
-    encodeFile() function is used to encode the input file containing '0's and '1's.
-    It reads the input file, counts the meaningful bits, and encodes the data.
-    It writes the encoded data to a temporary file using a BitStream object.
-    Finally, it writes the header and copies the temporary file contents to the final output file.
-*/
-void encodeFile(const std::string& inputFilePath, const std::string& outputFilePath) {
-    std::ifstream inputFile(inputFilePath);
+// Function to encode the input file and store the bits in a vector
+void encodeFile(const string& inputFilePath, const string& outputFilePath) {
+    ifstream inputFile(inputFilePath);
     if (!inputFile.is_open()) {
-        std::cerr << "Failed to open input file: " << inputFilePath << std::endl;
+        cerr << "Failed to open input file: " << inputFilePath << endl;
         return;
     }
 
-    size_t meaningfulBits = 0; // Count of meaningful bits
+    vector<bool> encodedBits; // Vector to store the encoded data as individual bits
     char bitChar;
-    int bitBuffer = 0; // Buffer to hold bits before writing them as a byte
-    int bitCount = 0;  // Counter for number of bits in the buffer
 
-    // First count the meaningful bits and encode the data
-    std::string tempOutputFilePath = outputFilePath + ".tmp";
-    BitStream bitStream(tempOutputFilePath, true); // Temporary stream for writing bit data
-
+    // Read and encode the data into the vector
     while (inputFile.get(bitChar)) {
-        if (bitChar == '0' || bitChar == '1') {
-            bitBuffer = (bitBuffer << 1) | (bitChar - '0'); // Add bit to buffer
-            bitCount++;
-            meaningfulBits++;
-
-            // If we have 8 bits, write the byte to the BitStream
-            if (bitCount == 8) {
-                bitStream.writeBits(bitBuffer, 8);
-                bitBuffer = 0;
-                bitCount = 0;
-            }
+        if (bitChar == '0') {
+            encodedBits.push_back(false); // Store 0 as false
+        } else if (bitChar == '1') {
+            encodedBits.push_back(true);  // Store 1 as true
         } else {
-            std::cerr << "Invalid character in input file (only '0' and '1' allowed)." << std::endl;
+            cerr << "Invalid character in input file (only '0' and '1' allowed)." << endl;
             inputFile.close();
-            bitStream.close();
             return;
         }
     }
 
-    // Handle padding if there are remaining bits
-    /*
-        If there are remaining bits in the buffer, we need to add 0s to complete the byte.
-        We shift the bits to the left to align them and write the byte to the BitStream.
-    */
-    if (bitCount > 0) {
-        bitBuffer <<= (8 - bitCount); // Add 0s to complete the byte
-        bitStream.writeBits(bitBuffer, 8);
+    inputFile.close();
+
+    // Calculate padding bits needed to align the data to a byte boundary
+    int paddingBits = 0;
+    if (encodedBits.size() % 8 != 0) {
+        paddingBits = 8 - (encodedBits.size() % 8);
+        for (int i = 0; i < paddingBits; ++i) {
+            encodedBits.push_back(false); // Add padding bits (0) to align to a byte
+        }
+    }
+
+    // Create a BitStream object for the final output
+    BitStream bitStream(outputFilePath, true);
+
+    // Write the header with the calculated padding bits
+    writeHeader(bitStream, paddingBits);
+
+    // Write the encoded data from the vector to the output file bit by bit
+    int bitBuffer = 0;
+    int bitCount = 0;
+    for (bool bit : encodedBits) {
+        bitBuffer = (bitBuffer << 1) | bit; // Add bit to buffer
+        bitCount++;
+
+        // If we have 8 bits, write the byte to the BitStream
+        if (bitCount == 8) {
+            bitStream.writeBits(bitBuffer, 8);
+            bitBuffer = 0;
+            bitCount = 0;
+        }
     }
 
     bitStream.close();
-    inputFile.close();
 
-    // Write the final output file with the header
-    BitStream finalStream(outputFilePath, true);
-    std::string meaningfulBitsStr = std::to_string(meaningfulBits);
-    writeHeader(finalStream, meaningfulBitsStr);
-
-    // Copy the temporary file contents (bit data) to the final stream
-    std::ifstream tempInput(tempOutputFilePath, std::ios::binary);
-    if (tempInput.is_open()) {
-        char byte;
-        while (tempInput.get(byte)) {
-            finalStream.writeBits(static_cast<unsigned char>(byte), 8);
-        }
-        tempInput.close();
-    }
-    finalStream.close();
-
-    // Remove the temporary file
-    /*
-        PROVIROSY:
-        We remove the temporary file after copying its contents to the final output file.
-    */
-    std::remove(tempOutputFilePath.c_str());
-
-    std::cout << "Encoding complete. Output written to: " << outputFilePath << std::endl;
+    cout << "Encoding complete. Output written to: " << outputFilePath << endl;
 }
 
-
 int main() {
-    std::string inputFilePath, outputFilePath;
-    std::cout << "Enter input text file path (containing 0s and 1s): ";
-    std::cin >> inputFilePath;
-    std::cout << "Enter output binary file path: ";
-    std::cin >> outputFilePath;
+    string inputFilePath, outputFilePath;
+    cout << "Enter input text file path (containing 0s and 1s): ";
+    cin >> inputFilePath;
+    cout << "Enter output binary file path: ";
+    cin >> outputFilePath;
+
+    // Start timing
+    auto start = chrono::high_resolution_clock::now();
 
     encodeFile(inputFilePath, outputFilePath);
+
+    // Stop timing
+    auto end = chrono::high_resolution_clock::now();
+
+    // Calculate and display the elapsed time
+    chrono::duration<double> elapsed = end - start;
+    cout << "\nEncoding completed in " << elapsed.count() << " seconds.\n" << endl;
 
     return 0;
 }

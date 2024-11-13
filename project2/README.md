@@ -9,7 +9,17 @@
 
 ## Testing Bitstream
 
-1. `Runing the encoder`:
+`In order to make script exevcutable : chmod +x <scriptName>.sh`
+
+| Extra | Convertion | info |
+|-------|------------|----------|
+| `./stb` | String -> Binary | convert a String in their binary representation and store it in `input.txt` |
+| `./bts` | Binary -> String | convert a Binary code from a file in their string representation showned in the **terminal** | 
+
+<br>
+<br>
+
+1. `Running the encoder`:
 ```bash
 ./run_encoder.sh
 ```
@@ -20,7 +30,7 @@
     ```
     The value for binary file path is a sugestion
 
-2. `Runing the decoder`:
+2. `Running the decoder`:
 ```bash
 ./run_decoder.sh
 ```
@@ -30,3 +40,19 @@
     Enter output text file path (to reconstruct 0s and 1s): <decoded.txt>
     ```
     The values for output text file path is a sugestion
+
+
+## ENCODER
+
+1.`FIRST ATTEMPT` --> **HEADER** the nº of padding bits  
+- while getting the nº padding bits, create a teporary file writing the code
+- write the header and the rest the temporary file
+- time of encoding:
+    - 0.000820213 seconds
+
+2.`SECOND ATTEMPT` --> **HEADER** the nº of padding bits  
+- while getting the nº padding bits create store it in a internal structure
+- write the header and the rest the temporary file
+- time of encoding:
+    - 0.000493798 seconds
+
