@@ -3,22 +3,17 @@
 #include <string>
 #include "BitStream.h"
 
-// Function to decode the header and return the number of meaningful bits
-/*
-    decodeHeader() function is used to decode the header from the file.
-    It reads the header until the delimiter '#' is encountered.
-    It converts the header to a number and returns it as size_t.
-*/
+using namespace std;
+
+// Function to decode the header and return the number of padding bits
 size_t decodeHeader(BitStream &bitStream) {
-    std::string header;
+    string header;
     char currentChar;
-    std::cout << "\nDecoding header..." << std::endl;
+    cout << "\nDecoding header..." << endl;
     while (true) {
         // Read one character as 8 bits
         uint64_t charBits = bitStream.readBits(8);
         currentChar = static_cast<char>(charBits);
-
-        //std::cout << "Read character: " << currentChar << std::endl; // Debugging output
 
         if (currentChar == '#') {
             break; // End of header
@@ -26,38 +21,58 @@ size_t decodeHeader(BitStream &bitStream) {
         header += currentChar;
     }
 
-    // Convert the header to size_t
+    // Convert the header to size_t (number of padding bits)
     try {
-        std::cout << "Header decoded successfully.\n" << std::endl;
-        return std::stoull(header);  
-    } catch (const std::invalid_argument&) {
-        std::cerr << "Invalid header format: unable to convert to a number.\n" << std::endl;
+        cout << "Header decoded successfully.\n" << endl;
+        return stoull(header);  
+    } catch (const invalid_argument&) {
+        cerr << "Invalid header format: unable to convert to a number.\n" << endl;
         throw; // Propagate the exception for handling in the calling function
     }
 }
 
+// Function to get the total bits in the file (excluding header)
+size_t calculateTotalBits(const string& filePath) {
+    ifstream file(filePath, ios::binary | ios::ate);
+    if (!file.is_open()) {
+        cerr << "Failed to open file: " << filePath << endl;
+        return 0;
+    }
+    streamsize fileSize = file.tellg(); // Get size in bytes
+    file.close();
+    return static_cast<size_t>(fileSize * 8); // Convert bytes to bits
+}
+
 // Function to decode the input binary file to a text file
-/*
-    decodeFile() function is used to decode the input binary file to a text file.
-    It reads the header to get the number of meaningful bits and decodes the message bits.
-    It writes the decoded bits to the output text file.
-*/
-void decodeFile(const std::string& inputFilePath, const std::string& outputFilePath) {
+void decodeFile(const string& inputFilePath, const string& outputFilePath) {
     BitStream bitStream(inputFilePath, false); // Open for reading
-    std::cout << "\nDecoding " << inputFilePath << " ... " << std::endl;
-    size_t meaningfulBits = 0;
+    cout << "\nDecoding " << inputFilePath << " ... " << endl;
+    size_t paddingBits = 0;
     try {
-        // Decode the header to get the number of meaningful bits
-        meaningfulBits = decodeHeader(bitStream);
+        // Decode the header to get the number of padding bits
+        paddingBits = decodeHeader(bitStream);
     } catch (...) {
-        std::cerr << "Failed to decode header.\n" << std::endl;
+        cerr << "Failed to decode header.\n" << endl;
         return;
     }
 
+    // Calculate the total number of bits in the file
+    size_t totalBits = calculateTotalBits(inputFilePath);
+    if (totalBits == 0) {
+        cerr << "Failed to determine the total number of bits in the file.\n" << endl;
+        return;
+    }
+
+    // Calculate the number of bits used by the header
+    size_t headerBits = (paddingBits > 9) ? 24 : 16; // Assume header length is 2 or 3 characters plus '#'
+
+    // Calculate the number of meaningful bits
+    size_t meaningfulBits = totalBits - headerBits - paddingBits;
+
     // Open the output file for writing the decoded bits
-    std::ofstream outputFile(outputFilePath);
+    ofstream outputFile(outputFilePath);
     if (!outputFile.is_open()) {
-        std::cerr << "Failed to open output file: " << outputFilePath << std::endl;
+        cerr << "Failed to open output file: " << outputFilePath << endl;
         return;
     }
 
@@ -69,23 +84,33 @@ void decodeFile(const std::string& inputFilePath, const std::string& outputFileP
             outputFile << (bit ? '1' : '0');
             bitsRead++;
         }
-    } catch (const std::ios_base::failure&) {
-        std::cerr << "Unexpected end of file while reading." << std::endl;
+    } catch (const ios_base::failure&) {
+        cerr << "Unexpected end of file while reading." << endl;
     }
 
     bitStream.close();
     outputFile.close();
-    std::cout << "Decoding complete! \nOutput written to: " << outputFilePath <<"\n " <<std::endl;
+    cout << "Decoding complete! \nOutput written to: " << outputFilePath << "\n" << endl;
 }
 
+
 int main() {
-    std::string inputFilePath, outputFilePath;
-    std::cout << "Enter input binary file path: ";
-    std::cin >> inputFilePath;
-    std::cout << "Enter output text file path (to reconstruct 0s and 1s): ";
-    std::cin >> outputFilePath;
+    string inputFilePath, outputFilePath;
+    cout << "Enter input binary file path: ";
+    cin >> inputFilePath;
+    cout << "Enter output text file path (to reconstruct 0s and 1s): ";
+    cin >> outputFilePath;
+
+    // Start timing
+    auto start = chrono::high_resolution_clock::now();
 
     decodeFile(inputFilePath, outputFilePath);
+
+    // End timing
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = end - start;
+    cout << "\nDecoding completed in " << elapsed.count() << " seconds.\n" << endl;
+
 
     return 0;
 }
