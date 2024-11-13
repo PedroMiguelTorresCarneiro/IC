@@ -56,3 +56,13 @@
 - time of encoding:
     - 0.000493798 seconds
 
+## DECODER
+
+1.`FIRST ATTEMPT` --> **HEADER + BODY** count
+- calculate the bits of the header
+- calculate totatl bits
+- get the number of meaningfull bits subtracting the padding number and header size
+- time of encoding:
+    - 0.00124619 seconds
+
+2.`SECOND ATTEMPT` --> 
