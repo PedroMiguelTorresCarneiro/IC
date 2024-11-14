@@ -56,6 +56,18 @@
 - time of encoding:
     - 0.000493798 seconds
 
+### Examples:
+
+| ex | file | content | $N_{bits} \% {8} = 0$| Padding bits | HEADER |
+|---------|------|---------|----------------------|--------------|----------|
+| 1 | input.txt | 01010(...)101111 | yes | - | - |
+| 1 | output.bin | `0#PedroMiguelTorresCarneiro` | - | 0 | `0#` |
+| 2 | input.txt | 01010(...)101 | No | - | - |
+| 2 | output.bin | `3#PedroMiguelTorresCarneirh` | - | 3 | `3#` | 
+
+<br>
+<br>
+
 ## DECODER
 
 1.`FIRST ATTEMPT` --> **HEADER + BODY** count
