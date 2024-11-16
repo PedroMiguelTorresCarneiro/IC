@@ -76,24 +76,26 @@ void encodeFile(const string& inputFilePath, const string& outputFilePath) {
     cout << "Encoding complete. Output written to: " << outputFilePath << endl;
 }
 
-int main() {
-    string inputFilePath, outputFilePath;
-    cout << "Enter input text file path (containing 0s and 1s): ";
-    cin >> inputFilePath;
-    cout << "Enter output binary file path: ";
-    cin >> outputFilePath;
+
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        cerr << "Usage: " << argv[0] << " <input_text_file> <output_binary_file>" << endl;
+        return 1;
+    }
+
+    string inputFilePath = argv[1];
+    string outputFilePath = argv[2];
 
     // Start timing
     auto start = chrono::high_resolution_clock::now();
 
+    // Call your existing function to process the files
     encodeFile(inputFilePath, outputFilePath);
 
-    // Stop timing
+    // End timing
     auto end = chrono::high_resolution_clock::now();
-
-    // Calculate and display the elapsed time
     chrono::duration<double> elapsed = end - start;
-    cout << "\nEncoding completed in " << elapsed.count() << " seconds.\n" << endl;
+    cout << "\nDecoding completed in " << elapsed.count() << " seconds.\n" << endl;
 
     return 0;
 }
