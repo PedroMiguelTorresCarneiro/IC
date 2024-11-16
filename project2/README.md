@@ -40,32 +40,73 @@
 - while getting the nº padding bits, create a <u>teporary file</u> writing the code
 - write the header and the rest the temporary file
 - time of encoding:
-    - ***FILE USED***: input.txt --> 197 Bytes / output.bin ---> 28 bytes
-        - we run encoder 100 times: 
-            - $\bar{x} = 0,436622 \text{ miliseconds}$
-    - ***FILE USED***: input.txt --> 2 kBytes / output.bin ---> 250 bytes
-        - we run encoder 100 times: 
-            - $\bar{x} = 0.518067 \text{ miliseconds}$
-    - ***FILE USED***: input.txt --> 2 MBytes / output.bin ---> 246 Kbytes
+    1. ### -| 197 Bytes |-
         - `Compression rate`
             - Using the formula, $ \left( 1 - \frac{Compressed_{size}}{Original_{size}}\right) \times 100$
-                - $Original_{size}$ = 2Mb 
-                - $Compressed_{size}$ = 246KB,  
+                - $Original_{size}$ = 197 bytes 
+                - $Compressed_{size}$ = 28 Bytes,  
+            - $Compression_{rate} = 85,79 \%$
+        - `Compression time`
+            - we run encoder 100 times: 
+                - $\bar{x} = 0.421627 \text{ miliseconds}$
+        ---
+    2. ### -| 2 kBytes |-
+        - `Compression rate`
+            - Using the formula, $ \left( 1 - \frac{Compressed_{size}}{Original_{size}}\right) \times 100$
+                - $Original_{size}$ = 2 kbytes 
+                - $Compressed_{size}$ = 250 Bytes,  
+            - $Compression_{rate} = 87,5 \%$
+        - `Compression time`
+            - we run encoder 100 times: 
+                - $\bar{x} = 0.510059 \text{ miliseconds}$
+        ---
+    3. ### -| 2 MBytes |- 
+        - `Compression rate`
+            - Using the formula, $ \left( 1 - \frac{Compressed_{size}}{Original_{size}}\right) \times 100$
+                - $Original_{size}$ = 2 Mbytes 
+                - $Compressed_{size}$ = 246KBytes,  
             - $Compression_{rate} = 87,7 \%$
         - `Compression time`
             - we run encoder 100 times: 
                 - $\bar{x} = 55.480459 \text{ miliseconds}$
+---
+<br>
+
+---
 
 2.`SECOND ATTEMPT` --> **HEADER** the nº of padding bits  
 - while getting the nº padding bits create store it in a <u>internal structure</u>
 - write the header and the rest the temporary file
 - time of encoding:
-    - ***FILE USED***: input.txt --> 197 bytes / output.bin ---> 27 bytes
-        - we run encoder 100 times: 
-            - $\bar{x} = 0,249829 \text{ miliseconds}$
-    - ***FILE USED***: input.txt --> 2000 bytes / output.bin ---> 249 bytes
-        - we run encoder 100 times: 
-            - $\bar{x} = 0,418746 \text{ miliseconds}$
+    1. ### -| 197 Bytes |-
+        - `Compression rate`
+            - Using the formula, $ \left( 1 - \frac{Compressed_{size}}{Original_{size}}\right) \times 100$
+                - $Original_{size}$ = 197 bytes 
+                - $Compressed_{size}$ = 27 Bytes,  
+            - $Compression_{rate} = 85,29 \%$
+        - `Compression time`
+            - we run encoder 100 times: 
+                - $\bar{x} = 0.275198 \text{ miliseconds}$
+        ---
+    2. ### -| 2 kBytes |-
+        - `Compression rate`
+            - Using the formula, $ \left( 1 - \frac{Compressed_{size}}{Original_{size}}\right) \times 100$
+                - $Original_{size}$ = 2 kbytes 
+                - $Compressed_{size}$ = 249 Bytes,  
+            - $Compression_{rate} = 87,55 \%$
+        - `Compression time`
+            - we run encoder 100 times: 
+                - $\bar{x} = 0.455895 \text{ miliseconds}$
+        ---
+    3. ### -| 2 MBytes |- 
+        - `Compression rate`
+            - Using the formula, $ \left( 1 - \frac{Compressed_{size}}{Original_{size}}\right) \times 100$
+                - $Original_{size}$ = 2 Mbytes 
+                - $Compressed_{size}$ = 246KBytes,  
+            - $Compression_{rate} = 87,7 \%$
+        - `Compression time`
+            - we run encoder 100 times: 
+                - $\bar{x} = 182.785280 \text{ miliseconds}$
 
 ### Examples:
 
