@@ -93,17 +93,19 @@ void decodeFile(const string& inputFilePath, const string& outputFilePath) {
     cout << "Decoding complete! \nOutput written to: " << outputFilePath << "\n" << endl;
 }
 
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        cerr << "Usage: " << argv[0] << " <input_binary_file> <output_text_file>" << endl;
+        return 1;
+    }
 
-int main() {
-    string inputFilePath, outputFilePath;
-    cout << "Enter input binary file path: ";
-    cin >> inputFilePath;
-    cout << "Enter output text file path (to reconstruct 0s and 1s): ";
-    cin >> outputFilePath;
+    string inputFilePath = argv[1];
+    string outputFilePath = argv[2];
 
     // Start timing
     auto start = chrono::high_resolution_clock::now();
 
+    // Call your existing function to process the files
     decodeFile(inputFilePath, outputFilePath);
 
     // End timing
