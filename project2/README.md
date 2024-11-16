@@ -19,42 +19,53 @@
 <br>
 <br>
 
-1. `Running the encoder`:
-```bash
-./run_encoder.sh
-```
-- Then will appear the following prompt:
+1. **`Build and Run`**
+    ```bash
+        mkdir build
+        cd build
+        cmake ..
+        make
     ```
-    Enter input text file path (containing 0s and 1s): <input.txt>
-    Enter output binary file path: <output.bin>
-    ```
-    The value for binary file path is a sugestion
-
-2. `Running the decoder`:
-```bash
-./run_decoder.sh
-```
-- Then will appear the following prompt:
-    ```
-    Enter input binary file path: <output.bin>
-    Enter output text file path (to reconstruct 0s and 1s): <decoded.txt>
-    ```
-    The values for output text file path is a sugestion
-
 
 ## ENCODER
+```bash
+./encoder <input_string_file> <output_binary_file>
+```
+- You need to create the input.txt inside `/build` or giving the the path to the file
+---
+<br>
+<br>
 
 1.`FIRST ATTEMPT` --> **HEADER** the nº of padding bits  
-- while getting the nº padding bits, create a teporary file writing the code
+- while getting the nº padding bits, create a <u>teporary file</u> writing the code
 - write the header and the rest the temporary file
 - time of encoding:
-    - 0.000820213 seconds
+    - ***FILE USED***: input.txt --> 197 Bytes / output.bin ---> 28 bytes
+        - we run encoder 100 times: 
+            - $\bar{x} = 0,436622 \text{ miliseconds}$
+    - ***FILE USED***: input.txt --> 2 kBytes / output.bin ---> 250 bytes
+        - we run encoder 100 times: 
+            - $\bar{x} = 0.518067 \text{ miliseconds}$
+    - ***FILE USED***: input.txt --> 2 MBytes / output.bin ---> 246 Kbytes
+        - `Compression rate`
+            - Using the formula, $ \left( 1 - \frac{Compressed_{size}}{Original_{size}}\right) \times 100$
+                - $Original_{size}$ = 2Mb 
+                - $Compressed_{size}$ = 246KB,  
+            - $Compression_{rate} = 87,7 \%$
+        - `Compression time`
+            - we run encoder 100 times: 
+                - $\bar{x} = 55.480459 \text{ miliseconds}$
 
 2.`SECOND ATTEMPT` --> **HEADER** the nº of padding bits  
-- while getting the nº padding bits create store it in a internal structure
+- while getting the nº padding bits create store it in a <u>internal structure</u>
 - write the header and the rest the temporary file
 - time of encoding:
-    - 0.000493798 seconds
+    - ***FILE USED***: input.txt --> 197 bytes / output.bin ---> 27 bytes
+        - we run encoder 100 times: 
+            - $\bar{x} = 0,249829 \text{ miliseconds}$
+    - ***FILE USED***: input.txt --> 2000 bytes / output.bin ---> 249 bytes
+        - we run encoder 100 times: 
+            - $\bar{x} = 0,418746 \text{ miliseconds}$
 
 ### Examples:
 
@@ -69,12 +80,23 @@
 <br>
 
 ## DECODER
+```bash
+./decoder <input_binary_file> <output_string_file>
+```
+---
+<br>
+<br>
 
 1.`FIRST ATTEMPT` --> **HEADER + BODY** count
 - calculate the bits of the header
 - calculate totatl bits
 - get the number of meaningfull bits subtracting the padding number and header size
 - time of encoding:
-    - 0.00124619 seconds
+    - ***FILE USED***: input.txt --> 197 bytes / 27 bytes
+        - we run encoder 100 times: 
+            - $\bar{x} = 0,292412 \text{ miliseconds}$
+    - ***FILE USED***: input.txt --> 2000 bytes /output.bin ---> 249 bytes
+        - we run encoder 100 times: 
+            - $\bar{x} = 0.361967 \text{ miliseconds}$
 
 2.`SECOND ATTEMPT` --> 
