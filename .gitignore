@@ -3,6 +3,8 @@ build/
 
 # Allow specific files to be tracked in the build/ directory
 !build/input.txt
+!build/input2kB.txt
+!build/input2MB.txt
 !build/encoderRunner.sh
 
 .DS_Store
