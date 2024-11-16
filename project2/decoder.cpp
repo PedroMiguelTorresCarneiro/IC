@@ -9,7 +9,7 @@ using namespace std;
 size_t decodeHeader(BitStream &bitStream) {
     string header;
     char currentChar;
-    cout << "\nDecoding header..." << endl;
+    //cout << "\nDecoding header..." << endl;
     while (true) {
         // Read one character as 8 bits
         uint64_t charBits = bitStream.readBits(8);
@@ -23,7 +23,7 @@ size_t decodeHeader(BitStream &bitStream) {
 
     // Convert the header to size_t (number of padding bits)
     try {
-        cout << "Header decoded successfully.\n" << endl;
+        //cout << "Header decoded successfully.\n" << endl;
         return stoull(header);  
     } catch (const invalid_argument&) {
         cerr << "Invalid header format: unable to convert to a number.\n" << endl;
@@ -46,7 +46,7 @@ size_t calculateTotalBits(const string& filePath) {
 // Function to decode the input binary file to a text file
 void decodeFile(const string& inputFilePath, const string& outputFilePath) {
     BitStream bitStream(inputFilePath, false); // Open for reading
-    cout << "\nDecoding " << inputFilePath << " ... " << endl;
+    //cout << "\nDecoding " << inputFilePath << " ... " << endl;
     size_t paddingBits = 0;
     try {
         // Decode the header to get the number of padding bits
@@ -110,8 +110,8 @@ int main(int argc, char* argv[]) {
 
     // End timing
     auto end = chrono::high_resolution_clock::now();
-    chrono::duration<double> elapsed = end - start;
-    cout << "\nDecoding completed in " << elapsed.count() << " seconds.\n" << endl;
+    chrono::duration<double, std::milli> elapsed = end - start;
+    cout << "\nEncoding completed in " << elapsed.count() << " milliseconds.\n" << endl;
 
 
     return 0;

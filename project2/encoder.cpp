@@ -94,8 +94,8 @@ int main(int argc, char* argv[]) {
 
     // End timing
     auto end = chrono::high_resolution_clock::now();
-    chrono::duration<double> elapsed = end - start;
-    cout << "\nDecoding completed in " << elapsed.count() << " seconds.\n" << endl;
+    chrono::duration<double, std::milli> elapsed = end - start;
+    cout << "\nEncoding completed in " << elapsed.count() << " milliseconds.\n" << endl;
 
     return 0;
 }
