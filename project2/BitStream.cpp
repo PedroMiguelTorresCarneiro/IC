@@ -139,6 +139,24 @@ string BitStream::readString() {
     return result; // -----------> Return the final string
 }
 
+
+/*
+    // Using '\0' as a delimiter for readString()
+    string BitStream::readString() {
+        string result;
+        while (file.peek() != EOF) { // Check if the end of the file is reached
+            char c = static_cast<char>(readBits(8)); // Read a character (8 bits)
+            if (c == '\0') { // Stop reading if a null character is encountered
+                break;
+            }
+            result += c; // Append the character to the result string
+        }
+        return result; // Return the final string
+    }
+
+*/
+
+
 // Closing the file explicitly
 /*
     close() function is used to close the file explicitly.

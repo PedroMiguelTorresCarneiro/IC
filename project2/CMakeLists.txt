@@ -8,8 +8,10 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Add the encoder and decoder executables
-add_executable(encoder encoder.cpp BitStream.cpp)
+#(encoder encoder.cpp BitStream.cpp)
 add_executable(encoder1 encoder1.cpp BitStream.cpp)
 add_executable(encoderMeaning encoderMeaning.cpp BitStream.cpp)
 add_executable(encoderMeaning1 encoderMeaning1.cpp BitStream.cpp)
 add_executable(decoder decoder.cpp BitStream.cpp)
+add_executable(golongMain GolombMain.cpp GolombCoding.cpp BitStream.cpp)
+
