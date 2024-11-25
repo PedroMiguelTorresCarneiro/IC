@@ -8,10 +8,10 @@ totalTime=0.0
 for ((i=1; i<=iterations; i++))
 do
     # Run the encoder and capture the output
-    output=$(./encoder1 "$inputFile" "$outputFile")
-    #output=$(./encoder "$inputFile" "$outputFile")
-    #output=$(./encoderMeaning "$inputFile" "$outputFile")
-    #output=$(./encoderMeaning1 "$inputFile" "$outputFile")
+    output=$(./build/encoder1 "$inputFile" "$outputFile")
+    #output=$(./build/encoder "$inputFile" "$outputFile")
+    #output=$(./build/encoderMeaning "$inputFile" "$outputFile")
+    #output=$(./build/encoderMeaning1 "$inputFile" "$outputFile")
 
     # Extract the timing value using awk
     timeTaken=$(echo "$output" | awk '/Encoding completed in/ {print $4}')
