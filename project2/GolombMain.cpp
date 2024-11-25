@@ -149,6 +149,7 @@ int main() {
         int optimalM = calculateOptimalM(filePath);
 
         if (optimalM > 0) {
+            std::cout << "\nOptimal m calculation:" << std::endl;
             std::cout << "Optimal m value based on data in " << filePath << " is: " << optimalM << std::endl;
         } else {
             std::cerr << "Error calculating optimal m." << std::endl;
@@ -170,7 +171,7 @@ int main() {
         displayEncodedData("test_golomb_pos_negOptimun.dat");
 
         BitStream readStream3("test_golomb_pos_negOptimun.dat", false);
-        GolombCoding decoder3(optimalM, readStream2, GolombCoding::POS_NEG);
+        GolombCoding decoder3(optimalM, readStream3, GolombCoding::POS_NEG);
 
         std::cout << "Decoded values using POS_NEG mode:" << std::endl;
         for (size_t i = 0; i < valuesToEncode.size(); ++i) {
