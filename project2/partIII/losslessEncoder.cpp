@@ -71,7 +71,7 @@ int main(){
         */
 
         std::string inputWav = "../dataSet/sample01.wav";
-        std::string outputCodec = "audio.mycodec";
+        std::string outputCodec = "../audio.mycodec";
         int m = 1;
         // Call the encode function
         encode(inputWav, outputCodec, m);

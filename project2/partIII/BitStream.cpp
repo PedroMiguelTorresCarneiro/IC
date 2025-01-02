@@ -176,3 +176,13 @@ bool BitStream::eof(){
     return file.eof();
 }
 
+//Read bits accounting for little endian
+uint64_t BitStream::readBitsLittleEndian(int numBits) {
+    uint64_t value = 0;
+    for (int i = 0; i < numBits / 8; ++i) {
+        uint64_t byte = readBits(8);
+        value |= (byte << (i * 8));  
+    }
+    return value;
+}
+

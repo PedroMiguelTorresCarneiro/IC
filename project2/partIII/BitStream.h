@@ -29,6 +29,7 @@ public:
     void writeString(const std::string& str);
     std::string readString();
     bool eof();
+    uint64_t readBitsLittleEndian(int numBits);
 
     // Utility method for closing the file
     void close();

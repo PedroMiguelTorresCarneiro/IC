@@ -15,7 +15,7 @@ WavData parseWavFile(BitStream &bitStream) {
         throw std::runtime_error("Invalid File!");
     }
 
-    wavData.fileSize = bitStream.readBits(32);
+    wavData.fileSize = bitStream.readBitsLittleEndian(32);
     wavData.waveHeader = readStringAux(bitStream, 4);
     if (wavData.waveHeader != "WAVE") {
         throw std::runtime_error("Invalid File!");
@@ -27,13 +27,15 @@ WavData parseWavFile(BitStream &bitStream) {
         throw std::runtime_error("Invalid File!");
     }
 
-    wavData.fmtChunkSize = bitStream.readBits(32);  // Chunk size
-    wavData.audioFormat = bitStream.readBits(16);   // Audio format (1 = PCM)
-    wavData.channelCount = bitStream.readBits(16);  // Number of channels
-    wavData.sampleRate = bitStream.readBits(32);    // Sample rate
-    bitStream.readBits(32);                         // Byte rate (skip)
-    bitStream.readBits(16);                         // Block align (skip)
-    wavData.bitDepth = bitStream.readBits(16);      // Bits per sample
+    wavData.fmtChunkSize = bitStream.readBitsLittleEndian(32);  // Chunk size
+    wavData.audioFormat = bitStream.readBitsLittleEndian(16);   // Audio format (1 = PCM)
+    wavData.channelCount = bitStream.readBitsLittleEndian(16);  // Number of channels
+    wavData.sampleRate = bitStream.readBitsLittleEndian(32);    // Sample rate
+    bitStream.readBitsLittleEndian(32);                         // Byte rate (skip)
+    bitStream.readBitsLittleEndian(16);                         // Block align (skip)
+    wavData.bitDepth = bitStream.readBitsLittleEndian(16);      // Bits per sample
+
+    std::cout << "Audio Format: " << wavData.audioFormat << std::endl;
 
     if (wavData.audioFormat != 1) {
         throw std::runtime_error("Unsupported WAV file: Only PCM is supported");
@@ -45,7 +47,7 @@ WavData parseWavFile(BitStream &bitStream) {
     std::string dataChunk;
     do {
         dataChunk = readStringAux(bitStream, 4); 
-        uint32_t chunkSize = bitStream.readBits(32); 
+        uint32_t chunkSize = bitStream.readBitsLittleEndian(32); 
         if (dataChunk == "data") {
             wavData.dataChunkSize = chunkSize;
             wavData.numSamples = chunkSize / (wavData.bitDepth / 8);
@@ -53,14 +55,15 @@ WavData parseWavFile(BitStream &bitStream) {
 
             // Get the audio samples
             for (uint32_t i = 0; i < wavData.numSamples; ++i) {
-                wavData.samples.push_back(bitStream.readBits(wavData.bitDepth));
+                wavData.samples.push_back(bitStream.readBitsLittleEndian(wavData.bitDepth));
             }
             break;
         } else {
             // Skip non-data chunks
-            bitStream.readBits(chunkSize * 8);
+            bitStream.readBitsLittleEndian(chunkSize * 8);
         }
     } while (!bitStream.eof());
+    std::cout<<"Data read"<<std::endl;
 
     return wavData;
 }
@@ -69,7 +72,7 @@ WavData parseWavFile(BitStream &bitStream) {
 std::string readStringAux(BitStream &bitStream, size_t length) {
     std::string result;
     for (size_t i = 0; i < length; ++i) {
-        char ch = static_cast<char>(bitStream.readBits(8));
+        char ch = static_cast<char>(bitStream.readBitsLittleEndian(8));
         result.push_back(ch);
     }
     return result;
