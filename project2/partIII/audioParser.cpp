@@ -39,6 +39,8 @@ WavData parseWavFile(BitStream &bitStream) {
         throw std::runtime_error("Unsupported WAV file: Only PCM is supported");
     }
 
+    std::cout<<"Header read"<<std::endl;
+
     // Data chunk
     std::string dataChunk;
     do {
