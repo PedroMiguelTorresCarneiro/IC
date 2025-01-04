@@ -9,4 +9,4 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Add an executable target for the project
-add_executable(AudioCodec audioParser.cpp BitStream.cpp GolombCoding.cpp losslessEncoder.cpp predictModel.cpp)
+add_executable(AudioCodec audioParser.cpp BitStream.cpp GolombCoding.cpp losslessEncoder.cpp predictModel.cpp losslessDecoder.cpp audioCodecMain.cpp )

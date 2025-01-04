@@ -1,8 +1,8 @@
 #include <vector>
 #include <iostream>
 
-//Calculate Residuals using first order prediction
-std::vector<int16_t> calculateResiduals(const std::vector<int16_t> &samples) {
+//Calculate residuals using first order prediction
+std::vector<int16_t> calculateResidualsMono(const std::vector<int16_t> &samples) {
     std::vector<int16_t> residuals;
 
     // Can't calculate residuals for the first sample, so just add it as it is
@@ -16,6 +16,30 @@ std::vector<int16_t> calculateResiduals(const std::vector<int16_t> &samples) {
 
     return residuals;
 }
+
+
+std::vector<int16_t> calculateResidualsStereo(const std::vector<int16_t> &samples) {
+    std::vector<int16_t> leftChannel, rightChannel;
+
+    //split samples into 2 channels
+    for (size_t i = 0; i < samples.size(); i += 2) {
+        leftChannel.push_back(samples[i]);      
+        rightChannel.push_back(samples[i + 1]); 
+    }
+
+    //calculate residuals for each channel
+    std::vector<int16_t> leftResiduals = calculateResidualsMono(leftChannel);
+    std::vector<int16_t> rightResiduals = calculateResidualsMono(rightChannel);
+
+    // combine the channels
+    std::vector<int16_t> residuals;
+    for (size_t i = 0; i < leftResiduals.size(); ++i) {
+        residuals.push_back(leftResiduals[i]);    
+        residuals.push_back(rightResiduals[i]); 
+    }
+    return residuals;
+}
+
 
 //----------------------------------------------------------------------------------
 

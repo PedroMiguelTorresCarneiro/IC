@@ -20,6 +20,5 @@ struct WavData {
 };
 
 WavData parseWavFile(BitStream &bitStream);
-std::string readStringAux(BitStream &bitStream, size_t length);
 
 #endif

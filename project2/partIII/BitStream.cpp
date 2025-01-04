@@ -180,9 +180,26 @@ bool BitStream::eof(){
 uint64_t BitStream::readBitsLittleEndian(int numBits) {
     uint64_t value = 0;
     for (int i = 0; i < numBits / 8; ++i) {
-        uint64_t byte = readBits(8);
-        value |= (byte << (i * 8));  
+        uint64_t byte = readBits(8);     
+        value |= (byte << (i * 8));       
     }
     return value;
 }
 
+
+//auxiliary function to read strings
+std::string BitStream::readStringAux(size_t length) {
+    std::string result;
+    for (size_t i = 0; i < length; ++i) {
+        char ch = static_cast<char>(readBitsLittleEndian(8));
+        result.push_back(ch);
+    }
+    return result;
+}
+
+void BitStream::writeBitsLittleEndian(uint64_t value, int numBits) {
+    // Write the bits from least significant to most significant
+    for (int i = 0; i < numBits; ++i) {
+        writeBit((value >> i) & 1); // Extract the i-th bit (from LSB to MSB)
+    }
+}
