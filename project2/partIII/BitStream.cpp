@@ -203,3 +203,4 @@ void BitStream::writeBitsLittleEndian(uint64_t value, int numBits) {
         writeBit((value >> i) & 1); // Extract the i-th bit (from LSB to MSB)
     }
 }
+

@@ -14,6 +14,7 @@ Metadata readMetadata(BitStream &bitStream) {
     if (fileIdentifier != "AUDIOCODEC") {
         throw std::runtime_error("Invalid file format: Expected AUDIOCODEC");
     }
+    
 
     //read the metadata
     metadata.sampleRate = bitStream.readBits(32);
@@ -21,6 +22,8 @@ Metadata readMetadata(BitStream &bitStream) {
     metadata.bitDepth = bitStream.readBits(16);
     metadata.numSamples = bitStream.readBits(32);
     metadata.golombParam = bitStream.readBits(16);
+    
+    
 
     return metadata;
 }

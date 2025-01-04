@@ -12,21 +12,21 @@ WavData parseWavFile(BitStream &bitStream) {
     // Read RIFF header
     wavData.riffHeader = bitStream.readStringAux(4);
     if (wavData.riffHeader != "RIFF") {
-        throw std::runtime_error("Invalid File!");
+        throw std::runtime_error("Invalid File! 1");
     }
 
     wavData.fileSize = bitStream.readBitsLittleEndian(32);
     wavData.waveHeader = bitStream.readStringAux(4);
     if (wavData.waveHeader != "WAVE") {
-        throw std::runtime_error("Invalid File!");
+        throw std::runtime_error("Invalid File! 2");
     }
 
     // Read ftm chunk
     wavData.fmtChunk = bitStream.readStringAux(4);
     if (wavData.fmtChunk != "fmt ") {
-        throw std::runtime_error("Invalid File!");
+        throw std::runtime_error("Invalid File! 3");
     }
-
+    
     wavData.fmtChunkSize = bitStream.readBitsLittleEndian(32);  // Chunk size
     wavData.audioFormat = bitStream.readBitsLittleEndian(16);   // Audio format (1 = PCM)
     wavData.channelCount = bitStream.readBitsLittleEndian(16);  // Number of channels

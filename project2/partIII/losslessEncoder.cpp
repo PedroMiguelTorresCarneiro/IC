@@ -17,12 +17,14 @@ void finalEncode(const std::string &inputWav, const std::string &outputCodec, in
     // Calculate residuals
     std::vector<int16_t> residuals;
 
+    /*
+    THE ISSUE OF THE CHANNELS IS COMING FROM HERE
     if(metadata.channelCount = 1){
         residuals = calculateResidualsMono(metadata.samples); //for mono audio
     }else{
         residuals = calculateResidualsStereo(metadata.samples); //for stereo audio
     }
-    
+    */
     
     // Write metadata
     writeMetadata(outputStream, metadata, m);
@@ -41,11 +43,14 @@ void writeMetadata(BitStream &bitStream, const WavData &metadata, int m) {
     bitStream.writeString("AUDIOCODEC");
 
     // Metadata
-    bitStream.writeBits(metadata.sampleRate, 32); 
+    
+    bitStream.writeBits(metadata.sampleRate, 32);
     bitStream.writeBits(metadata.channelCount, 16);
-    bitStream.writeBits(metadata.bitDepth, 16); 
+    bitStream.writeBits(metadata.bitDepth, 16);
     bitStream.writeBits(metadata.numSamples, 32);
     bitStream.writeBits(m, 16); // Golomb parameter
+    
+    
 }
 
 void writeResiduals(BitStream &bitStream, const std::vector<int16_t> &residuals, int m) {

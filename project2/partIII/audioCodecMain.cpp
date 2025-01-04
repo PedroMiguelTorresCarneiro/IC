@@ -31,7 +31,7 @@ int main(){
 
 //--------------------------TESTING DECODER--------------------------
         // Open the .mycodec file in read mode
-        BitStream bitStreamDec("audio.mycodec", false);
+        BitStream bitStreamDec("../audio.mac", false);
 
         // Read the metadata
         Metadata metadata;
@@ -44,6 +44,7 @@ int main(){
         std::cout << "  Bit Depth: " << metadata.bitDepth << " bits\n";
         std::cout << "  Number of Samples: " << metadata.numSamples << "\n";
         std::cout << "  Golomb Parameter (m): " << metadata.golombParam << "\n";
+        
         
         bitStreamDec.close();
 //---------------------------------------------------------------------------------------------
