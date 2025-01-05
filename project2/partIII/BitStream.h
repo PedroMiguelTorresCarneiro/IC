@@ -32,6 +32,7 @@ public:
     uint64_t readBitsLittleEndian(int numBits);
     std::string readStringAux(size_t length);
     void writeBitsLittleEndian(uint64_t value, int numBits);
+    void writeStringLittleEndian(const std::string& str);
 
     // Utility method for closing the file
     void close();

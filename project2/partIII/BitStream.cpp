@@ -197,6 +197,7 @@ std::string BitStream::readStringAux(size_t length) {
     return result;
 }
 
+//write in little Endian format
 void BitStream::writeBitsLittleEndian(uint64_t value, int numBits) {
     // Write the bits from least significant to most significant
     for (int i = 0; i < numBits; ++i) {
@@ -204,3 +205,8 @@ void BitStream::writeBitsLittleEndian(uint64_t value, int numBits) {
     }
 }
 
+void BitStream::writeStringLittleEndian(const string& str) {
+    for (char c : str) {
+        writeBitsLittleEndian(static_cast<uint64_t>(c), 8); // -----------> Write each character as 8 bits
+    }
+}

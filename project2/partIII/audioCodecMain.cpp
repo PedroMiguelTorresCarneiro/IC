@@ -24,11 +24,15 @@ int main(){
 
         std::string inputWav = "../dataSet/sample01.wav";
         std::string outputCodec = "../audio.mac";
-        int m = 16; //fixed golomb parameter for now
+        std::string inputCodec = "../audio.mac";
+        std::string outputWav = "../test.wav";
+
         // Call the encode function
-        finalEncode(inputWav, outputCodec, m);
+        finalEncode(inputWav, outputCodec);
         std::cout << "Encoding complete, output written to " << outputCodec << std::endl;
 
+        finalDecode(inputCodec, outputWav);
+/*
 //--------------------------TESTING DECODER--------------------------
         // Open the .mycodec file in read mode
         BitStream bitStreamDec("../audio.mac", false);
@@ -48,7 +52,7 @@ int main(){
         
         bitStreamDec.close();
 //---------------------------------------------------------------------------------------------
-
+*/
     } catch (const std::exception &ex) {
         std::cerr << "Error: " << ex.what() << std::endl;
         return 1;

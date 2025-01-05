@@ -10,7 +10,10 @@ struct Metadata {
     uint16_t bitDepth;
     uint32_t numSamples;
     int golombParam; // m parameter
+    std::vector<int16_t> samples;
 };
 
 Metadata readMetadata(BitStream &bitStream);
+std::vector<int16_t> decodeResiduals(int m, BitStream &bitStream, int numSamples);
+void finalDecode(const std::string &inputCodec, const std::string &outputWav);
 #endif

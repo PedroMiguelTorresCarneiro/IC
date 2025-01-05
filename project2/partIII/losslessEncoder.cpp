@@ -4,11 +4,12 @@
 #include "losslessEncoder.h"
 #include "GolombCoding.h"
 
-void finalEncode(const std::string &inputWav, const std::string &outputCodec, int m) {
+void finalEncode(const std::string &inputWav, const std::string &outputCodec) {
 
     BitStream inputStream(inputWav, false); // Open WAV file for reading
     BitStream outputStream(outputCodec, true); // Open .audiocodec file for writing
 
+    int m = 16; //fixed golomb parameter for now
     // Parse WAV file
     
     std::vector<int16_t> samples;
@@ -17,20 +18,19 @@ void finalEncode(const std::string &inputWav, const std::string &outputCodec, in
     // Calculate residuals
     std::vector<int16_t> residuals;
 
-    /*
-    THE ISSUE OF THE CHANNELS IS COMING FROM HERE
-    if(metadata.channelCount = 1){
+    
+    if(metadata.channelCount == 1){
         residuals = calculateResidualsMono(metadata.samples); //for mono audio
     }else{
         residuals = calculateResidualsStereo(metadata.samples); //for stereo audio
     }
-    */
+    
     
     // Write metadata
     writeMetadata(outputStream, metadata, m);
 
     // Encode and write residuals
-    //writeResiduals(outputStream, residuals, m);
+    writeResiduals(outputStream, residuals, m);
 
     // Clean up
     inputStream.close();
