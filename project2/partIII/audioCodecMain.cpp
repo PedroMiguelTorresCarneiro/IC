@@ -24,14 +24,21 @@ int main(){
 
         std::string inputWav = "../dataSet/sample01.wav";
         std::string outputCodec = "../audio.mac";
+        
         std::string inputCodec = "../audio.mac";
         std::string outputWav = "../test.wav";
-
-        // Call the encode function
+        
+        
+        //Encode
         finalEncode(inputWav, outputCodec);
         std::cout << "Encoding complete, output written to " << outputCodec << std::endl;
 
+        
+        //Decode
         finalDecode(inputCodec, outputWav);
+        std::cout << "Decoding complete, output written to " << outputWav << std::endl;
+        
+       
 /*
 //--------------------------TESTING DECODER--------------------------
         // Open the .mycodec file in read mode
@@ -51,6 +58,13 @@ int main(){
         
         
         bitStreamDec.close();
+
+        BitStream input(inputWav, false);
+       BitStream output(outputWav, false);
+       std::cout<<"Original wav: "<<"\n";
+       readAndPrintWavHeader(input);
+       std::cout<<"Decoded wav: "<<"\n";
+       readAndPrintWavHeader(output);
 //---------------------------------------------------------------------------------------------
 */
     } catch (const std::exception &ex) {
@@ -59,3 +73,5 @@ int main(){
     }
 
 }
+
+

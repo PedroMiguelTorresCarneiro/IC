@@ -35,10 +35,6 @@ WavData parseWavFile(BitStream &bitStream) {
     bitStream.readBitsLittleEndian(16);                         // Block align (skip)
     wavData.bitDepth = bitStream.readBitsLittleEndian(16);      // Bits per sample
 
-    std::cout << "Audio Format: " << wavData.audioFormat << std::endl;
-    std::cout << "Sample size: " << wavData.bitDepth << std::endl;
-    std::cout << "Channel count: " << wavData.channelCount << std::endl;
-
 
     if (wavData.audioFormat != 1) {
         throw std::runtime_error("Unsupported WAV file: Only PCM is supported");

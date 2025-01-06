@@ -1,4 +1,5 @@
 #include "BitStream.h"
+#include <inttypes.h>
 
 using namespace std;
 
@@ -176,7 +177,7 @@ bool BitStream::eof(){
     return file.eof();
 }
 
-//Read bits accounting for little endian
+//Read bits in little endian
 uint64_t BitStream::readBitsLittleEndian(int numBits) {
     uint64_t value = 0;
     for (int i = 0; i < numBits / 8; ++i) {
@@ -197,11 +198,17 @@ std::string BitStream::readStringAux(size_t length) {
     return result;
 }
 
-//write in little Endian format
+//Write in little endian
 void BitStream::writeBitsLittleEndian(uint64_t value, int numBits) {
-    // Write the bits from least significant to most significant
-    for (int i = 0; i < numBits; ++i) {
-        writeBit((value >> i) & 1); // Extract the i-th bit (from LSB to MSB)
+    uint64_t be;
+    if(numBits == 32){
+        be = __builtin_bswap32(value);
+    }else{
+       be = __builtin_bswap16(value);
+    }
+    
+    for (int i = numBits - 1; i >= 0; --i) { // -----------> Iterate over the number of bits to write
+        writeBit((be >> i) & 1); // -----------> Write each bit by shifting the value
     }
 }
 

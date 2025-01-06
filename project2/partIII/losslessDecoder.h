@@ -16,4 +16,5 @@ struct Metadata {
 Metadata readMetadata(BitStream &bitStream);
 std::vector<int16_t> decodeResiduals(int m, BitStream &bitStream, int numSamples);
 void finalDecode(const std::string &inputCodec, const std::string &outputWav);
+void readAndPrintWavHeader(BitStream& bitStream);
 #endif
