@@ -1,45 +1,40 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
 #include "GolombCoding.h"
 #include "BitStream.h"
 
+void printUsage() {
+    std::cout << "Usage:\n"
+              << "-Golomb -load <TXT_PATH> -SignMag|-PosNeg [-m <NUM>]\n"
+              << "Example:\n"
+              << "-Golomb -load \"../.../inputINT.txt\" -SignMag\n"
+              << "-Golomb -load \"../.../inputINT.txt\" -PosNeg -m 6\n";
+}
+
 // Function to read integers from a file and calculate optimal m
-int calculateOptimalM(const std::string& filePath) {
-    std::ifstream inputFile(filePath);
-    if (!inputFile.is_open()) {
-        std::cerr << "Failed to open file: " << filePath << std::endl;
-        return -1; // Return an error indicator
-    }
-
-    std::vector<int> values;
-    int value;
-    double sum = 0;
-    size_t count = 0;
-
-    // Read values and calculate sum and count
-    while (inputFile >> value) {
-        values.push_back(value);
-        sum += std::abs(value); // Using absolute values since Golomb coding handles positive integers
-        ++count;
-    }
-    inputFile.close();
-
-    if (count == 0) {
-        std::cerr << "No values found in the file." << std::endl;
+int calculateOptimalM(const std::vector<int>& values) {
+    if (values.empty()) {
+        std::cerr << "No values provided to calculate optimal m." << std::endl;
         return 1; // Default m value (cannot be 0)
     }
 
-    // Calculate mean
-    double mean = sum / count;
+    double sum = 0;
+    for (int value : values) {
+        sum += std::abs(value);
+    }
 
-    // Calculate nearest power of 2 greater than or equal to the mean
+    double mean = sum / values.size();
+
     int optimalM = 1;
     while (optimalM < mean) {
         optimalM *= 2;
     }
     return optimalM;
 }
+
+
 
 
 // Function to read integers from a file
@@ -77,114 +72,83 @@ void displayEncodedData(const std::string& filePath) {
     }
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     try {
-        // Read integers from inputINT.txt
-        std::vector<int> valuesToEncode = readIntegersFromFile("inputINT.txt");
-        if (valuesToEncode.empty()) {
-            std::cerr << "No values to encode found in inputINT.txt." << std::endl;
+        if (argc < 5 || std::string(argv[1]) != "-Golomb" || std::string(argv[2]) != "-load") {
+            printUsage();
             return 1;
         }
 
-        // Initialize BitStream for writing to a file
-        BitStream writeStream("test_golomb.dat", true);
+        std::string filePath = argv[3];
+        std::string codingType;
+        int mValue = 0;
 
-        // Create a GolombCoding object for encoding with m = 5 and SIGN_MAG mode
-        GolombCoding encoder(5, writeStream, GolombCoding::SIGN_MAG);
+        if (argc >= 5) {
+            codingType = argv[4];
+            if (codingType != "-SignMag" && codingType != "-PosNeg") {
+                std::cerr << "Error: Invalid coding type. Use -SignMag or -PosNeg." << std::endl;
+                printUsage();
+                return 1;
+            }
+        } else {
+            std::cerr << "Error: Coding type is required." << std::endl;
+            printUsage();
+            return 1;
+        }
 
-        // Encode the values read from inputINT.txt
-        std::cout << "Encoding values from inputINT.txt:" << std::endl;
+        if (argc == 7 && std::string(argv[5]) == "-m") {
+            try {
+                mValue = std::stoi(argv[6]);
+                if (mValue <= 0) {
+                    throw std::invalid_argument("mValue must be positive.");
+                }
+            } catch (const std::exception&) {
+                std::cerr << "Error: Invalid value for m." << std::endl;
+                printUsage();
+                return 1;
+            }
+        } else if (argc > 5 && argc != 7) {
+            std::cerr << "Error: Unexpected arguments." << std::endl;
+            printUsage();
+            return 1;
+        }
+
+        std::vector<int> valuesToEncode = readIntegersFromFile(filePath);
+        if (valuesToEncode.empty()) {
+            std::cerr << "No values to encode found in " << filePath << std::endl;
+            return 1;
+        }
+
+        if (mValue == 0) {
+            mValue = calculateOptimalM(valuesToEncode);
+        }
+
+        std::string encodedFile = "encoded_golomb.dat";
+        BitStream writeStream(encodedFile, true);
+        GolombCoding encoder(mValue, writeStream, codingType == "-PosNeg" ? GolombCoding::POS_NEG : GolombCoding::SIGN_MAG);
+
+        std::cout << "Encoding values from " << filePath << ":" << std::endl;
         for (int value : valuesToEncode) {
             std::cout << "Encoding value: " << value << std::endl;
             encoder.encode(value);
         }
-
-        // Close the writing stream
         writeStream.close();
 
-        // Display the encoded data
-        displayEncodedData("test_golomb.dat");
+        displayEncodedData(encodedFile);
 
-        // Initialize BitStream for reading from the same file
-        BitStream readStream("test_golomb.dat", false);
+        BitStream readStream(encodedFile, false);
+        GolombCoding decoder(mValue, readStream, codingType == "-PosNeg" ? GolombCoding::POS_NEG : GolombCoding::SIGN_MAG);
 
-        // Create a GolombCoding object for decoding
-        GolombCoding decoder(5, readStream, GolombCoding::SIGN_MAG);
-
-        // Decode and print the values
         std::cout << "Decoded values:" << std::endl;
         for (size_t i = 0; i < valuesToEncode.size(); ++i) {
             std::cout << decoder.decode() << std::endl;
         }
-
-        // Close the reading stream
         readStream.close();
-
-        // Repeat similar test for POS_NEG mode
-        BitStream writeStream2("test_golomb_pos_neg.dat", true);
-        GolombCoding encoder2(33, writeStream2, GolombCoding::POS_NEG);
-
-        std::cout << "\nEncoding values using POS_NEG mode from inputINT.txt:" << std::endl;
-        for (int value : valuesToEncode) {
-            std::cout << "Encoding value: " << value << std::endl;
-            encoder2.encode(value);
-        }
-
-        writeStream2.close();
-
-        // Display the encoded data
-        displayEncodedData("test_golomb_pos_neg.dat");
-
-        BitStream readStream2("test_golomb_pos_neg.dat", false);
-        GolombCoding decoder2(33, readStream2, GolombCoding::POS_NEG);
-
-        std::cout << "Decoded values using POS_NEG mode:" << std::endl;
-        for (size_t i = 0; i < valuesToEncode.size(); ++i) {
-            std::cout << decoder2.decode() << std::endl;
-        }
-
-        readStream2.close();
-
-        std::string filePath = "inputINT.txt";
-        int optimalM = calculateOptimalM(filePath);
-
-        if (optimalM > 0) {
-            std::cout << "\nOptimal m calculation:" << std::endl;
-            std::cout << "Optimal m value based on data in " << filePath << " is: " << optimalM << std::endl;
-        } else {
-            std::cerr << "Error calculating optimal m." << std::endl;
-        }
-
-        // Repeat similar test for POS_NEG mode
-        BitStream writeStream3("test_golomb_pos_negOptimun.dat", true);
-        GolombCoding encoder3(optimalM, writeStream3, GolombCoding::POS_NEG);
-
-        std::cout << "\nEncoding values using POS_NEG mode from inputINT.txt:" << std::endl;
-        for (int value : valuesToEncode) {
-            std::cout << "Encoding value: " << value << std::endl;
-            encoder3.encode(value);
-        }
-
-        writeStream3.close();
-
-        // Display the encoded data
-        displayEncodedData("test_golomb_pos_negOptimun.dat");
-
-        BitStream readStream3("test_golomb_pos_negOptimun.dat", false);
-        GolombCoding decoder3(optimalM, readStream3, GolombCoding::POS_NEG);
-
-        std::cout << "Decoded values using POS_NEG mode:" << std::endl;
-        for (size_t i = 0; i < valuesToEncode.size(); ++i) {
-            std::cout << decoder3.decode() << std::endl;
-        }
-
-        readStream3.close();
 
     } catch (const std::exception& ex) {
         std::cerr << "Error: " << ex.what() << std::endl;
+        return 1;
     }
-
-    
 
     return 0;
 }
