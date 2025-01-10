@@ -1,7 +1,7 @@
 # IC - Information and Coding (2024/25)
 
 ---
-# PROJECT 1 
+# PROJECT 2 
 
 ## Report:
 
@@ -40,9 +40,9 @@ We all did one readme.md file
 
 ### Project Overview:
 
-|  | Description | Status | Readme | Author | Contribution |
-|------|-------------|--------|--------|----|---|
-| **Part I**| Text data manipulation | **100%** | [Part I](../project1/partI/README.md) | Inês Águia | 33% |
-| **Part II**| Audio data manipulation | **100%** | [Part II](../project1/partII/README.md) | João Oliveira | 33% |
-| **Part II**| Image Data Processing | **100%** | [Part III](../project1/partIII/README.md) | Pedro Carneiro | 33% |
-
+|  | Description | Status | Readme |
+|------|-------------|--------|--------|
+| **Part I**| BitStream class | **100%** | [Part I](../project2/partI/README.md) |
+| **Part II**| Golomb Coding | **100%** | [Part II](../project2/partII/README.md) |
+| **Part III**| Audio Encoding with Predictive Coding | **70%** | [Part III](../project2/partIII/readme.md) |
+| **Part IV**| Image and Video Coding with Predictive Coding | **25%** | [Part IV](../project2/partIV/readme.md) |
