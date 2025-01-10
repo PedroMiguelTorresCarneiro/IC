@@ -90,10 +90,14 @@ This results in a `15-byte header(fixed)` + `X(format string)` + `1-byte (delimi
     - keep the difference between the original and the predited pixel
 4. Use golomb encoding:
     - on the residuals matrix apply the golomb coding
-
-- Additionally we create 2 tests in order to see if we can achieve better compression ratios and if wanted we can try the examples to see how this encoding works:
-    - `Huffman Encoding`
-    - `Arithmetic Encoding` 
+5. Additionally we create 2 tests in order to see if we can achieve better compression ratios:
+    - `Huffman` and `Arithmetic` coding work best when the input data exhibits high statistical redundancy and predictable patterns. The images' data lacks these properties, the compression ratio were not improved:
+    - `Huffman Encoding` : 
+        - **Limited Adaptability** : Huffman coding does not adapt to varying probabilities across different parts of the image. If local regions of the image have distinct statistical properties, the compression wasn't optimal.
+        - **Small Symbol Set** : If the residuals or pixel values have a uniform distribution or a small range of values, Huffman coding won't achieve significant compression.
+    - `Arithmetic Encoding` :
+        - **Ineffective Probability Models** : If the probability model used for arithmetic coding does not accurately reflect the actual distribution of the data, the coding efficiency will be reduced, and we cannot achieve a pprobability model suited for all differente images.
+        - **High Overhead** : Arithmetic coding involves computational overhead and precision challenge. With use the encoding could be more than 5x the normal time of compression and the compression ratio were poorer.
 
 ### B. DECODING
 1. Apply the Golomb decoding
@@ -104,14 +108,38 @@ This results in a `15-byte header(fixed)` + `X(format string)` + `1-byte (delimi
     - getting the original
 
 --- 
+### COMPRESSION RATIOS:
 
+| Encoding Approuch |  m  | coded file size(KB) | original size(KB) | encoding ratio(%) |
+|-------------------|-----|-----------------|---------------|----------------|
+| ***Positive Negative*** | ***optimal*** |  ***563***  | ***786*** | **28** |
+| Signal and Magnitude | optimal | 612 | 786 | 22 |
+| Positive Negative | 6 | 650 | 786 | 17 |
+| ***Signal and Magnitude*** | ***6*** | ***605*** | ***786*** | **23** |
+| Positive Negative | 12 | 599 | 786 | 24 |
+| Signal and Magnitude | 12 | 629 | 786 | 20 |
 
+### ***Considerations***:
+- As we can see the best *compression ratio* were achieved using the Positive/Negative approuch in Golomb coding and using the calculated optimal m value.
+- Another thing we can see on this table is that the optimal value is working for the Positive/Negative approuch and not for Signal and Magnitude, as we can see that the best compression ration for Signal and Magnitude approuch is when we choose the m = 6 and not the optimal as previouslly expected.
 
-### CONCLUSIONS:
+<br>
+<br>
+
+---
+## CONCLUSIONS:
 - 1st attempt : we try to convert the image to a graysclae in order to achieve greatter compression, it works, but after we cannot get the colors as initially we it says that the compression was not being lossless, as expected.
 - 2nd attempt: we try transform the values of the residuals into positive values in order to be more easy to encode using Golomb but we do not achieve any better compression ratio, and the complexity increase
 
-- `FINAL CONCLUSION` for this stage the we achieve not a bigger compression, but we got a lossless compression working.
+- `FINAL CONCLUSION` in this task we not achieve a bigger compression ratio (***28% best***) even with all tentatives we have made, like using `Huffman, Àrithmetic`, treat the image as grayscale, etc ... but we stick with the principal objective make a ***LOSSLESS*** compression.
+
+
+#### CURIOSITIES:
+The following image is the representation of the residuals for :
+```shell
+./ImageCoding -ImgCoding -load "boat.ppm" -PosNeg
+```
+![optimal](../partIV/img/posneg_optimal.png) 
 
 <br>
 <br>
