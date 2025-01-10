@@ -22,7 +22,7 @@ int main(){
         }
         */
 
-        std::string inputWav = "../dataSet/sample01.wav";
+        std::string inputWav = "../../../datasets/audio/sample01.wav";
         std::string outputCodec = "../audio.mac";
         
         std::string inputCodec = "../audio.mac";

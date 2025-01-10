@@ -9,7 +9,7 @@ void finalEncode(const std::string &inputWav, const std::string &outputCodec) {
     BitStream inputStream(inputWav, false); // Open WAV file for reading
     BitStream outputStream(outputCodec, true); // Open .audiocodec file for writing
 
-    int m = 16; //fixed golomb parameter for now
+    
     // Parse WAV file
     
     std::vector<int16_t> samples;
@@ -25,7 +25,8 @@ void finalEncode(const std::string &inputWav, const std::string &outputCodec) {
         residuals = calculateResidualsStereo(metadata.samples); //for stereo audio
     }
     
-    
+    int m = calculateOptimalM(residuals);
+
     // Write metadata
     writeMetadata(outputStream, metadata, m);
 
@@ -53,8 +54,10 @@ void writeMetadata(BitStream &bitStream, const WavData &metadata, int m) {
     
 }
 
+//encode and write residuals to the file
 void writeResiduals(BitStream &bitStream, const std::vector<int16_t> &residuals, int m) {
 
+    
     GolombCoding golombCoder(m, bitStream, GolombCoding::POS_NEG);
 
     //Encode and write the reisduals
@@ -63,3 +66,17 @@ void writeResiduals(BitStream &bitStream, const std::vector<int16_t> &residuals,
     }
 }
 
+//calculate optimal m for golomb encoding
+int calculateOptimalM(std::vector<int16_t> vector){
+    int sum, mean, num, m = 0;
+
+    for(int16_t sample : vector){
+        sum += abs(sample);
+        num++;
+    }
+
+    mean = sum/num;
+
+    m = ceil((mean+1)/2);
+    return m;
+}
