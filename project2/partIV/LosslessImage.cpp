@@ -27,6 +27,10 @@ LosslessImage::LosslessImage(const std::string& filePath) {
 
 
 // Decode image and calculate residuals
+/*
+    The main function that calculates the residuals for each pixel
+    in the image using the median edge predictor.
+*/
 void LosslessImage::decodeImage() {
     if (image.empty()) {
         throw std::runtime_error("Image is not loaded.");
@@ -35,21 +39,7 @@ void LosslessImage::decodeImage() {
     calculateResiduals();
 }
 
-// Median Edge Predictor
-/*
-int LosslessImage::medianEdgePredictor(const cv::Mat& img, int x, int y) {
-    int A = (x > 0) ? img.at<uchar>(y, x - 1) : 0;     // Left neighbor
-    int B = (y > 0) ? img.at<uchar>(y - 1, x) : 0;     // Top neighbor
-    int C = (x > 0 && y > 0) ? img.at<uchar>(y - 1, x - 1) : 0; // Top-left neighbor
 
-    if (C >= std::max(A, B))
-        return std::min(A, B);
-    else if (C <= std::min(A, B))
-        return std::max(A, B);
-    else
-        return A + B - C;
-}
-*/
 // Median Edge Predictor
 int LosslessImage::medianEdgePredictor(const cv::Mat& img, int x, int y, int c) {
     int A, B, C;
@@ -79,6 +69,10 @@ int LosslessImage::medianEdgePredictor(const cv::Mat& img, int x, int y, int c) 
 
 
 // Calculate residuals
+/*
+    for each pixel in the image we calculate the residual
+    by subtracting the predicted value from the actual value.
+*/
 void LosslessImage::calculateResiduals() {
     if (imageType == 1) { // Color image
         residuals = cv::Mat(image.size(), CV_32SC(channels.size()));
@@ -104,9 +98,32 @@ void LosslessImage::calculateResiduals() {
 }
 
 // Write header to BitStream
+/*
+    The header contains: 
+        the image type (0 for grayscale, 1 for color),
+        the Golomb coding type (fixed as POS_NEG for now),
+        the optimal m value for Golomb coding, 
+        the image width and height,
+        and the image format.
+*/
+/*
 void LosslessImage::writeHeader(BitStream& stream) {
     stream.writeBits(imageType, 8); // Image type: 0 or 1
     stream.writeBits(1, 8);         // Golomb coding type (fixed as POS_NEG for now)
+    stream.writeBits(optimalM, 32); // Optimal m
+    stream.writeBits(width, 32);    // Image width
+    stream.writeBits(height, 32);   // Image height
+
+    // Write image format
+    for (char ch : imageFormat) {
+        stream.writeBits(static_cast<int>(ch), 8); // Write each character of the format
+    }
+
+    stream.writeBits('#', 8); // End of header delimiter
+}*/
+void LosslessImage::writeHeader(BitStream& stream, const std::string& codingType) {
+    stream.writeBits(imageType, 8); // Image type: 0 or 1
+    stream.writeBits((codingType == "-PosNeg") ? 1 : 0, 8); // Golomb coding type: 0 for SIGN_MAG, 1 for POS_NEG
     stream.writeBits(optimalM, 32); // Optimal m
     stream.writeBits(width, 32);    // Image width
     stream.writeBits(height, 32);   // Image height
@@ -138,18 +155,20 @@ void LosslessImage::readHeader(BitStream& stream) {
 
 
 // Encode residuals using GolombCoding
+/*
 void LosslessImage::encodeResiduals(const std::string& outputFile) {
     // Calculate optimal m
     double sum = 0;
     int count = width * height * (imageType == 1 ? 3 : 1);
 
+    // Calculate the sum of absolute residuals for the optimal m value
     for (int y = 0; y < residuals.rows; ++y) {
         for (int x = 0; x < residuals.cols; ++x) {
             if (imageType == 1) {
-                for (int c = 0; c < 3; ++c) {
+                for (int c = 0; c < 3; ++c) { // Color image
                     sum += std::abs(residuals.at<cv::Vec<int, 3>>(y, x)[c]);
                 }
-            } else {
+            } else { // Grayscale image
                 sum += std::abs(residuals.at<int>(y, x));
             }
         }
@@ -182,8 +201,58 @@ void LosslessImage::encodeResiduals(const std::string& outputFile) {
     }
 
     writeStream.close();
-}
+}*/
+void LosslessImage::encodeResiduals(const std::string& outputFile, const std::string& codingType, int mValue) {
+    // Calculate optimal m only if mValue is zero
+    if (mValue == 0) {
+        double sum = 0;
+        int count = width * height * (imageType == 1 ? 3 : 1);
 
+        // Calculate the sum of absolute residuals for the optimal m value
+        for (int y = 0; y < residuals.rows; ++y) {
+            for (int x = 0; x < residuals.cols; ++x) {
+                if (imageType == 1) {
+                    for (int c = 0; c < 3; ++c) { // Color image
+                        sum += std::abs(residuals.at<cv::Vec<int, 3>>(y, x)[c]);
+                    }
+                } else { // Grayscale image
+                    sum += std::abs(residuals.at<int>(y, x));
+                }
+            }
+        }
+
+        double mean = sum / count;
+        optimalM = 1;
+        while (optimalM < mean) {
+            optimalM *= 2;
+        }
+    } else {
+        optimalM = mValue;
+    }
+
+    BitStream writeStream(outputFile, true);
+
+    // Write header
+    writeHeader(writeStream, codingType);
+
+    // Set GolombCoding type based on codingType
+    GolombCoding encoder(optimalM, writeStream, (codingType == "-PosNeg") ? GolombCoding::POS_NEG : GolombCoding::SIGN_MAG);
+
+    // Encode residuals
+    for (int y = 0; y < residuals.rows; ++y) {
+        for (int x = 0; x < residuals.cols; ++x) {
+            if (imageType == 1) {
+                for (int c = 0; c < 3; ++c) {
+                    encoder.encode(residuals.at<cv::Vec<int, 3>>(y, x)[c]);
+                }
+            } else {
+                encoder.encode(residuals.at<int>(y, x));
+            }
+        }
+    }
+
+    writeStream.close();
+}
 
 // Reconstruct the image
 cv::Mat LosslessImage::reconstructImage(const std::string& encodedFile) {
