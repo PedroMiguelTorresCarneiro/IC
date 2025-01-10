@@ -10,20 +10,31 @@
 
 class LosslessImage {
 public:
-    // Constructor
+    // Constructor for images
     LosslessImage(const std::string& filePath);
+
+    // Constructor for videos
+    LosslessImage(const std::string& videoPath, bool isVideo);
+
 
     // Main functions
     void decodeImage();
     void calculateResiduals();
-    void encodeResiduals(const std::string& outputFile);
+    void encodeResiduals(const std::string& outputFile, const std::string& codingType, int mValue);
     cv::Mat reconstructImage(const std::string& encodedFile);
     void saveResidualImage(const std::string& filePath);
     std::string getImageFormat() const { return imageFormat; }
 
+    // Video processing functions
+    void loadVideo(const std::string& videoFilePath);
+    void decodeVideo();
+    void encodeVideoResiduals(const std::string& outputFile);
+    void setFrame(const cv::Mat& frame);
+
+
 private:
     // Helper functions
-    void writeHeader(BitStream& stream);
+    void writeHeader(BitStream& stream, const std::string& codingType);
     void readHeader(BitStream& stream);
 
     // Prediction function (supports both grayscale and color)
@@ -39,6 +50,15 @@ private:
     int optimalM;                  // Optimal value for Golomb coding
     int width;                     // Image width
     int height;                    // Image height
+
+    cv::VideoCapture video;        // For video processing
+    std::vector<cv::Mat> residualFrames; // Store residuals for each frame
+    int frameCount;          // Number of frames (for video)
+    std::string videoFormat; // Format (e.g., "mp4")
+    int totalFrames;               // Total number of frames in the video
+    bool isVideo;                  // Flag to differentiate between image and video
+    int calculateOptimalM(const cv::Mat& residuals);
+
 };
 
 #endif // LOSSLESSIMAGE_H
