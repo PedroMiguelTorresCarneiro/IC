@@ -4,10 +4,8 @@
 
 | Project | Report link | Grade |
 |-----|-------|------|
-|*PROJECT 1* | [Project 1 - README](/project1/readme.md) | -- |
-|*PROJECT 2* | -- | -- |
-|*PROJECT 3* | -- | -- |
-
+|*PROJECT 1* | [Project 1 - README](/project1/readme.md) | 18 |
+|*PROJECT 2* | [Project 2 - README](/project2/readme.md) | -- |
 
 
 ---
