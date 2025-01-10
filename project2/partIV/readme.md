@@ -91,6 +91,10 @@ This results in a `15-byte header(fixed)` + `X(format string)` + `1-byte (delimi
 4. Use golomb encoding:
     - on the residuals matrix apply the golomb coding
 
+- Additionally we create 2 tests in order to see if we can achieve better compression ratios and if wanted we can try the examples to see how this encoding works:
+    - `Huffman Encoding`
+    - `Arithmetic Encoding` 
+
 ### B. DECODING
 1. Apply the Golomb decoding
     - after this we got the residuals matrix
@@ -100,6 +104,8 @@ This results in a `15-byte header(fixed)` + `X(format string)` + `1-byte (delimi
     - getting the original
 
 --- 
+
+
 
 ### CONCLUSIONS:
 - 1st attempt : we try to convert the image to a graysclae in order to achieve greatter compression, it works, but after we cannot get the colors as initially we it says that the compression was not being lossless, as expected.
