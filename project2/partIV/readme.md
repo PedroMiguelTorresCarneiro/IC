@@ -1,7 +1,18 @@
 <!-- 
 This is the README file for Part IV of Project 2 in the IC course. 
 -->
-# Project 2 - Part IV
+# IC - Information and Coding (2024/25)
+
+Return to the main README : [Project 2 - README](../../project2/README.md)
+
+<br>
+<br>
+
+---
+# Part IV – Image and Video Coding with Predictive Coding
+
+<br>
+<br>
 
 ## T1 - Lossless image coding using predictive coding
 

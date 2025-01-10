@@ -1,8 +1,17 @@
 <!-- 
 This is the README file for Part III of Project 2 in the IC course. 
 -->
-# PROJECT 2 : Part III
-Author: João Oliveira
+# IC - Information and Coding (2024/25)
+
+Return to the main README : [Project 2 - README](../../project2/README.md)
+
+<br>
+<br>
+
+# Part III – Audio Encoding with Predictive Coding
+
+<br>
+<br>
 
 - **Build and Run**
     ```bash
