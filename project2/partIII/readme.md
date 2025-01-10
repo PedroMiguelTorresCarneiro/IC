@@ -92,7 +92,7 @@ To reconstruct the original audio file, we started by using our bitStream to rea
 
 Afterwards, we read the data portion of the file and obtained a vector with the residuals. We used the golomb parameter read in the header and used it to decode the residuals. 
 
-With the decode residuals, we preformed the inverse operation to the prediction algorithm and reconstructed the original samples from the residuals.
+With the decode residuals, we performed the inverse operation to the prediction algorithm and reconstructed the original samples from the residuals.
 
 Now that we had all the necessary data we wrote everything to the wave file, being careful with how we wrote the header structure and how we calculated the necessary fields (such as the file size). The end result was a wave file identical to the original, runnign: 
 
