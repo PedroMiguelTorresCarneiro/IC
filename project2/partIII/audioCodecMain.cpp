@@ -27,7 +27,21 @@ int main(int argc, char* argv[]){
             std::cout << "Decoding complete, output written to " << outputWav << std::endl;
 
         }else if(choice == "lossy"){
-            std::cout<<"Coming soon!";
+            std::string inputWav = argv[2];
+            std::string outputCodec = argv[3];
+        
+            std::string inputCodec = argv[3];
+            std::string outputWav = argv[4];
+        
+        
+            //Encode
+            lossyEncode(inputWav, outputCodec);
+            std::cout << "Encoding complete, output written to " << outputCodec << std::endl;
+
+        
+            //Decode
+            finalDecode(inputCodec, outputWav);
+            std::cout << "Decoding complete, output written to " << outputWav << std::endl;
         }else{
             std::cerr<<"Invalid choice!";
         }

@@ -20,10 +20,16 @@ Return to the main README : [Project 2 - README](../../project2/README.md)
     cmake ..
     make
     ```
-    Then you can execute ./AudioCodec by choosing either lossless or lossy(coming soon) compression and providing the paths for the desired files. Example:
+    Then you can execute ./AudioCodec by choosing either lossless or lossy compression and providing the paths for the desired files. Example:
 
     ```bash
     ./AudioCodec lossless ../../../datasets/audio/sample01.wav ../audio.mac ../newAudio.wav
+    ```
+
+    Or
+
+    ```bash
+    ./AudioCodec lossy ../../../datasets/audio/sample01.wav ../audio.mac ../newAudio.wav
     ```
 
     This will alow you to compress sample01.wav into the audio.mac file and then decode it into newAudio.wav (you can adjust file names to your liking).
@@ -108,3 +114,9 @@ Our resulting pipeline endend up looking something like this:
         <img src="../partIII/figures/Pipeline.jpg">
     <p align="center">
     Project pipeline
+
+## **Lossy compression**
+
+To reduce the file size even further, we added quantization to our codec. We initially though of quantizing the samples, but this ended up increasing the size of the file, likely due to the fact that that it increased the difference between samples and thus increase the size of the residuals, so we decided to quantize the residuals instead.
+
+This led to a slight improve in compression efficiency (with a quantization level of 100) but not significant. Lossy compression could be significantly improved if we added a mechanism to dynamically quantize the data.
