@@ -44,5 +44,5 @@ We all did one readme.md file
 |------|-------------|--------|--------|
 | **Part I**| BitStream class | **100%** | [Part I](../project2/partI/README.md) |
 | **Part II**| Golomb Coding | **100%** | [Part II](../project2/partII/README.md) |
-| **Part III**| Audio Encoding with Predictive Coding | **70%** | [Part III](../project2/partIII/readme.md) |
-| **Part IV**| Image and Video Coding with Predictive Coding | **25%** | [Part IV](../project2/partIV/readme.md) |
+| **Part III**| Audio Encoding with Predictive Coding | **80%** | [Part III](../project2/partIII/readme.md) |
+| **Part IV**| Image and Video Coding with Predictive Coding | **75%** | [Part IV](../project2/partIV/readme.md) |
