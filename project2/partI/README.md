@@ -97,9 +97,11 @@ We built 4 encoders with some differences, in order to compare them we calculate
     - We ran each encoder 100 times and calculated the median value of the encoding time
 - `compression ratio`
     - Using the formula, 
+    
         $$ 
             \left( 1 - \frac{Compressed_{size}}{Original_{size}} \right) * 100
         $$
+
         - $Original_{size}$ = size of the input.txt 
         - $Compressed_{size}$ = size of the output.bin  
 
