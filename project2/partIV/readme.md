@@ -365,7 +365,7 @@ We use 2 videos:
 COMMAND :   "-Video" arg  
         ;
 
-arg     :   VIDEO ("-SignMag"|"-PosNeg") ("-m" NUM)* ("-q" NUM)*
+arg     :   VIDEO ("-SignMag"|"-PosNeg") ("-m" NUM)* ("-q" NUM)
         ;
 
 VIDEO   :  path_to_video
@@ -401,17 +401,17 @@ values, so all numbers map to non-negative integers.
 
 1. **Encode `video1` using a Sign and magnitude approach with optimal value for m**
 ```bash
-./IntraCoding -Video "movie1.mp4" -SignMag -q 4
+./IntraLossyCoding -Video "movie1.mp4" -SignMag -q 4
 ```
 2. **Encode `video1` using a Sign and magnitude approach with `m` = 6**
 ```bash
-./IntraCoding -Video "movie1.mp4" -SignMag -m 6 -q 4
+./IntraLossyCoding -Video "movie1.mp4" -SignMag -m 6 -q 4
 ```
 3. **Encode `video1` using a Positive/negative interleaving approach with optimal value for m**
 ```bash
-./IntraCoding -Video "movie1.mp4" -PosNeg -q 4
+./IntraLossyCoding -Video "movie1.mp4" -PosNeg -q 4
 ```
 4. **Encode `video1` using a Positive/negative interleaving approach with `m` = 12**
 ```bash
-./IntraCoding -Video "movie1.mp4" -PosNeg -m 12 -q 4
+./IntraLossyCoding -Video "movie1.mp4" -PosNeg -m 12 -q 4
 ```

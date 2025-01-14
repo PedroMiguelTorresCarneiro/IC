@@ -30,6 +30,13 @@ add_executable(IntraCoding
     GolombCoding.cpp
 )
 
+add_executable(IntraLossyCoding
+    IntraLossyCoding.cpp
+    LossyVideo.cpp
+    BitStream.cpp
+    GolombCoding.cpp
+)
+
 add_executable( HuffmanTest
     HuffmanTest.cpp
     HuffmanCoding.cpp
@@ -44,5 +51,6 @@ add_executable( ArithmeticTest
 # Link libraries
 target_link_libraries(ImageCoding ${OpenCV_LIBS})
 target_link_libraries(IntraCoding ${OpenCV_LIBS})
+target_link_libraries(IntraLossyCoding ${OpenCV_LIBS})
 target_link_libraries(HuffmanTest ${OpenCV_LIBS})
 target_link_libraries(ArithmeticTest ${OpenCV_LIBS})
