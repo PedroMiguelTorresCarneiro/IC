@@ -74,7 +74,7 @@ void LossyVideo::reconstructVideo(const std::string& inputFile, const std::strin
     BitStream bitStream(inputFile, false);
     readHeader(bitStream); // Ensure header is parsed correctly
 
-    cv::VideoWriter writer(outputFile, cv::VideoWriter::fourcc('X', '2', '6', '4'), 30, cv::Size(width, height), true);
+    cv::VideoWriter writer(outputFile, cv::VideoWriter::fourcc('a', 'v', 'c', '1'), 30, cv::Size(width, height), true);
     if (!writer.isOpened()) {
         throw std::runtime_error("Failed to open video writer: " + outputFile);
     }
