@@ -23,6 +23,13 @@ add_executable(ImageCoding
     ImageDecoder.cpp
 )
 
+add_executable(IntraCoding
+    IntraFrameCoding.cpp
+    LosslessVideo.cpp
+    BitStream.cpp
+    GolombCoding.cpp
+)
+
 add_executable( HuffmanTest
     HuffmanTest.cpp
     HuffmanCoding.cpp
@@ -36,5 +43,6 @@ add_executable( ArithmeticTest
 
 # Link libraries
 target_link_libraries(ImageCoding ${OpenCV_LIBS})
+target_link_libraries(IntraCoding ${OpenCV_LIBS})
 target_link_libraries(HuffmanTest ${OpenCV_LIBS})
 target_link_libraries(ArithmeticTest ${OpenCV_LIBS})
