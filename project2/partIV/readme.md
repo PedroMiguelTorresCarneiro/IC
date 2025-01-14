@@ -196,7 +196,7 @@ A command can be:
     - `-Video` ***arg*** --> Command to load the Video Coding algorithm
 
 2. **arg:**
-    - `-load` ***VIDEO*** `-SignMag | -PosNeg`--> load the *VIDEO* and choose the type of encoding for **Golomb coding**:
+    - ***VIDEO*** `-SignMag | -PosNeg`--> load the *VIDEO* and choose the type of encoding for **Golomb coding**:
         - `-SignMag` ***(Sign and magnitude)***: encode the sign separately from the magnitude
         - `-PosNeg` ***(Positive/negative interleaving)***: Use a zigzag or odd-even mapping to interleave positive and negative
 values, so all numbers map to non-negative integers.
@@ -253,59 +253,83 @@ This results in a `29-byte header(fixed)` + `X(format string)` + `1-byte (delimi
 <br>
 
 ### A. ENCODING
-1. Load the Video
-    - extract necessary info to write the header
-2. Use a Median Edge Predicition in each frame
-    - it works like the simple neighboring exploration to predict the pixel value
-3. Use a matrix of Residuals of each frame
-    - keep the difference between the original and the predited pixel
-4. Use golomb encoding:
-    - on the residuals matrix's apply the golomb coding
+1. **Load the Video**:
+    - The codec opens the video file and extracts key information to write the header:
+        - Number of frames, video width, height, and format.
+        - Golomb coding parameters (type and value of m).
+    - Each frame is processed independently (intra-frame coding) without leveraging inter-frame compression.
+2. **Apply Median Edge Prediction**
+    - The median edge prediction algorithm predicts pixel values based on spatial neighbors
+    - The algorithm evaluates these neighbors to predict the most likely pixel value for each position in the frame.
+3. **Generate Residual Matrix**
+    - A residual matrix is created for each frame:
+        - Each pixel's residual is the difference between the actual value and the predicted value.
+        - This residual matrix captures the deviation from the predicted values, effectively compressing spatial redundancy.
+4. **Golomb Encoding**
+    - The residual matrix of each frame is encoded using Golomb coding:
+        - Encodes residuals as efficiently as possible using the Golomb parameter m to achieve compression.
+        - Supports two modes for handling negative residuals:
+            - **Sign and Magnitude (SignMag)**: Separates the sign from the magnitude.
+            - **Positive/Negative Interleaving (PosNeg)**: Maps negative and positive values to non-negative integers.
+
 
 ### B. DECODING
-1. Apply the Golomb decoding
-    - After this we obtained the residuals matrix
-2. Use Media Edge Prediction to reconstruct the image
-    - Do the same as in encoding
-    - Use the residuals matrix and predict the pixel
-    - Getting the original
-
+1. **Golomb Decoding**
+    - The encoded video is read, and the Golomb decoding is applied to reconstruct the residual matrices.
+    - The header information is utilized to decode the residuals accurately.
+2. **Reconstruct Frame using Median Edge Prediction**
+    - The same median edge prediction algorithm is used to reconstruct each frame:
+        - Adds the predicted pixel values to the decoded residuals to obtain the original pixel values.
+    - Frame-by-frame reconstruction ensures the decoded video matches the original video, preserving its quality.
+4. **Reconstruct Video**
+    - The reconstructed frames are written to a video file using the format specified in the header and using compression `H.264`, because the video used is `.mp4`
+    - **CONSIDERATIONS**:
+        - in order to achieve the same size of the original `video.mp4` we have to use compression, in this case using the OpenCv H.264 compression. 
+        - Even with this we do not achieve the same size (*ours: 286 KB, original: 229 KB*), but we are happy with the end result.
 --- 
-### COMPRESSION RATIOS:
+<br>
+
+### COMPRESSION RATIOS & TIMES:
 
 We use 2 videos:
 1. `movie.mp4` with 7,6 MB , `m = 8, Pos_Neg`
-- When using the OpenCv function to get the frames we got the value of the **RAW PIXELS** in RGB:
-    - knowing the video as the following specs:
-        - 1080*1920
-        - 410 frames
-        - Color ( 3 channels)
-    - we can calculate the original size:
-        1. 1080 * 1920 = 2073600 pixels/frame
-        2. 2073600 * 3 (channels) = 6220800 bytes/frame
-        3. 6220800 * 410 (frames) = 2550528000 bytes
-        4. *Original Value uncompressed* = **2.38 GB** 
-- **COMPRESSION** achieved:
-    - Compressed file = ***1.32 GB***
-        - WE ACHIEVED ***44.54 %*** of compression ratio. 
+    - When using the OpenCv function to get the frames we got the value of the **RAW PIXELS** in RGB:
+        - knowing the video as the following specs:
+            - 1080*1920
+            - 410 frames
+            - Color ( 3 channels)
+        - we can calculate the original size:
+            1. 1080 * 1920 = 2073600 pixels/frame
+            2. 2073600 * 3 (channels) = 6220800 bytes/frame
+            3. 6220800 * 410 (frames) = 2550528000 bytes
+            4. *Original Value uncompressed* = **2.38 GB** 
+    - **COMPRESSION**:
+        - Compressed file = ***1.32 GB***
+            - WE ACHIEVED ***44.54 %*** of compression ratio. 
+    - **TIMES** :
+        - **ENCODING :** *21.5216 seconds*
+        - **DECODING :** *21.989 seconds*
 
 <br>
 <br>
 
 2. `movie1.mp4` with 229 KB , `m = 8, Pos_Neg`
-- When using the OpenCv function to get the frames we got the value of the **RAW PIXELS** in RGB:
-    - knowing the video as the following specs:
-        - 270*480
-        - 410 frames
-        - Color ( 3 channels)
-    - we can calculate the original size:
-        1. 270 * 480 = 129600 pixels/frame
-        2. 129600 * 3 (channels) = 388800 bytes/frame
-        3. 388800 * 410 (frames) = 159408000 bytes
-        4. *Original Value uncompressed* = **152.1 MB** 
-- **COMPRESSION** achieved:
-    - Compressed file = ***88 MB***
-        - WE ACHIEVED ***42.14 %*** of compression ratio. 
+    - When using the OpenCv function to get the frames we got the value of the **RAW PIXELS** in RGB:
+        - knowing the video as the following specs:
+            - 270*480
+            - 410 frames
+            - Color ( 3 channels)
+        - we can calculate the original size:
+            1. 270 * 480 = 129600 pixels/frame
+            2. 129600 * 3 (channels) = 388800 bytes/frame
+            3. 388800 * 410 (frames) = 159408000 bytes
+            4. *Original Value uncompressed* = **152.1 MB** 
+    - **COMPRESSION RATIO**:
+        - Compressed file = ***88 MB***
+            - WE ACHIEVED ***42.14 %*** of compression ratio. 
+    - **TIMES** :
+        - **ENCODING :** *20.862 seconds*
+        - **DECODING :** *21.6663 seconds*
 
 ### ***Considerations***:
 - The compression ratio should be calculated based on the **original uncompressed** size (RAW PIXELS in RGB) and not the MP4 size, as the MP4 format is already compressed.
@@ -315,3 +339,79 @@ We use 2 videos:
 
 <br>
 <br>
+<br>
+
+---
+
+## T2 - Intra-Frame Video Coding
+
+### STEPS TO IMPLEMENT INTRA-FRAME VIDEO
+1. Modify the imput handling for video files
+    - use OpenCv's :
+        - `cv::VideoCapture` to load the video file,
+        - `cv::VideoCapture::read()` to extract frames and process them one by one
+        - `cv::VideoWritter` to combine frames into a video
+
+2. Encode Each frame independently
+    - treat each frame as an image and apply existing image codec
+    
+3. The header must now have differences and must have for example the number of frames
+    - here we can have various approuch like have info for each frame, like the `m` etc... or have a unique header!
+
+
+### OPTION SELECTION:
+
+```java
+COMMAND :   "-Video" arg  
+        ;
+
+arg     :   VIDEO ("-SignMag"|"-PosNeg") ("-m" NUM)* ("-q" NUM)*
+        ;
+
+VIDEO   :  path_to_video
+        ; 
+
+NUM     :    [0 9]+;
+```
+1. **COMMAND:**
+A command can be:
+    - `-Video` ***arg*** --> Command to load the Video Coding algorithm
+
+2. **arg:**
+    - ***VIDEO*** `-SignMag | -PosNeg`--> load the *VIDEO* and choose the type of encoding for **Golomb coding**:
+        - `-SignMag` ***(Sign and magnitude)***: encode the sign separately from the magnitude
+        - `-PosNeg` ***(Positive/negative interleaving)***: Use a zigzag or odd-even mapping to interleave positive and negative
+values, so all numbers map to non-negative integers.
+    - <u>***Optionally***</u>:
+        - `-m` ***NUM*** --> The **Golomb coding scheme** requires a parameter `m`, which controls the encoding length.
+            - If ***provided***, the encoding uses this fixed `m` value.
+            - If ***not provided***, the algorithm calculates an optimal `m` (**as explained before**) by:
+                1. Calculating the mean absolute residual value.
+                2. Setting \( m = 1 \) initially.
+                3. Doubling \( m \) until \( m \geq \text{mean absolute residual} \).
+        - `-q` ***NUM*** --> quantization level, which controls the trade-off between compression and quality.
+
+3. **VIDEO:**
+    - ***Path*** where the video is stored.
+
+4. **NUM:**
+    - ***Integer*** value.
+
+### COMMAND EXAMPLES:
+
+1. **Encode `video1` using a Sign and magnitude approach with optimal value for m**
+```bash
+./IntraCoding -Video "movie1.mp4" -SignMag -q 4
+```
+2. **Encode `video1` using a Sign and magnitude approach with `m` = 6**
+```bash
+./IntraCoding -Video "movie1.mp4" -SignMag -m 6 -q 4
+```
+3. **Encode `video1` using a Positive/negative interleaving approach with optimal value for m**
+```bash
+./IntraCoding -Video "movie1.mp4" -PosNeg -q 4
+```
+4. **Encode `video1` using a Positive/negative interleaving approach with `m` = 12**
+```bash
+./IntraCoding -Video "movie1.mp4" -PosNeg -m 12 -q 4
+```

@@ -14,6 +14,8 @@ public:
 
     // Main processing function
     void processVideo(const std::string& outputFile);
+    std::string getOriginalFormat(const std::string& encodedFile);
+    void reconstructVideo(const std::string& encodedFile, const std::string& outputFile);
 
 private:
     // Video-related attributes
@@ -37,6 +39,9 @@ private:
     void writeHeader(BitStream& bitStream);
     void encodeResiduals(const cv::Mat& residual, BitStream& bitStream);
     std::string extractFormat(const std::string& filePath);
+    cv::Mat reconstructFrame(const cv::Mat& residual);
+    void readHeader(BitStream& bitStream);
+
 };
 
 #endif // LOSSLESS_VIDEO_H

@@ -307,3 +307,127 @@ std::string LosslessVideo::extractFormat(const std::string& filePath) {
     }
     return "unknown";
 }
+
+std::string LosslessVideo::getOriginalFormat(const std::string& encodedFile) {
+    BitStream bitStream(encodedFile, false);
+
+    // Skip header fields until format string
+    bitStream.readBits(16); // Skip number of frames
+    bitStream.readBits(8);  // Skip coding type
+    bitStream.readBits(32); // Skip optimal m
+    bitStream.readBits(32); // Skip video width
+    bitStream.readBits(32); // Skip video height
+
+    // Read format string
+    std::string format;
+    char ch;
+    while ((ch = static_cast<char>(bitStream.readBits(8))) != '#') { // Stop at delimiter
+        format += ch;
+    }
+
+    return format; // Return extracted format
+}
+
+void LosslessVideo::reconstructVideo(const std::string& inputFile, const std::string& outputFile) {
+    BitStream bitStream(inputFile, false);
+    readHeader(bitStream); // Ensure header is parsed correctly
+
+    cv::VideoWriter writer(outputFile, cv::VideoWriter::fourcc('X', '2', '6', '4'), 30, cv::Size(width, height), true);
+    if (!writer.isOpened()) {
+        throw std::runtime_error("Failed to open video writer: " + outputFile);
+    }
+
+    std::cout << "Reconstructing video to: " << outputFile << std::endl;
+
+    GolombCoding decoder(mValue, bitStream, codingType == "POS_NEG" ? GolombCoding::POS_NEG : GolombCoding::SIGN_MAG);
+
+    for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
+        std::cout << "Reconstructing frame " << frameIndex + 1 << " of " << frameCount << std::endl;
+
+        cv::Mat residual(height, width, CV_32SC3); // Assuming color video
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                if (residual.channels() == 3) {
+                    for (int c = 0; c < 3; ++c) {
+                        residual.at<cv::Vec3i>(y, x)[c] = decoder.decode();
+                    }
+                } else {
+                    residual.at<int>(y, x) = decoder.decode();
+                }
+            }
+        }
+
+        cv::Mat reconstructedFrame(height, width, CV_8UC3); // Assuming color video
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                if (residual.channels() == 3) {
+                    for (int c = 0; c < 3; ++c) {
+                        int predicted = medianEdgePredictor(reconstructedFrame, x, y, c);
+                        int value = predicted + residual.at<cv::Vec3i>(y, x)[c];
+                        reconstructedFrame.at<cv::Vec3b>(y, x)[c] = cv::saturate_cast<uchar>(value);
+                    }
+                } else {
+                    int predicted = medianEdgePredictor(reconstructedFrame, x, y, -1);
+                    int value = predicted + residual.at<int>(y, x);
+                    reconstructedFrame.at<uchar>(y, x) = cv::saturate_cast<uchar>(value);
+                }
+            }
+        }
+
+        writer.write(reconstructedFrame);
+    }
+
+    bitStream.close();
+    writer.release();
+    std::cout << "Reconstructed video saved to: " << outputFile << std::endl;
+}
+
+
+cv::Mat LosslessVideo::reconstructFrame(const cv::Mat& residual) {
+    cv::Mat reconstructedFrame(residual.size(), CV_8UC3);
+
+    for (int y = 0; y < residual.rows; ++y) {
+        for (int x = 0; x < residual.cols; ++x) {
+            for (int c = 0; c < 3; ++c) {
+                int predicted = medianEdgePredictor(reconstructedFrame, x, y, c);
+                int reconstructedValue = residual.at<cv::Vec3i>(y, x)[c] + predicted;
+
+                // Clip the value to the valid range [0, 255]
+                reconstructedFrame.at<cv::Vec3b>(y, x)[c] = std::clamp(reconstructedValue, 0, 255);
+            }
+        }
+    }
+
+    return reconstructedFrame;
+}
+
+void LosslessVideo::readHeader(BitStream& bitStream) {
+    // Read the number of frames
+    frameCount = bitStream.readBits(16);
+    
+    // Read the coding type
+    int codingTypeFlag = bitStream.readBits(8);
+    codingType = (codingTypeFlag == 1) ? "POS_NEG" : "SIGN_MAG";
+
+    // Read the optimal m
+    optimalM = bitStream.readBits(32);
+
+    // Read video width and height
+    width = bitStream.readBits(32);
+    height = bitStream.readBits(32);
+
+    // Read the format string
+    format.clear();
+    char ch;
+    while ((ch = static_cast<char>(bitStream.readBits(8))) != '#') {
+        format += ch;
+    }
+
+    std::cout << "Header Information:\n"
+              << "Frame Count: " << frameCount << "\n"
+              << "Coding Type: " << codingType << "\n"
+              << "Optimal m: " << optimalM << "\n"
+              << "Video Width: " << width << "\n"
+              << "Video Height: " << height << "\n"
+              << "Format: " << format << "\n";
+}
