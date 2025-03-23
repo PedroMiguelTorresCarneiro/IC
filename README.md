@@ -2,10 +2,10 @@
 
 ## GROUP 12
 
-| Project | Report link | Grade |
-|-----|-------|------|
-|*PROJECT 1* | [Project 1 - README](/project1/readme.md) | 18 |
-|*PROJECT 2* | [Project 2 - README](/project2/README.md) | -- |
+| Project | Report link | Grade | Comments |
+|-----|-------|------|-----|
+|*PROJECT 1* | [Project 1 - README](/project1/readme.md) | 18 | all tasks done |
+|*PROJECT 2* | [Project 2 - README](/project2/README.md) | 15 | incomplete: 2 missing tasks |
 
 
 ---
